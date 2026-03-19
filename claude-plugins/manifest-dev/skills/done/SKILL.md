@@ -70,6 +70,25 @@ Manifest execution verified complete.
 3. **Adapt detail to complexity** - Simple task = condensed output. Complex task = full hierarchy.
 4. **Called by /verify only** - /done is the final step after /verify confirms all criteria pass. If the execution log doesn't show verification, something went wrong upstream.
 
+## ADR Finalization
+
+When the manifest's Intent & Context section contains an `**ADR:**` field, finalize ADRs after producing the completion summary.
+
+Generate individual ADR files from the draft into the output directory specified in the manifest's ADR metadata (create the directory if needed). Each DRAFT-NNN entry becomes a file at `NNN-kebab-case-title.md` containing Title, Status, Context, Decision, Alternatives Considered, Consequences, and Source sections per `skills/define/references/ADR_FORMAT.md`.
+
+**Constraints**: If the draft file is missing or malformed, warn in the summary and continue — do not fail /done. If no DRAFT-NNN entries exist, note "No ADR-worthy decisions identified" in the summary.
+
+Append to the completion summary:
+
+```markdown
+### Architecture Decision Records
+| # | Title | File |
+|---|-------|------|
+| 001 | [title] | [path] |
+
+ADRs written to: [output-directory]
+```
+
 ## Collaboration Mode
 
 In team mode, /done output goes through the calling context (/verify → /do → lead). No special routing needed — just produce the summary as normal.

@@ -99,9 +99,9 @@ The manifest has three moving parts:
 
 | Skill | Description |
 |-------|-------------|
-| `/define` | Interviews you, builds an executable manifest with verification criteria. `--interview minimal\|autonomous\|thorough` controls questioning depth (default: thorough). |
+| `/define` | Interviews you, builds an executable manifest with verification criteria. `--interview minimal\|autonomous\|thorough` controls questioning depth (default: thorough). `--adr <path>` exports decisions as Architecture Decision Records. |
 | `/do` | Works through the manifest autonomously, verifies everything passes |
-| `/auto` | End-to-end autonomous: `/define --interview autonomous` → auto-approve → `/do` in one command. Supports `--mode` pass-through to `/do`. |
+| `/auto` | End-to-end autonomous: `/define --interview autonomous` → auto-approve → `/do` in one command. Supports `--mode` and `--adr` pass-through. |
 | `/verify` | Runs all verifiers in parallel (you rarely call this directly; `/do` handles it) |
 | `/done` | Prints what got done and what was verified |
 | `/escalate` | When something's blocked, surfaces the issue for you to decide |
@@ -118,6 +118,17 @@ The manifest has three moving parts:
 | **efficient** | Haiku for verification, skips reviewer agents, sequential, max 1 fix loop |
 
 See `skills/do/references/BUDGET_MODES.md` for full routing table and escalation rules.
+
+### ADR Export
+
+`/define` and `/auto` support `--adr <path>` to produce Architecture Decision Records alongside the manifest. ADRs capture significant architectural decisions — trade-off resolutions, scope choices, integration approaches — with their context, alternatives, and consequences.
+
+```
+/define "add rate limiting to the API" --adr docs/adr/
+/auto "add rate limiting" --adr docs/adr/
+```
+
+ADR generation is incremental: `/define` captures decisions from the interview, `/do` adds implementation decisions, `/done` writes final ADR files in MADR format to the specified directory. Not every decision becomes an ADR — only those with downstream architectural impact. See `skills/define/references/ADR_FORMAT.md` for the decision-worthiness criteria and format.
 
 ### Task-Specific Guidance
 

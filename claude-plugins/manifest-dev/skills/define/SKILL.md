@@ -22,9 +22,11 @@ Output: `/tmp/manifest-{timestamp}.md`
 
 ## Input
 
-`$ARGUMENTS` = task description, optionally with context/research and `--interview <level>`
+`$ARGUMENTS` = task description, optionally with context/research, `--interview <level>`, and `--adr <path>`
 
 Parse `--interview` from arguments (can appear anywhere). Valid values: `minimal`, `autonomous`, `thorough`. Default: `thorough`. Invalid value → error and halt: "Invalid interview style '<value>'. Valid styles: minimal | autonomous | thorough"
+
+Parse `--adr <path>` from arguments (takes a directory path). When present, enables ADR generation — final ADR files will be written to the specified directory by /done. See ADR Generation section.
 
 If no arguments provided, ask: "What would you like to build or change?"
 
@@ -346,6 +348,7 @@ Three categories, each covering **output** or **process**:
 - **Goal:** [High-level purpose]
 - **Mental Model:** [Key concepts to understand]
 - **Mode:** efficient | balanced | thorough *(optional, default: thorough — controls verification intensity during /do)*
+- **ADR:** [output-path] | Draft: /tmp/adr-draft-{timestamp}.md *(only when --adr specified)*
 
 ## 2. Approach (Complex Tasks Only)
 *Initial direction, not rigid plan. Provides enough to start confidently; expect adjustment when reality diverges.*
@@ -472,6 +475,16 @@ Before asking for approval, output a scannable summary that enables full manifes
 
 When `$ARGUMENTS` contains a `TEAM_CONTEXT:` block, read `references/COLLABORATION_MODE.md` for full collaboration mode instructions. If no `TEAM_CONTEXT:` block is present, ignore this — all other sections apply as written.
 
+## ADR Generation
+
+When `--adr` is present, generate Architecture Decision Records alongside the manifest. If ADR generation fails at any point, warn and continue — the manifest is the primary output.
+
+**During the interview**: Tag ADR-worthy decisions in the discovery log with an `ADR:` prefix. Read `references/ADR_FORMAT.md` for decision-worthiness criteria — not every decision warrants an ADR. Focus on architecture choices, trade-off resolutions, scope decisions with rationale, and key constraint decisions where alternatives were considered.
+
+**At manifest completion**: Before presenting the summary for approval, synthesize tagged decisions into an ADR draft file at `/tmp/adr-draft-{timestamp}.md`. Read `references/ADR_FORMAT.md` for the draft file format. Each ADR-worthy decision becomes a DRAFT-NNN entry with context, decision, alternatives, and consequences drawn from the discovery log. If no decisions meet the ADR-worthiness threshold, create the draft file with a note that no ADR-worthy decisions were identified.
+
+**In the manifest**: Add `**ADR:** [output-path] | Draft: /tmp/adr-draft-{timestamp}.md` to the Intent & Context section, where `[output-path]` is the directory specified by `--adr`. This enables /do and /done to detect ADR context from the manifest without requiring `--adr` to be re-specified.
+
 ## Complete
 
 /define ends here. Output the manifest path and stop.
@@ -480,6 +493,12 @@ When `$ARGUMENTS` contains a `TEAM_CONTEXT:` block, read `references/COLLABORATI
 Manifest complete: /tmp/manifest-{timestamp}.md
 
 To execute: /do /tmp/manifest-{timestamp}.md [log-file-path if iterating]
+```
+
+When `--adr` was specified, also output the ADR draft path:
+
+```text
+ADR draft: /tmp/adr-draft-{timestamp}.md (will be finalized by /done)
 ```
 
 If this was an iteration on a previous manifest that had an execution log, include the log file path in the suggestion.

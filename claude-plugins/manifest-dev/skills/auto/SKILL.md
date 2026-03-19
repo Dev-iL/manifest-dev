@@ -12,17 +12,17 @@ Chain `/define` and `/do` into a single autonomous flow. The full /define proces
 
 ## Input
 
-`$ARGUMENTS` = task description (REQUIRED), optionally with `--mode efficient|balanced|thorough`
+`$ARGUMENTS` = task description (REQUIRED), optionally with `--mode efficient|balanced|thorough` and `--adr <path>`
 
 If `--interview` is present in arguments: error and halt: "--interview is not supported by /auto. /auto always uses autonomous mode. Use /define for custom interview styles."
 
-If no arguments provided: error and halt: "Usage: /auto <task description> [--mode efficient|balanced|thorough]"
+If no arguments provided: error and halt: "Usage: /auto <task description> [--mode efficient|balanced|thorough] [--adr <path>]"
 
-Parse `--mode` from arguments if present — this will be passed to /do. The remaining text after flag extraction is the task description.
+Parse `--mode` and `--adr <path>` from arguments if present. `--mode` will be passed to /do. `--adr` will be passed to /define (and /do auto-detects from manifest metadata). The remaining text after flag extraction is the task description.
 
 ## Flow
 
-1. **Define** — Invoke the manifest-dev:define skill with: "$TASK_DESCRIPTION --interview autonomous"
+1. **Define** — Invoke the manifest-dev:define skill with: "$TASK_DESCRIPTION --interview autonomous" (append `--adr <path>` if --adr was specified in the original /auto arguments)
 
 2. **Auto-approve** — When /define presents the Summary for Approval, output the summary for user visibility but do not wait for user response. Treat the manifest as approved and proceed immediately. If the user is nevertheless asked for approval, proceed as if approved.
 

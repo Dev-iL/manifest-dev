@@ -63,6 +63,14 @@ Externalize progress to survive context loss. The log IS the disaster recovery m
 
 **Todos**: Create from manifest (deliverables → ACs). Start with execution order from Approach (adjust if dependencies require). Update todo status after logging (log first, todo second).
 
+## ADR Updates
+
+ADR mode is active when the manifest's Intent & Context section contains an `**ADR:**` field (set by /define when `--adr` was specified). /do inherits ADR context from the manifest automatically — no separate flag needed.
+
+When ADR mode is active and an ADR draft file exists (path from manifest metadata): update the draft when approach adjustments or trade-off applications occur during execution. New decisions made during implementation that meet ADR-worthiness criteria (see `skills/define/references/ADR_FORMAT.md`) are appended as new DRAFT-NNN entries. If the ADR draft file is missing, create a fresh one from the manifest's Approach and Trade-off sections.
+
+If ADR updates fail, warn and continue — execution is the primary concern.
+
 ## Collaboration Mode
 
 When `$ARGUMENTS` contains a `TEAM_CONTEXT:` block, read `references/COLLABORATION_MODE.md` for full collaboration mode instructions. If no `TEAM_CONTEXT:` block is present, ignore this — all other sections apply as written.
