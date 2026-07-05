@@ -111,6 +111,10 @@ repaired, since every repair is a delta each judgment gate re-reads; `/done` and
 surface them for the user. A bar never moves down on the executor's judgment, and a summary
 claim is not evidence.
 
+## Shared-worktree hazard
+
+Criteria in the same phase launch in parallel, sharing the orchestrator's working directory. A `verify.prompt` that requires an actual checked-out branch (not just `git diff`/`git show` inspection) should isolate via a disposable `git worktree add` rather than mutating the shared tree in place with `git checkout` — a sibling criterion's concurrent reads can race against it. `git worktree add` fails outright (not a race) if a sibling already holds that same branch checked out in its own worktree — when that happens, or when a dedicated worktree isn't otherwise practical, give the criterion its own `phase:` instead. See `define/tasks/CODING.md` → "Defaults".
+
 ## The execution log
 
 Unless `--no-log`, keep an append-only log at `~/.manifest-dev/logs/do-<name>-<hash>.md`,
