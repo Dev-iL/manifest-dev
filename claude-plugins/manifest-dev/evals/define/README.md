@@ -7,8 +7,13 @@ which would therefore make every case a vanity win.
 Run it from the plugin directory:
 
 ```bash
-claude plugin eval . --tag define --ablation with-without --judge-model opus --allow-tools Write Bash -j 8
+claude plugin eval . --tag define --ablation with-without --judge-model opus --allow-tools Write Bash --scaffold -j 8
 ```
+
+`--scaffold` runs the `scaffold.sh` that `d16` declares in its `case.yaml`: it starts from a saved
+Manifest beside a small repository. Without it, the case runs against an empty directory and
+measures nothing. Only pass it for case files from this
+repository: a scaffold is bash that runs as you.
 
 The headline number is **Δ**, the with-plugin score minus the no-plugin baseline. Read the
 figure-out suite's README (`../README.md`) before trusting a Δ from this one: its rules on
@@ -21,7 +26,49 @@ opus judge matched known answers on a clean Manifest and on a copy with an unsta
 ungated rule, and an invented threshold planted in it. Keep opus here unless that check is
 repeated with a cheaper judge.
 
+## First measurement of `d11`–`d17` — 2026-10-12
+
+CLI 2.1.296, agent `claude-opus-5-5`, judge `claude-opus-5-5`, 6 runs per arm, skill at
+`4d7b988` (`d16`'s row is its re-run at `802e81e`, after the fixes below). 84 runs, $127, about $1.52 a run.
+These cases only; `d01`–`d10` are not re-recorded yet.
+
+| Case | With | Without | Δ | What separates the arms |
+|---|---|---|---|---|
+| `d11-experienced-wait` | 0.92 | 0.42 | +0.50 | shared graders only; `gates-the-experienced-wait` 6/6 in both arms |
+| `d12-true-not-present` (held out) | 0.92 | 0.38 | +0.54 | shared graders only; `gates-truth-and-edges` 6/6 in both arms |
+| `d13-owner-keeps-the-yes` | 1.00 | 0.57 | +0.43 | shared graders only; both case graders 6/6 in both arms |
+| `d14-small-but-risky` | 0.96 | 0.50 | +0.46 | shared graders only; `keeps-the-defect-checks` 6/6 in both arms |
+| `d15-amend-outside-delegation` (held out) | 1.00 | 1.00 | 0.00 | nothing: both arms keep the rule and raise the blocker on every run |
+| `d16-approved-means-handoff` | 1.00 | 0.33 | +0.67 | `stops-at-the-handoff` 6/6 against 1/6; `layout-unchanged` 6/6 against 3/6 |
+| `d17-taste-in-encoding` | 0.93 | 0.63 | +0.30 | `follows-and-cites-the-entry` 6/6 against 0/6; `flags-the-users-call` 6/6 against 3/6 |
+
+- **`d16` found a defect, now fixed.** At `4d7b988` every plugin run scored 0: after
+  "looks good" the run executed the Manifest. Two causes: `define` never said to stop after its
+  handoff, whose lines for callers read as an instruction, and the outer agent called `/do` on a
+  plan's approval without loading `define` at all. `define` now stops after the handoff, and
+  `/do` runs only when execution was asked for. The re-run passed every plugin run. `d16`'s
+  seeded Manifest also lacked the ceiling invariant, so `ceiling-verbatim` could not pass; it
+  carries it now.
+- **The plugin runs stopped without loading `define` on the `d16` re-run** (`skill-fired` 0/6,
+  so `handoff-line` 0/6): the `/do` description now says it is not for an approved plan, and the
+  agent answered from that. The behavior the case scores held on every run.
+- **`d11`–`d15` were removed after this run.** Each case's own graders passed every run in both
+  arms, so the base model already does what it targets: an experienced wait gated on the device,
+  edge cases in a data summary, the owner's yes kept, a defect review on a small money change, a
+  binding rule kept through an unattended amendment. `d11`–`d14` separated the arms only on the
+  shared graders, which `d01`–`d10` already measure, and `d15` on nothing. At about $1.52 a run
+  they bought no signal the suite lacked. Rebuild one only if the plugin is seen to regress there.
+
 ## Baseline — 2026-10-06, after the threshold rubric fix
+
+**This baseline predates a change that edited `define` and this suite.** `define` now states the
+shared rule for the user's calls (two careful people with the same evidence could reasonably
+decide differently, and the difference would matter to the user), checks the user's Taste entries
+at those calls, marks an `ASM-*` entry that records one, and offers a Taste entry when the user
+reverses an earlier call and says why. The same change added `d16` and `d17` and gave `d05` a scored
+grader, `keeps-other-requirements`, moved from the retired `evals-define/` pilot. `d05`'s recorded
+number no longer compares: it now carries one more scored grader. Re-record both arms before
+measuring against this.
 
 Report `results/define-baseline-20261006b`. Skill at `62481855`, graders as committed with this
 section, CLI 2.1.289, agent `claude-opus-5-5`, judge `claude-opus-5-5`, 6 runs per arm, $189. It
@@ -245,20 +292,43 @@ definition of done for an executor with no other context.
 | `d08-neg-small` | **Negative:** mechanical rename | `proportionate`, settleable |
 | `d09-amend-widen` | Amendment: steering names an instance an existing gate should have claimed | `widens-not-siblings` |
 | `d10-loop-bait` | Open-ended absolutes ("excellent", "nothing missing") with the anchors supplied | `bounds-the-open-ends`, settleable |
+| `d16-approved-means-handoff` | Interactive: the user approves the digest with "looks good" | `stops-at-the-handoff`, `layout-unchanged` · measured 2026-10-12 |
+| `d17-taste-in-encoding` | Taste entries in memory: a narrow one that settles an encoding call, a broad one that tempts dropping a review on a payment step, and a user's call none bears on | `follows-and-cites-the-entry`, `flags-the-users-call`, `broad-entry-drops-nothing`, `no-taste-offer`, `no-taste-write`, `no-taste-edit`, shared three · measured 2026-10-12 |
+
+"Shared three" is `binding-lives-in-gates`, `gates-are-settleable`, and `no-invented-thresholds`.
+`d05` also carries `keeps-other-requirements`: resolving the conflict must not lower or drop
+another stated requirement without saying so.
+
+Every case that writes a spec also carries two display-only regex graders, never scored:
+`ceiling-verbatim` (the ceiling invariant appears verbatim in `manifest.md`; a test ties its
+pattern to `SCHEMA.md`) and `handoff-line` (the last message names the Manifest with a
+`Manifest complete:` line). They show schema conformance without counting it as uplift, since
+the no-plugin arm has no schema to follow.
 
 `d07` and `d08` are the over-planning floor. Keep at least one through any tuning that pushes
 `define` to encode harder.
 
 ## Held-out split
 
-`d04`, `d06`, and `d08` are held out from tuning: one binding-rule case, one anchoring case, one
-negative. The 2026-10-05 hill-climb used this split; an analyzer reads only the other seven.
+`d04`, `d06`, and `d08` are held out from tuning: one binding-rule case, one anchoring case, and one
+negative. The 2026-10-05 hill-climb used this split; an analyzer reads only the other nine.
 
 ## Known limits
 
-- **No repository.** Every prompt describes the codebase inline and says it is unavailable. A
-  case that needs `define` to read real code would degenerate in both arms.
-- **One turn of the interview.** The suite measures unattended encoding. Interview quality
-  (which questions `define` surfaces, which it auto-decides) is out of scope.
-- **The amendment manifest is inline.** Seeding files before a run is undocumented in the CLI,
-  so `d09` asks the agent to save the pasted manifest before amending it.
+- **A case gets files only through its scaffold.** Most prompts describe the codebase inline and
+  say it is unavailable. `d16` seeds a Manifest and a small repository with `scaffold.sh`. `d09` predates scaffolds and still asks the agent to save a pasted manifest.
+- **One turn of the interview.** The suite measures unattended encoding, plus one interactive
+  turn after approval (`d16`). Interview order, re-asking settled ground, and the digest's form
+  need a scripted second turn the harness does not run, so they are out of scope.
+- **No memory file loads in the sandbox.** `d17` puts the user's memory file in
+  `append_system_prompt`.
+- **Not covered, by choice.** Babysit mode needs a GitHub stand-in, and multi-repo Manifests need
+  two repositories. Handing off to figure-out when understanding is missing has shown no failure
+  and only the plugin arm can do it. Composing writing registers and visual gates is partly
+  covered by `d06` and `d10`. Checking that every gate declares its kind and that each `(auto)`
+  item pairs with an `ASM-*` entry needs a judge over the whole Manifest on every run, which
+  costs more than it would show; `ceiling-verbatim` covers the one schema element that ships
+  verbatim. Raising a conflict and flagging the user's call already have `d05` and `d17`; the
+  reversal offer in `define` is checked by reading its text. A stale Intent after an amendment,
+  and a reversed decision left without a gate, have a guard in the skill and `d09` covers
+  amendment. Build one when a miss shows in use.

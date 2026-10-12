@@ -11,6 +11,13 @@ SHARED = [
     "define/*/graders/gates-are-settleable.md",
     "define/*/graders/binding-lives-in-gates.md",
     "*/graders/turn-discipline.md",
+    "*/graders/autonomous-flag-passed.md",
+    "**/graders/skill-fired.md",
+    "define/*/graders/ceiling-verbatim.md",
+    "define/*/graders/handoff-line.md",
+    "**/graders/no-taste-offer.md",
+    "**/graders/no-taste-write.md",
+    "**/graders/no-taste-edit.md",
 ]
 
 
