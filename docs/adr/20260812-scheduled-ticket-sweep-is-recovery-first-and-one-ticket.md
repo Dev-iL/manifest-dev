@@ -51,6 +51,9 @@ controller is introduced.
 - Event triggers are still useful when low latency or parallel start matters.
 - The adapter must expose a stable automation claim identity so recovery candidates are recognizable.
 
+## Enforced by
+`tests/test_ticket_automation_prompts.py` — `test_sweep_tickets_recovers_first_and_runs_at_most_one` fails if sweep-tickets stops recovering a Ticket claimed by its own automation identity first, drops a readiness filter, changes a claim while it selects, or selects a second Ticket. Also `tests/test_ticket_automation_prompts.py` — `test_ticket_execution_skills_ship_on_every_distribution` fails if the distributed copy loses recovery first or the one-Ticket limit.
+
 ## Source
 - Session: unattended Ticket automation design (2026-08-12)
 - Related: 20260812-trigger-adapters-enforce-per-ticket-single-flight, 20260812-ticket-recovery-uses-coherent-pushed-checkpoints, 20260812-human-assignment-pauses-auto-ticket-execution

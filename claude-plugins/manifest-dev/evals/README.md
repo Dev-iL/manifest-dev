@@ -17,10 +17,12 @@ so cases that need a repository, project docs, or a context file find them in th
 directory. Without it, those cases run against an empty directory and measure nothing. Only pass
 it for case files from this repository: a scaffold is bash that runs as you.
 
-Two cases test behavior that exists only with the plugin — offering a Taste entry, and not
-offering one for a discipline every session owes — so the no-plugin arm passes or fails them by
-construction. They carry the tag `figure-out-plugin-only` instead of `figure-out` and run on the
-plugin arm alone:
+Eight cases test behavior that exists only with the plugin: offering a Taste entry and not
+offering one for a discipline every session owes (`27`, `28`), offering a setup update and
+offering none to a current project (`30`, `45`), a record naming what enforces it (`31`), the
+verification surface's stale marker (`36`), and recall of earlier sessions only where they bear
+on the work (`43`, `46`). The no-plugin arm passes or fails them by construction. They carry the
+tag `figure-out-plugin-only` instead of `figure-out` and run on the plugin arm alone:
 
 ```bash
 claude plugin eval . --tag figure-out-plugin-only --ablation none --judge-model opus --allow-tools Write Bash --scaffold -j 8
@@ -35,6 +37,30 @@ The headline number is **Δ** — with-plugin score minus the no-plugin baseline
 **Judge with `opus`.** A sonnet-tier judge disagreed with itself across its three votes on the same
 output and failed outputs an opus judge passed unanimously; see the 2026-10-06 baseline. Every
 number before that baseline is sonnet-judged and does not compare with it.
+
+## Scope and statuses
+
+These two suites are this repository's behavior check for its prompts. They cover `figure-out`
+and `define` only, on purpose: a suite run is expensive, and those two skills shape every
+Manifest the others work from. A change to another skill is checked by tracing its text against
+the situations it changes, and adds no case here.
+
+Each case carries one status:
+
+- `unmeasured` — written but never run. Not proof of anything.
+- `measured` — run, with the date and the result, recorded in a dated results section later
+  in this file.
+- `stale` — a prompt it covers changed after it was measured, so its numbers no longer hold. A
+  bold dated line, such as *Every recorded number in this file is stale as of 2026-10-13*,
+  marks every number recorded before that date.
+
+A change to a prompt that a case covers updates that case where the change affects what it tests, and
+either runs the measured cases or marks them stale; unmeasured cases stay unmeasured.
+
+A case shows `unmeasured`, in its row or in the heading of the table that lists it, until its
+first run. A case without it was measured, and the bold stale line under the case table says
+whether its number still holds.
+`tests/test_eval_cases.py` fails when a case directory has no row, or a row has no directory.
 
 ## Running on macOS
 
@@ -106,6 +132,37 @@ from a discipline `SKILL.md` explicitly states.
 | `27-taste-offers` | Taste, plugin arm only | At the session-end sweep, offer an entry for a stated preference and for an explained reversal, built on the user's reason; write nothing before a yes | tuning · unmeasured |
 | `28-universal-not-taste` | Taste, plugin arm only | Make no Taste offer for a discipline every session owes | held out · unmeasured |
 | `29-ratified-entry-lands` | Taste, repository | After the user's yes, write the entry inside the `## Taste` section and change nothing else in the file | tuning · unmeasured |
+| `30-update-offer-for-older-setup` | docs, repository, plugin arm only | Offer the setup update for a project set up before surfaces versions existed — only what the newer setup adds, never a redo of what it has | unmeasured |
+| `31-record-names-what-enforces-it` | docs, repository, plugin arm only | A recorded decision names what enforces it, or why nothing can | unmeasured |
+| `32-reads-the-verification-surface` | autonomous, repository | Plan the check through the project's verification surface and treat an `unverified` entry as not yet proof | unmeasured |
+| `33-no-verification-surface` | autonomous, repository | With no way to check the product, plan a durable one scoped to what the change touches | unmeasured |
+| `34-checking-a-skill-change` | autonomous, repository | Check a skill change by behavior cases, and note which recorded numbers go stale | unmeasured |
+| `35-checking-a-readme-change` | autonomous, repository | Check a document change by the tasks its reader comes to do | unmeasured |
+| `36-marks-drift-it-wont-fix` | autonomous, repository, plugin arm only | Mark an untouched drifting map entry stale with a dated line; leave touched entries for the work | unmeasured |
+| `37-correction-becomes-a-lock` | press, repository | Turn a stated invariant into a check with its kind and scope, not a comment | unmeasured |
+| `38-stated-rule-conflicts-with-a-record` | autonomous, repository | Raise a requested rule's conflict with a recorded decision before locking it | unmeasured |
+| `39-one-off-mistake` | negative, repository | Call a one-off a one-off; no check aimed at a single sentence | unmeasured |
+| `40-shape-before-build` | autonomous, repository | Sketch the shape, compare a second one, and settle one owner for shared state | unmeasured |
+| `41-hand-synced-list` | autonomous, repository | Derive one list from the other, or check they agree, instead of editing both by hand | unmeasured |
+| `42-one-line-fix` | negative, repository | No design ceremony for a typo | unmeasured |
+| `43-recalls-earlier-work` | autonomous, repository, plugin arm only | Bring in this repository's earlier ruling as a dated lead; ignore another repository's log | unmeasured |
+| `44-debt-on-the-path` | autonomous, repository | Offer recorded debt on the change's path as a behavior-preserving first step | unmeasured |
+| `45-current-setup-offers-nothing` | docs, repository, plugin arm only | Offer no setup update to a project that records the newest surfaces version, and do not re-offer the items it declined | unmeasured |
+| `46-general-question-skips-recall` | autonomous, repository, plugin arm only | Open no earlier session log for a general question the repository's history cannot bear on | unmeasured |
+
+Cases `30` to `46` were written on 2026-10-13 and have never been run. Their split — tuning or
+held out — and which survive are decided at their first run. `30` uses a project set up before
+surfaces versions existed: until a second surfaces version ships, that is the only way a project
+can be behind. It tests the update offer for a project with no recorded version, graded on
+offering what v1 adds and not a redo. `45` tests the other branch of the recorded-version path:
+a project that records the newest version and declined some of its items gets no offer at all. A
+project that records an older version gets its own case in the change that adds v2, as the
+repository's context file requires. `30`, `31`, `36`, `43`, `45`, and `46` exist only with the
+plugin and run on the plugin arm alone, like `27` and `28`.
+
+**Every recorded number in this file is stale as of 2026-10-13.** That change edited figure-out's
+spine, its docs-mode and autonomous references, and its task files, so no earlier result measures
+the skill as it ships now. The next baseline replaces them.
 
 Headroom per case comes from the current baseline, not from this table. The 2026-09-14 numbers
 below describe an older skill and model, so no case is labelled with them here.
@@ -114,7 +171,7 @@ below describe an older skill and model, so no case is labelled with them here.
 that always digs in fails `05`. No constant policy passes both.
 
 The cases from `17` on were added in one change and have never been run: their headroom, noise,
-and whether either arm already passes them are unknown. The first both-arm run decides which stay,
+and whether either arm already passes them are unknown. Their first run decides which stay,
 under the rules below. Their pairs: `17` mirrors `08` (agreement without a named change against an
 authorized change); `27` mirrors `28` (offer an entry against offer none); `25` and `26` are the
 same three-call shape, unattended and interactive; and `24` is the held-out witness for `23`'s

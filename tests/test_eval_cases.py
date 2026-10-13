@@ -8,6 +8,7 @@ schema; when the CLI accepts a new key, add it here in the same change that firs
 
 from __future__ import annotations
 
+import os
 import re
 import subprocess
 import tempfile
@@ -116,10 +117,16 @@ def test_graders_use_only_their_types_keys(case: Path) -> None:
 
 @pytest.mark.parametrize("script", SCAFFOLDS, ids=lambda p: _case_id(p.parent))
 def test_scaffold_runs_in_an_empty_directory(script: Path) -> None:
-    with tempfile.TemporaryDirectory() as workdir:
+    # The harness runs a scaffold with HOME set to the run's own temporary home, and some
+    # scaffolds write fixture logs there; the user's real HOME must never receive them.
+    with (
+        tempfile.TemporaryDirectory() as workdir,
+        tempfile.TemporaryDirectory() as home,
+    ):
         result = subprocess.run(
             ["bash", str(script)],
             cwd=workdir,
+            env={**os.environ, "HOME": home},
             capture_output=True,
             text=True,
             timeout=SCAFFOLD_LIMIT_SECONDS,
@@ -129,6 +136,7 @@ def test_scaffold_runs_in_an_empty_directory(script: Path) -> None:
         assert any(Path(workdir).iterdir()), "scaffold wrote nothing"
 
 
+# Holds the decision in docs/adr/20260728-bound-the-acceptance-contract-from-above.md.
 def test_ceiling_grader_matches_the_schemas_ceiling() -> None:
     copies = sorted(EVALS.glob("define/*/graders/ceiling-verbatim.md"))
     assert copies
@@ -148,3 +156,67 @@ def test_rubrics_quote_their_cases_current_request() -> None:
         if " ".join(quoted.split()) != " ".join(body.split()):
             stale.append(_case_id(grader.parent.parent))
     assert not stale, f"rubric request differs from prompt.md: {stale}"
+
+
+HOME_WRITERS = [
+    p for p in SCAFFOLDS if ".manifest-dev" in p.read_text(encoding="utf-8")
+]
+
+
+@pytest.mark.parametrize("script", HOME_WRITERS, ids=lambda p: _case_id(p.parent))
+def test_scaffold_writing_home_refuses_a_home_with_logs(script: Path) -> None:
+    # Run by hand without a scratch HOME, such a scaffold would plant fixture logs among the
+    # user's own, where recall reads them as real history.
+    with (
+        tempfile.TemporaryDirectory() as workdir,
+        tempfile.TemporaryDirectory() as home,
+    ):
+        logs = Path(home, ".manifest-dev", "logs")
+        logs.mkdir(parents=True)
+        (logs / "existing.md").write_text("# a real session\n", encoding="utf-8")
+        result = subprocess.run(
+            ["bash", str(script)],
+            cwd=workdir,
+            env={**os.environ, "HOME": home},
+            capture_output=True,
+            text=True,
+            timeout=SCAFFOLD_LIMIT_SECONDS,
+            check=False,
+        )
+        assert result.returncode != 0, "ran over a HOME that already holds logs"
+        assert "scratch HOME" in result.stderr
+        assert [p.name for p in logs.iterdir()] == [
+            "existing.md"
+        ], "wrote into the user's logs"
+        assert not any(Path(workdir).iterdir()), "wrote fixtures before refusing"
+
+
+CASE_ROW = re.compile(r"^\| `([^`]+)` \|", re.MULTILINE)
+
+
+def _case_dirs(suite: Path) -> set[str]:
+    return {case.name for case in CASES if case.parent == suite}
+
+
+def _case_table_rows(readme: Path) -> set[str]:
+    # Case tables sit under headings that start with "## Cases"; other tables in the same
+    # README name graders or prompts, not cases.
+    sections = re.split(r"^## ", readme.read_text(encoding="utf-8"), flags=re.MULTILINE)
+    return {
+        name
+        for section in sections
+        if re.match(r"Cases\b", section)
+        for name in CASE_ROW.findall(section)
+    }
+
+
+# Holds the decision in docs/adr/20261013-runs-build-and-maintain-a-project-verification-surface.md.
+@pytest.mark.parametrize(
+    "suite", [EVALS, EVALS / "define"], ids=["figure-out", "define"]
+)
+def test_suite_readme_lists_exactly_its_cases(suite: Path) -> None:
+    # The README is the suite's index and carries each case's status; a case missing from it
+    # has no status, and a row for a removed case points at nothing.
+    dirs, rows = _case_dirs(suite), _case_table_rows(suite / "README.md")
+    assert not dirs - rows, f"cases with no README row: {sorted(dirs - rows)}"
+    assert not rows - dirs, f"README rows with no case: {sorted(rows - dirs)}"

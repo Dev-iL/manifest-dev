@@ -15,9 +15,11 @@ Manifest beside a small repository. Without it, the case runs against an empty d
 measures nothing. Only pass it for case files from this
 repository: a scaffold is bash that runs as you.
 
-The headline number is **Δ**, the with-plugin score minus the no-plugin baseline. Read the
-figure-out suite's README (`../README.md`) before trusting a Δ from this one: its rules on
-decomposing Δ by arm, the noise floor, and changing graders apply here unchanged.
+This suite's scope and the meaning of each case's status are in the figure-out suite's README
+(`../README.md`, *Scope and statuses*). The headline number is **Δ**, the with-plugin score minus
+the no-plugin baseline. Read the figure-out suite's README (`../README.md`) before trusting a Δ
+from this one: its rules on decomposing Δ by arm, the noise floor, and changing graders apply here
+unchanged.
 
 **The judge is opus, not sonnet.** The CLI's judge must reply with one word, PASS or FAIL, with no
 room to reason on the page. On a 20k-character Manifest, a sonnet judge failed whole-document
@@ -25,6 +27,19 @@ checks it passes when allowed to reason: a sound Manifest scored FAIL on nearly 
 opus judge matched known answers on a clean Manifest and on a copy with an unstable gate, an
 ungated rule, and an invented threshold planted in it. Keep opus here unless that check is
 repeated with a cheaper judge.
+
+## Cases added 2026-10-13 — unmeasured
+
+| Case | Discipline under test |
+|---|---|
+| `d18-map-gate` | A change touching a mapped feature gates that its verification-surface entry is updated and exercised live |
+| `d19-workaround-comment` | A workaround comment in touched code becomes a refactor target, not a deletion |
+| `d20-preparatory-slice` | When the touched area resists the change, a behavior-preserving restructuring comes first |
+| `d21-user-rule-over-default` | A rule the project states overrides a conflicting task-file Default, and the adjustment is recorded |
+
+These have never been run; the first both-arm run decides which stay. **Every number below is stale
+as of 2026-10-13**: that change edited define's spine and its task files, so the next baseline
+replaces them.
 
 ## First measurement of `d11`–`d17` — 2026-10-12
 

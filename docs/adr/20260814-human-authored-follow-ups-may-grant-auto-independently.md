@@ -48,6 +48,9 @@ Do not add a second marker for "AI may implement but not merge." The supervised 
 - `ticket-up` must distinguish a fresh explicit human grant at its own authoring boundary from mere human provenance elsewhere in the call chain.
 - Follow-up Auto behavior is no longer expressible as source inheritance alone; invocation authority becomes part of the authoring context.
 
+## Enforced by
+`tests/test_ticket_automation_prompts.py` — `test_ticket_up_preserves_auto_authority_boundary` fails if ticket-up drops the fresh human Auto grant for follow-ups, the source-Auto rule when no person grants it, the limit on manual run-ticket calls, or "Shaped never implies Auto".
+
 ## Source
 - Session: figure-out on project Ticket prioritization and human/agent allocation, 2026-08-14
 - Supersedes 20260812-auto-follow-up-grant-requires-source-and-local-grant

@@ -120,6 +120,7 @@ def codex_plugin_skills(plugin: str) -> set[str]:
     return {p.name for p in skills_dir.iterdir() if p.is_dir()}
 
 
+# Holds the decision in docs/adr/20260531-codex-plugin-native-distribution.md.
 def test_codex_plugins_carry_their_skill_split() -> None:
     assert codex_plugin_skills("manifest-dev") == set(CORE_SKILLS)
     assert codex_plugin_skills("manifest-dev-tools") == set(TOOLS_SKILLS)
@@ -145,6 +146,7 @@ def test_codex_plugin_versions_match_sources() -> None:
         assert codex["version"] == source["version"], plugin
 
 
+# Holds the decision in docs/adr/20260811-a-review-dimension-may-take-a-defect-as-input.md.
 def test_codex_code_review_skill_carries_every_dimension() -> None:
     refs = (
         DIST
@@ -169,6 +171,7 @@ def test_codex_does_not_ship_reviewer_agents_or_removed_skills() -> None:
         assert not (RETIRED_REVIEWER_AGENTS & skills)
 
 
+# Holds the decision in docs/adr/20260531-codex-plugin-native-distribution.md.
 def test_codex_marketplace_points_at_existing_plugins() -> None:
     marketplace = json.loads(
         (ROOT / ".agents" / "plugins" / "marketplace.json").read_text(encoding="utf-8")
@@ -186,6 +189,8 @@ def test_codex_marketplace_points_at_existing_plugins() -> None:
 # --------------------------------------------------------------------------
 
 
+# Holds the decision in docs/adr/20260611-opencode-plugin-native-distribution.md.
+# Holds the decision in docs/adr/20260903-shipped-skills-are-host-neutral-and-distributions-read-source.md.
 def test_opencode_reads_the_source_skill_directories() -> None:
     """OpenCode registers claude-plugins/*/skills directly; no copied payload exists."""
     index = (DIST / "opencode" / "plugin" / "index.js").read_text(encoding="utf-8")
@@ -195,6 +200,7 @@ def test_opencode_reads_the_source_skill_directories() -> None:
     assert not (DIST / "pi" / "skills").exists()
 
 
+# Holds the decision in docs/adr/20260611-opencode-plugin-native-distribution.md.
 def test_opencode_ships_no_agents() -> None:
     # manifest-dev ships zero agents on every target; OpenCode drops its agents/ dir.
     assert not (DIST / "opencode" / "agents").exists()
@@ -217,6 +223,7 @@ def test_former_functional_agents_are_skills_in_every_dist() -> None:
 # --------------------------------------------------------------------------
 
 
+# Holds the decision in docs/adr/20260903-shipped-skills-are-host-neutral-and-distributions-read-source.md.
 def test_sync_tools_is_a_wrapper_around_the_copy_script() -> None:
     """The per-host rewrite is retired: sync-tools runs scripts/sync_dist.py and
     lists the hand-maintained packaging files; its reference files are gone."""
@@ -229,6 +236,7 @@ def test_sync_tools_is_a_wrapper_around_the_copy_script() -> None:
     assert not list(DIST.rglob(".sync-meta.json"))
 
 
+# Holds the decision in docs/adr/20260531-codex-plugin-native-distribution.md.
 def test_codex_copy_matches_source() -> None:
     """dist/codex/plugins/*/skills is a byte-identical copy of claude-plugins/*/skills."""
     result = subprocess.run(
@@ -240,6 +248,7 @@ def test_codex_copy_matches_source() -> None:
     assert result.returncode == 0, result.stderr
 
 
+# Holds the decision in docs/adr/20260531-codex-plugin-native-distribution.md.
 def test_codex_distribution_is_plugin_native() -> None:
     readme = (DIST / "codex" / "README.md").read_text(encoding="utf-8")
     assert "codex plugin marketplace add doodledood/manifest-dev" in readme
@@ -250,6 +259,7 @@ def test_codex_distribution_is_plugin_native() -> None:
     assert not (DIST / "codex" / "agents").exists()
 
 
+# Holds the decision in docs/adr/20260623-use-universal-goal-setting-language.md.
 def test_goal_setting_backstop_is_universal_across_source_and_dist() -> None:
     """Unattended-run backstops are a portable capability, not a literal /goal rule.
 
@@ -296,6 +306,7 @@ def test_goal_setting_backstop_is_universal_across_source_and_dist() -> None:
             assert stale not in text, f"{path}: stale goal wording {stale!r}"
 
 
+# Holds the decision in docs/adr/20260806-verification-is-bookkeeping-and-a-stop-condition.md.
 def test_do_completion_contract_requires_auditable_gate_ledger() -> None:
     """The backstop must preserve mode, provenance, and incomplete-gate state."""
     do_files = [
@@ -370,6 +381,7 @@ def test_do_completion_contract_requires_auditable_gate_ledger() -> None:
         assert not RETIRED_GATE_FIELDS.search(text), path
 
 
+# Holds the decision in docs/adr/20260907-executors-own-unattended-decisions-within-explicit-bounds.md.
 def test_executor_amendments_preserve_verification() -> None:
     """Prospective scope authority must reach the author and invalidate evidence."""
     base = ROOT / "claude-plugins/manifest-dev/skills"
@@ -388,6 +400,7 @@ def test_executor_amendments_preserve_verification() -> None:
     assert "The Manifest is read-only" not in executor
 
 
+# Holds the decision in docs/adr/20260914-one-skill-per-beat-built-from-the-lean-body.md.
 def test_manifest_schema_stays_topology_neutral() -> None:
     """The Manifest must not regain an evaluator copy, an ordering field, or an
     inferred kind. Run-level verification policy was retired with the modes."""
@@ -420,6 +433,7 @@ def test_manifest_schema_stays_topology_neutral() -> None:
         assert not (refs / "exhaustive-verification.md").exists(), path
 
 
+# Holds the decision in docs/adr/20260807-a-gate-is-one-text-not-two.md.
 def test_every_operative_manifest_example_uses_the_current_gate_schema() -> None:
     """Every shipped gate example is written in the current gate schema.
 
@@ -518,14 +532,15 @@ def test_self_independence_detector_catches_semantic_variants() -> None:
         assert not claims_self_verification_is_independent(claim), claim
 
 
-def test_verification_policy_prompts_preserve_portable_boundaries() -> None:
+# Holds the decision in docs/adr/20260709-do-keeps-default-execution-log-manifest-stays-contract.md.
+def test_do_log_prompts_preserve_journal_boundaries() -> None:
     log_files = [
         ROOT / "claude-plugins/manifest-dev/skills/do/references/LOG.md",
         DIST / "codex/plugins/manifest-dev/skills/do/references/LOG.md",
     ]
     for path in log_files:
         text = path.read_text(encoding="utf-8")
-        assert "default timestamped logs" in text, path
+        assert "Use the path `SKILL.md` names" in text, path
         assert "caller-supplied journal" in text, path
         assert "append a `Run initialized` boundary" in text, path
         assert "prior gate verdicts remain historical" in text, path
@@ -576,6 +591,7 @@ def test_define_task_gates_do_not_select_evaluator_topology() -> None:
     assert "tables with Agent + Threshold" not in project_context
 
 
+# Holds the decision in docs/adr/20260807-a-gate-is-one-text-not-two.md.
 def test_operational_guidance_has_no_stale_per_gate_topology() -> None:
     files = [
         ROOT / "README.md",
@@ -615,6 +631,7 @@ def test_operational_guidance_has_no_stale_per_gate_topology() -> None:
     assert not RETIRED_GATE_FIELDS.search(example)
 
 
+# Holds the decision in docs/adr/20260619-manifest-aware-review-pr.md.
 def test_review_pr_manifest_mode_remains_independently_per_gate() -> None:
     references = [
         ROOT
@@ -651,6 +668,7 @@ def test_review_pr_manifest_mode_remains_independently_per_gate() -> None:
         assert not RETIRED_GATE_FIELDS.search(text)
 
 
+# Holds the decision in docs/adr/20260905-executors-own-path-bearing-continuation-goals.md.
 def test_auto_investigation_keeps_read_bar_without_a_phase_goal() -> None:
     """Suppress the child goal before its generic standalone/parent rules run."""
     for root in (
@@ -718,6 +736,7 @@ def test_autonomous_diagnosis_goal_requires_mechanism_or_earned_underdeterminati
         assert expected in text, path
 
 
+# Holds the decision in docs/adr/20260905-executors-own-path-bearing-continuation-goals.md.
 def test_continuation_ownership_preserves_babysit_parent() -> None:
     """Nested workflow skills should not set competing narrower goals."""
     define_files = [
@@ -760,6 +779,7 @@ def test_continuation_ownership_preserves_babysit_parent() -> None:
 # --------------------------------------------------------------------------
 
 
+# Holds the decision in docs/adr/20260903-shipped-skills-are-host-neutral-and-distributions-read-source.md.
 def test_pi_package_metadata_points_to_source_skills_and_prompts() -> None:
     package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
 
@@ -782,6 +802,7 @@ def test_pi_package_metadata_points_to_source_skills_and_prompts() -> None:
     assert not (ROOT / "packages" / "manifest-dev-pi-tools").exists()
 
 
+# Holds the decision in docs/adr/20260903-shipped-skills-are-host-neutral-and-distributions-read-source.md.
 def test_pi_dist_carries_only_prompt_aliases() -> None:
     prompt_files = {path.stem for path in (DIST / "pi" / "prompts").glob("*.md")}
     assert prompt_files == set(PI_PROMPTS)
@@ -801,6 +822,7 @@ def test_pi_prompt_aliases_expand_to_matching_skills() -> None:
         assert "description:" in text
 
 
+# Holds the decision in docs/adr/20260623-use-host-continuation-as-optional-do-backstop.md.
 def test_pi_live_docs_do_not_claim_runtime_verifier_fanout() -> None:
     live_paths = [
         ROOT / "README.md",
@@ -855,6 +877,7 @@ def _skill_markdowns(*roots: Path) -> list[Path]:
     return [p for root in roots for p in root.rglob("*.md")]
 
 
+# Holds the decision in docs/adr/20260622-mark-review-pr-comments-with-hidden-marker.md.
 def test_skill_activation_names_are_bare_on_every_surface() -> None:
     """Cross-skill references name the skill bare (`check-pr`, `review-prompt`), never
     plugin-qualified: every host reads the same text, and a plugin namespace is one
@@ -909,3 +932,22 @@ def test_check_pr_stays_workflow_neutral_on_every_surface() -> None:
         assert path.exists(), path
         forbidden = "WAIT" + "-PENDING"
         assert forbidden not in path.read_text(encoding="utf-8"), path
+
+
+# Holds the decision in docs/adr/20260914-one-skill-per-beat-built-from-the-lean-body.md.
+def test_do_log_path_is_stated_once() -> None:
+    """Only do/SKILL.md names the log path; a second path lets a run write where
+    the next launch never looks."""
+    for skill in (
+        ROOT / "claude-plugins/manifest-dev/skills/do",
+        DIST / "codex/plugins/manifest-dev/skills/do",
+    ):
+        naming = sorted(
+            str(path.relative_to(skill))
+            for path in skill.rglob("*.md")
+            if re.search(
+                r"manifest-dev/logs/|do-log|\{timestamp\}",
+                path.read_text(encoding="utf-8"),
+            )
+        )
+        assert naming == ["SKILL.md"], (skill, naming)

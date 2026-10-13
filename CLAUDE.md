@@ -52,15 +52,21 @@ Read before building plugins:
 
 ## Project Surfaces
 
+<!-- setup-project surfaces v1 -->
+
 This project keeps its direction, vocabulary, and decision memory in the repo — shared ground for every contributor and agent, regardless of tooling.
 
-**The North Star is the standing direction.** `NORTH_STAR.md` is imported above, so it is already in context; anchor on it scope, priority, outward-facing claims, and any call the work's own contract does not settle — a mid-run pivot, whether to act on a review comment, what to leave alone. Each position carries a dated state (evidence / hypothesis / ruled / empty): new evidence may lower a state, but a position changes only by the owner's call, recorded as a decision record. The full form is `docs/NORTH_STAR_CONVENTIONS.md` — it is self-contained.
+**The North Star is the standing direction.** `NORTH_STAR.md` is imported above, so it is already in context. Where a harness does not support imports, read it at the start of every session. Use it to decide scope, priority, outward-facing claims, and any call the work's own contract does not settle — a mid-run pivot, whether to act on a review comment, what to leave alone. Each position carries a dated state (evidence / hypothesis / ruled / empty): new evidence may lower a state, but a position changes only by the owner's call, recorded as a decision record. The full form is `docs/NORTH_STAR_CONVENTIONS.md` — it is self-contained.
 
-**The glossary is not optional reading.** `CONTEXT.md` is imported above, so it is already in context. Where a harness does not support imports, read it at the start of every session before doing anything else. It exists to stop silent misreading, and nobody looks up a term they already believe they understand — which is why it is resident rather than referenced.
+**The glossary is not optional reading.** `CONTEXT.md` is imported above, so it is already in context. Where a harness does not support imports, read it at the start of every session before doing anything else. It exists to stop silent misreading, and nobody looks up a term they already believe they understand — which is why it is resident rather than referenced. Read it before naming things; add a term when the project settles one.
 
 **Read `docs/adr/` before re-deciding something.** Open the index at `docs/adr/README.md` when you are about to settle a question the project may already have settled, and when a change you are making contradicts or narrows an existing decision. Those two moments are the whole reason the corpus exists; outside them, leave it closed.
 
 **Writing a decision record is one act, not three** — the record, the restatus, and the index, in one change. Step two is the one that gets dropped, and dropping any of them leaves the corpus asserting something untrue. Open `docs/adr/CONVENTIONS.md` before you start: it carries the bar, the template, and what each step actually requires.
+
+**The verification surfaces are `claude-plugins/manifest-dev/evals/` with `tests/`, and `docs/reader-tasks/`.**
+- **The prompts:** the eval suites test the skills' behavior, and cover `figure-out` and `define` only, on purpose — runs are expensive and those two shape every Manifest. Each case carries its status in the suite READMEs (`evals/README.md`, `evals/define/README.md`) — unmeasured, measured with its date, or stale after a covered prompt changes. A change to a prompt that a case covers updates that case where the change affects what it tests, and runs it or marks it stale. Unmeasured cases stay unmeasured, as `evals/README.md` describes. `tests/` holds the property checks every change keeps green. `tests/test_eval_cases.py` fails when a suite README's case tables and its case directories disagree, so a case added or removed lands with its row. Read `evals/README.md` before changing a prompt it covers. `scripts/design-evals/` is the harness for the code instruments the `design` skill ships; its README says how to run it and what it does not measure.
+- **The living documents:** `docs/reader-tasks/` lists the tasks readers bring to the user-facing READMEs, `CONTRIBUTING.md`, and the explainer site, each with a status. `tests/test_reader_tasks.py` fails when an entry names a file or section that no longer exists, or breaks the entry format. A change to one of those documents, or to code they describe, updates and walks the entries it touches, as `docs/reader-tasks/README.md` describes.
 
 ## Repository Structure
 
@@ -112,7 +118,7 @@ Extraction is for bulk, not tidiness. A mode whose mechanics run to a paragraph 
 
 Keep the two vocabularies apart. The workflow's own terms — Manifest, Deliverable, Acceptance Criterion, Global Invariant, Ticket — are the product's language and travel with it, defined at use wherever the exact meaning binds. The words this repo uses to *reason about* its prompts — Spine, Altitude, Re-host, Door, House — are maintainer vocabulary: they belong in `CONTEXT.md`, ADRs, and this file, not in anything under `claude-plugins/` or `dist/`. A skill neither speaks them nor defines them.
 
-None of this touches the user's own context file. Reading it, seeding it, and capturing into it are real skill behaviors — `init-context` installs one and `figure-out`'s docs mode writes to it. Those name *the project context file* resolved by detection, never a fixed filename, and the file they mean is the user's, never this repo's.
+None of this touches the user's own context file. Reading it, seeding it, and capturing into it are real skill behaviors — `setup-project` installs one and `figure-out`'s docs mode writes to it. Those name *the project context file* resolved by detection, never a fixed filename, and the file they mean is the user's, never this repo's.
 
 ### Tool Definitions
 
@@ -152,9 +158,23 @@ See each plugin's README for architecture details.
 
 `claude-plugins/manifest-dev/skills/figure-out/references/ADR_FORMAT.md` is the plugin's shipped default, carrying the same content for projects that have no conventions file of their own; it also states the precedence rule. The two are kept in step — change one, change the other. figure-out's `WITH_DOCS.md` owns only *cadence*: when a session offers to record a decision. A project's conventions file has no say in cadence, and the plugin has no say in a project's conventions.
 
-The same split holds for the North Star: `docs/NORTH_STAR_CONVENTIONS.md` is this project's convention and governs; `claude-plugins/manifest-dev/skills/init-context/references/NORTH_STAR_FORMAT.md` is the plugin's shipped default carrying the same content plus the installer-facing emission templates, and states the precedence rule. The two are kept in step — change one, change the other. Cadence (when a session offers a North Star update) stays with figure-out's docs mode.
+The same split holds for the North Star: `docs/NORTH_STAR_CONVENTIONS.md` is this project's convention and governs; `claude-plugins/manifest-dev/skills/setup-project/references/NORTH_STAR_FORMAT.md` is the plugin's shipped default carrying the same content plus the installer-facing emission templates, and states the precedence rule. The two are kept in step — change one, change the other. Cadence (when a session offers a North Star update) stays with figure-out's docs mode.
 
-Distributed skill files stay repo-agnostic — maintainer/governance notes like this one belong here, not in skill references or in `docs/adr/CONVENTIONS.md` or `docs/NORTH_STAR_CONVENTIONS.md`, which the init skill emits into other people's repositories.
+Distributed skill files stay repo-agnostic — maintainer/governance notes like this one belong here, not in skill references or in `docs/adr/CONVENTIONS.md` or `docs/NORTH_STAR_CONVENTIONS.md`, which setup-project emits into other people's repositories.
+
+## Setup-Project Surfaces Version
+
+Every file setup-project copies or emits into projects — `figure-out/references/ADR_FORMAT.md`, `setup-project/references/NORTH_STAR_FORMAT.md`, and `setup-project/references/VERIFICATION_README_TEMPLATE.md` — is pinned to the latest surfaces version in `setup-project/references/CHANGES.md`. A change to any of them needs a new `## vN` entry in the same change. The entry lists what an installed project gains and carries the digest the version test prints on failure, and the version comment in the surfaces template of `NORTH_STAR_FORMAT.md` moves to `vN`. Installed projects record the version they carry, and an update offers only the entries after it, so a change shipped without a version never reaches them. HTML comments are outside the digest, so maintainer notes need no version. Each change that adds a version also adds an eval case for a project recording the version before it, graded on offering only the entries after that version. While v1 is the only version, no project can be one version behind, so that path has no case. `tests/test_setup_project_versions.py` fails when `45-current-setup-offers-nothing` does not record the newest version, or, from v2 on, no eval case records the version before it.
+
+## Red-Flag Mirror Pairs
+
+figure-out's task files and define's task files are decoupled, so a red-flag list both need lives in both. Change one, change the other:
+
+- `figure-out/tasks/CODING.md` (*Shape before build*, *A second shape*, *What the next agent copies*, *Design discipline*) ↔ `define/tasks/CODING.md` Defaults (*Sketch the shape before implementing*, *Screen for what the next agent copies*, *Reshape, don't patch*).
+- `figure-out/tasks/FEATURE.md` (*Bundled concerns*, *Remembered steps*) ↔ `define/tasks/FEATURE.md` Defaults (*One concern per change*, *No step that depends on memory*).
+- `figure-out/tasks/DOCUMENT.md` (*One mode*, *A fact restated*, *The same fact twice*) ↔ `define/tasks/DOCUMENT.md` Defaults (*One mode per document*, *Generate or link what code owns*, *One copy of each fact*).
+- `figure-out/tasks/PROMPTING.md` (*A rule in two files*, *An instruction where a check belongs*) ↔ `define/tasks/PROMPTING.md` Default (*One rule, one place*).
+- `figure-out/tasks/PERF.md` ↔ `define/tasks/PERF.md` (limiter, noise floor, fair comparison, harness first, unlike scenarios).
 
 ## Slicing Discipline Ownership
 

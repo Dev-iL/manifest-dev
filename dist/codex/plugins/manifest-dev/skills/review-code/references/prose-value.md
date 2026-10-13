@@ -37,7 +37,8 @@ These categories are guidance, not exhaustive. If you identify a prose-value iss
 
 Comments earn their place by capturing knowledge a future reader cannot recover from the code itself:
 
-- **Load-bearing-WHY**: A comment that documents non-obvious reasoning — a hidden constraint, a subtle invariant, a workaround for a specific bug, behavior that would surprise a reader, or the *reason* a particular approach was taken over an obvious alternative. These earn their place.
+- **Load-bearing-WHY**: A comment that documents non-obvious reasoning — a hidden constraint, a subtle invariant, a workaround forced by something the project cannot change (an external dependency, platform or protocol), behavior that would surprise a reader, or the *reason* a particular approach was taken over an obvious alternative. These earn their place.
+- **Workaround in the project's own code** *(flag as a refactor target)*: A comment explaining why code the project owns works around itself. Agents copy the workaround and cite the comment as the reason to leave the problem unsolved. Report it as a refactor flag naming the symbol to reshape; the comment stays until the reshape removes the need for it.
 - **WHAT-restatement** *(flag)*: A comment that paraphrases what the next line of code does. `// increment counter`, `// loop through items`, `// return the result`. Removing it loses nothing — well-named identifiers already convey this.
 - **Past-iteration narration** *(flag)*: A comment narrating change history or past attempts — `// previously this used a loop, switched to map`, `// fixed the bug from issue #123`, `// added for the new auth flow`. This belongs in commit messages or PR descriptions, not in code; it rots as the codebase evolves.
 - **Caller / context references** *(flag)*: `// used by X`, `// called from the Y workflow`. These are search-recoverable and rot when callers change. Belong in PR descriptions, not code.
@@ -81,7 +82,7 @@ Leftover assistant-voice that escaped into shipped artifacts:
 
 ## Actionability filter
 
-Before reporting a finding, it must pass ALL of these criteria. **If it fails ANY criterion, drop it entirely.**
+Before reporting a finding, it must pass ALL of these criteria. **If it fails ANY criterion, drop it entirely.** A refactor flag for a workaround in the project's own code is the one exception to criterion 2: the comment carries understanding and stays, and what the flag reports is the code it explains.
 
 1. **In scope** — Diff-based by default (only flag prose introduced or modified by this change). Pre-existing prose is out of scope unless the user invoked an explicit path review.
 2. **Removing the prose loses nothing** — For comments: would a future reader, encountering the code without this comment, lose understanding? For doc prose: does this paragraph carry information that's not elsewhere in the doc? If removal is lossless, flag.
@@ -116,6 +117,8 @@ Medium is the blocking grade here, so it separates from Low on what the prose co
 - **Low** — the prose is merely surplus: it restates what the line below already says, or carries a tell without misleading anyone. Deleting it loses nothing, and leaving it costs a reader a few seconds.
 
 A finding that cannot say which of those two it is has not made a Medium case.
+
+A refactor flag is graded **Low**: it hands the workaround to the run's debt list rather than blocking the change.
 
 ## Dimension-specific report fields
 

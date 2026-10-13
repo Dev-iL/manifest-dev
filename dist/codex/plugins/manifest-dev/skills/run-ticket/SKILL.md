@@ -78,7 +78,8 @@ Questions that do not need their own lifecycle stay in the result comment. A que
 
 `/done` proves the task contract; it does not by itself prove that repository work landed. Commit
 and push the coherent result to the stable branch, create or refresh its one pull request — its
-description listing the run's material decisions, the user's calls first — and drive
+description listing the run's material decisions, the user's calls first, and a "Debt left"
+section carrying the debt `/done` named, one line each — and drive
 that pull request through the repository's normal checks and review requirements. Activate the
 `check-pr` skill for the current pull request and head before merge. Address
 agent-resolvable failures and re-check rather than handing routine repair to a person.
@@ -124,6 +125,8 @@ After the required landing is observed, write a completion comment containing:
 - evidence that the definition of done holds;
 - branch, commit, pull-request, deployed-artifact, or recorded-answer references that exist;
 - follow-up Ticket links, or a clear statement that none were warranted;
+- the debt `/done` named, one line each, so it outlives the runner even where no pull request carries it;
+- the flagged offers, agent-decided records and drafted Taste entries `/done` named, each with what accepting or reviewing it would change;
 - the run's material decisions, the user's calls first, each with the alternative not taken and what decided it.
 
 Then close the same Ticket as done using the venue mapping. Closing is the assertion that its work
@@ -140,6 +143,8 @@ The record contains:
 - what was tried, what each attempt showed, and why it did not resolve the blocker;
 - branch, commit, and pull-request references for preserved work, or an explicit statement that none were produced;
 - any separately warranted follow-up Ticket links;
+- the debt `/escalate` named, one line each;
+- the flagged offers, agent-decided records and drafted Taste entries `/escalate` named, each with what accepting or reviewing it would change;
 - a mention of the person needed next, resolved from the Ticket, project escalation contact, or initiating human;
 - the run's material decisions, the user's calls first, each with the alternative not taken and what decided it.
 

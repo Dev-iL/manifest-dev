@@ -1,0 +1,27 @@
+# do: building and keeping the verification surface
+
+The surface's forms and parts — harness, feature map, eval suite,
+reader-task list, statuses, repository check — are in setup-project's
+`references/VERIFICATION_SURFACE.md`.
+
+- **Missing surface:** when the context file's project-surfaces section names none, look among the
+  verification assets the project keeps. Build the surface from what is found, or from nothing,
+  scoped to what the change touches — the form the artifact
+  needs, existing verification assets adopted rather than duplicated, the harness parts the
+  change needs, entries for the touched features, the README and the repository check. Record it with the verification-surface bullet of the
+  surfaces template in `../../setup-project/references/NORTH_STAR_FORMAT.md` → *The project-surfaces
+  section*, in the project-surfaces section of the project-level context
+  file the detected host reads, resolved per `../../review-code/references/context-file-adherence.md`;
+  create the file or the section, holding only that bullet, where it is missing. Build it unattended too: it is verification for the change, like a regression test. Name it in the
+  completion report as a new project surface the user can remove.
+- **Touched entries:** add a missing entry for a touched path. Update each touched entry to match
+  the change, exercise it, and mark it with the form's exercised status: `verified` with the date,
+  or `measured` with the date and result for an eval case. A change to a prompt that leaves its
+  measured cases unrun marks them `stale`; unmeasured cases stay `unmeasured`.
+- **Drift:** when an exercise fails because the entry is wrong about the product, repair the
+  entry within scope. When an entry the change does not touch is found drifting, mark it `stale`
+  with a dated line naming what differs, and leave the repair to the next run that touches it.
+- **Regressions:** when an exercise fails because the product is broken, report it as debt with
+  the evidence. Never weaken an entry or a journey to make it pass.
+- **Evidence:** keep exercise evidence where the harness names it, so the completion report can
+  link it for a person to open.

@@ -77,6 +77,15 @@ Record compact checkpoint notes as work proceeds: what changed, what was verifie
 Assume the user is AFK; make authorized decisions without asking questions. Surface blockers promptly and continue useful independent work. Stop after reporting completion, a blocker requiring a person when no useful independent work remains, or an external wait that this run's no-wait policy makes terminal. Continue while authorized, actionable work remains.
 ```
 
+## Corrections, debt and the verification surface
+
+Load `references/HARVEST.md` before the run reports, and earlier as soon as it repairs a finding,
+fixes a defect, receives a correction or touches a comment that explains a workaround or claims a
+constraint: a correction becomes a lock where a check can hold it, such a comment becomes a refactor flag or
+an encoding offer, and the debt the run leaves goes into its report and into every pull request it opens or updates. When the
+Manifest gates a verification-surface entry, or the work needs a surface the project lacks or
+touches a path the surface has no entry for, load `references/VERIFICATION.md`.
+
 ## What holds for every gate
 
 A gate declares `judgment` or `deterministic`; an undeclared kind is invalid, never
@@ -101,4 +110,4 @@ hex characters of SHA-256 over its absolute path. Fixing the scheme is what reop
 same Manifest's log on every launch and keeps two manifests sharing a basename in
 different directories apart. Read it before resuming and append as you go: it is where
 the goal block's checkpoint notes land. `references/LOG.md` holds the entry shape
-and append discipline — not its path rule.
+and append discipline; the path rule is this one.

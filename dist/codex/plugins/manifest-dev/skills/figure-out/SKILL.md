@@ -93,7 +93,11 @@ short messages do not require permission to do the next piece of research.
   branches as much as the main flow; what that enumeration wants and the
   proposal lacks are the gaps.
 - When the read implies making something, state exactly what it will be and
-  offer to render a quick disposable draft that makes the proposed result
+  how it will be checked — through the project's verification surface, its
+  durable way to check a result (a harness and feature map, an eval suite, or a
+  reader-task list), found where the context file's project-surfaces section
+  names it or, with none named, among the verification assets the project keeps
+  — and offer to render a quick disposable draft that makes the proposed result
   concrete enough to choose a direction and agree on what will be produced.
   Refine details after that choice, unless the user asks to explore them now.
   Before the first draft, settle what that person came to do and what we want
@@ -137,8 +141,9 @@ its overrides.
 | Reference | Loads when | What it adds |
 |---|---|---|
 | `references/LOG.md` | by default; `--no-log` suppresses | the investigation log's entry shape and append discipline |
+| `references/RECALL.md` | once the investigation concerns work in the active repository — a bug, change, design, or decision; a general or quick question that repository's history cannot bear on loads nothing | what earlier sessions, tickets, and pull requests left on this repository: dated leads, the debt on this topic's path, hotspots |
 | `references/TASTE.md` | by default; `--autonomous` or `--team` suppresses | offer-and-ratify capture of durable personal steering preferences into harness memory |
-| `references/WITH_DOCS.md` | by default, but only once the investigation is relevant to the active project or a mapped context; `--no-docs` or `--team` suppresses | glossary captures, ADR offers, North Star updates, map awareness — and it loads the project's ADR conventions, or the shipped default beside it |
+| `references/WITH_DOCS.md` | by default, but only once the investigation is relevant to the active project or a mapped context; `--no-docs` or `--team` suppresses | glossary captures, ADR offers, North Star updates, map awareness, the update offer for an older setup, a stale marker on a drifting verification-surface entry — and it loads the project's ADR conventions, or the shipped default beside it |
 | `references/autonomous.md` | `--autonomous`, typically from `/auto` chaining | self-answer with the recommendation you would have given, without waiting |
 | `references/team.md` | `--team`, typically from the `figure-out-team` wrapper | the counterparty becomes a Slack channel or thread, with the operator in the local session; owns team mode's own read-only project-context behavior |
 
@@ -155,7 +160,8 @@ you'd have brought to the user as a flagged assumption on the read.
 ## Probes
 
 Load the matching file(s) from `tasks/` for the topic's shape — coding, feature,
-bug, refactor, diagnosis, tech design, research. They carry only angles the
+bug, refactor, diagnosis, tech design, research, performance, documents, prompts.
+They carry only angles the
 model under-weights by default; fold in what's load-bearing and ignore the rest.
 Nothing fits → probe generally.
 

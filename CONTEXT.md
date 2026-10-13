@@ -69,8 +69,28 @@ _Avoid_: ADR format, ADR template.
 An index that asserts nothing its records don't, and is rebuilt from them rather than edited alongside them — so staleness is a repairable lag rather than lost information.
 _Avoid_: ADR list, table of contents.
 
+**Verification Surface**:
+A project's durable means of checking that an artifact future runs will change still does its job, in the artifact's own form: a harness plus a feature map for a runnable product, a behavior eval suite for prompts and skills, a reader-task list for a living document. Each entry is unverified, verified, or stale; an eval case is unmeasured, measured, or stale. Normal runs build and repair it where the work touches it, never a separate maintenance pass.
+_Avoid_: Test suite, e2e suite, control skill.
+
+**Reader Task**:
+One entry in a living document's verification surface: a task a reader comes to the document to do, the sections the reader relies on, what the reader should end up able to do, and a status. A reader with fresh context, given only the document, walks the entry.
+_Avoid_: User story, test case, doc test.
+
+**Surfaces Version**:
+The integer, listed in setup-project's `CHANGES.md`, that a project's context file records in its project-surfaces section. Setup-project writes it when it installs or updates the surfaces, and figure-out writes it when the user declines the whole update offer. The recorded number decides what an update offers: nothing at the newest version, the later `CHANGES.md` entries at an older one, and a full comparison when the project records none. Unrelated to the plugin's own version.
+_Avoid_: Plugin version, setup version, template version.
+
+**Lock**:
+A check installed from a correction so the corrected class of mistake fails for every later contributor — a type or structure, a lint or architecture test, an invariant test, or one owning site — with a declared scope; its repository-wide hits that a run leaves unfixed are reported as debt.
+_Avoid_: Rule (that is prose), guard, concurrency lock.
+
+**Debt**:
+What a run found and did not fix: unfixed lock hits, refactor flags from workaround comments, constraint comments awaiting encoding, new suppressions, reshapes outside the change's scope, product regressions the verification surface exposed, and a new verification surface the user may remove. A run names it in its completion report, in the "Debt left" section of every pull request it opens, and on its Ticket. A later run whose work reaches the same area offers to fold it in.
+_Avoid_: Tech debt (too broad), TODO, backlog.
+
 **Seed**:
-The deliberately under-produced vocabulary and decision corpus `/init-context` reconstructs from a project's history — a starting point that names what it could not recover, never a complete record.
+The deliberately under-produced vocabulary and decision corpus `/setup-project` reconstructs from a project's history — a starting point that names what it could not recover, never a complete record.
 _Avoid_: Import, migration, backfill.
 
 **Progressive Disclosure**:
@@ -237,8 +257,8 @@ _Avoid_: Batch runner, label pulse, dependency controller.
 - Every venue a **Ticket Store** runs on has a **Venue Reference**.
 - A **Ticket Store** holds one or more **Efforts**, each with its own front file and destination — so the priority rule's "impact" is measured within an **Effort**, and comparing across them takes the **North Star**'s winning definition, the measure the destinations alone don't supply.
 - A **North Star** informs every session by residency and never binds; the one binding route is `/define` routing an unsafe or irreversible Never to a **Global Invariant**.
-- A project-owned North Star conventions file (emitted by `init-context` beside the doc) governs the **North Star**'s form wherever it exists, with the plugin's shipped default applying otherwise — the same precedence the **ADR Conventions** carry; cadence stays with figure-out.
-- `init-context` installs and seeds a **North Star**; figure-out's docs mode keeps it current under the update asymmetry — evidence lowers a position's state, only the owner's ruling changes a position, and each position change is remembered as a decision record.
+- A project-owned North Star conventions file (emitted by `setup-project` beside the doc) governs the **North Star**'s form wherever it exists, with the plugin's shipped default applying otherwise — the same precedence the **ADR Conventions** carry; cadence stays with figure-out.
+- `setup-project` installs and seeds a **North Star**; figure-out's docs mode keeps it current under the update asymmetry — evidence lowers a position's state, only the owner's ruling changes a position, and each position change is remembered as a decision record.
 - `next-ticket` reads the **North Star**'s winning definition for cross-**Effort** comparison and surfaces a candidate that would cross a Never; `/define`'s marketing task file gates outward-facing claims against its Promise and Never.
 - A **Default** becomes **Process Guidance** in a **Manifest**, except one whose violation would be unsafe or irreversible, which becomes a **Global Invariant** so it binds.
 - The **Bearer Test** governs which advisory-tier **Quality Gates** a **Manifest** omits; defect-finding dimensions, deterministic project gates, and safety-critical **Global Invariants** are never eligible.
@@ -266,7 +286,7 @@ _Avoid_: Batch runner, label pulse, dependency controller.
 - One **Door** per discovery surface; every **Door** opens into the same **House**.
 - A **Re-host** preserves **Spine** content verbatim while making its **Altitude** typographically legible.
 - A **Taste** entry is ratified by the user and routed by scope to a user-level or project-level memory file; it is never inferred and applied silently, and it stays distinct from the review-time **Judgment Layer**.
-- `/init-context` installs a project's **ADR Conventions**, its glossary, and the **Project Context File** wiring that keeps sessions reading both; a **Seed** is layered on top wherever the project has history, and is never a substitute for the wiring.
+- `/setup-project` installs a project's **ADR Conventions**, its glossary, and the **Project Context File** wiring that keeps sessions reading both; a **Seed** is layered on top wherever the project has history, and is never a substitute for the wiring.
 - figure-out loads the **ADR Conventions** at bootstrap and writes records under them, which is what makes the project's copy govern rather than the shipped default; cadence — when a session offers to record a decision — stays with figure-out and is not the project's to set.
 - A **Derived Index** is rebuilt from the decision records per the **ADR Conventions**, in the same act that writes a record and restatuses whatever it supersedes.
 - **Seed** entries destined for the glossary are ratified in one batch before any is written, because the glossary is resident in every session; figure-out's inline capture needs no such batch, its warrant being that the user just used the term.

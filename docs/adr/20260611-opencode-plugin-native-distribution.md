@@ -48,5 +48,8 @@ Result across all four hosts — Claude Code plugin, Codex plugin marketplace, P
 - Minimum OpenCode version must be pinned (≥ v1.1.48 for skills-as-commands; the release introducing `skills.paths` must be identified at implementation).
 - Existing installer users need a migration note (remove suffixed copies, or the old uninstall path) to avoid lingering duplicates.
 
+## Enforced by
+`tests/test_dist_skill_references.py` — `test_opencode_reads_the_source_skill_directories` and `test_opencode_ships_no_agents` fail if `index.js` stops loading the skills of both source plugins, or a copied OpenCode or Pi `skills` folder or an OpenCode `agents` folder comes back. Also `tests/test_dist_install_uninstall.py` — `test_opencode_ships_no_installer_artifacts`, `test_opencode_plugin_entry_shape` fail if an installer artifact returns or the plugin entry stops being a `package.json` plus `index.js`.
+
 ## Source
 - Related: See also 20260531-codex-plugin-native-distribution (sibling decision; same retire-the-installer arc on Codex)
