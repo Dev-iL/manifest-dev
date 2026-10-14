@@ -34,7 +34,7 @@ Preconditions: the baseline in the index; a prompt file holding the matching eva
 
 ## How it is checked
 
-The figure-out behavior suite, `claude-plugins/manifest-dev/evals/` cases `01` to `48` (tags `figure-out`, `figure-out-plugin-only`), all `unmeasured` or stale per `claude-plugins/manifest-dev/evals/README.md`; `tests/test_eval_cases.py` keeps its case list in step. Drive evidence: `docs/features/evidence/figure-out/20261014T062318Z.md` (current setup), `docs/features/evidence/figure-out/20261014T075743Z.md` (reuse and a shallow layer, case `48`).
+The figure-out behavior suite, `claude-plugins/manifest-dev/evals/` cases `01` to `48` (tags `figure-out`, `figure-out-plugin-only`), all `unmeasured` or stale per `claude-plugins/manifest-dev/evals/README.md`; `tests/test_eval_cases.py` keeps its case list in step. Drive evidence: `docs/features/evidence/figure-out/20261014T062318Z.md` (current setup), `docs/features/evidence/figure-out/20261014T083022Z.md` (reuse and a shallow layer, case `48`).
 
 ## Gotchas
 
