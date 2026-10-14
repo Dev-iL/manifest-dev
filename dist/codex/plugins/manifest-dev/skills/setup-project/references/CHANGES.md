@@ -1,9 +1,9 @@
 # Surfaces versions
 
 What each surfaces version gives a project that setup-project has set up. A project's context
-file records the version it carries in its project-surfaces section; an update offers the
-entries after that version, each on its own, and records the newest version once the user has
-answered them.
+file records the version it carries in its project-surfaces section; an update offers what
+changed after that version, as the upgrade guide for it in `upgrades/` says, and records the
+newest version once the user has answered.
 
 ## v1
 
@@ -53,3 +53,26 @@ Digest: 5eb79c2e86bc14e2238e3982f48453e0c33db05d376b0a7e4abb0a730efcb794
   so a session knows how to use and keep the map from the context file alone.
 
 Digest: 80bc7de905bfb2a9d5eebb592ab7335742eac591ad98a58b73bc4b1a5e307178
+
+## v4
+
+- One verification harness replaces the verification surface, the feature map and the
+  reader-task list: a command-line tool (`scripts/verify` by default, copied from a shipped
+  implementation in TypeScript that Node 22.18 or newer runs directly, ported on request) whose
+  `--help` tells anyone how to verify the project, reading one Markdown recipe per feature,
+  skill, document walk or eval suite. Recipes delegate to the project's
+  existing test and drive commands; statuses are worked out from committed evidence, not kept by
+  hand, and go stale when a covered file no longer matches the fingerprint its evidence recorded;
+  `verify check` is the repository check.
+- Recipes whose runs cost something a person should weigh — money or quota, long run time,
+  shared environments, effects outside the repository — carry an `ask-first` mark with the
+  reason. By default the tool runs them only with `--yes`, given when a person ran them or
+  agreed; the user picks that default at setup and can change it in the harness settings.
+- The project-surfaces section carries one verification bullet, written for any reader with or
+  without this workflow: the command, when to run it, and how ask-first recipes run here. It
+  replaces the verification-surface and feature-map bullets.
+- An update moves an existing verification surface, feature map and reader-task list into
+  recipes, keeping their content, customizations and evidence, following the upgrade guide for
+  the version the project records.
+
+Digest: 932d17190a24d0fb7e0b99b039d1821ac54a13769d05b56f2b32b2bff7f118e9

@@ -4,7 +4,9 @@ Measures whether `define` encodes a Manifest by the disciplines its own prompt s
 whether it writes a document shaped like a Manifest, which only the with-plugin arm can do and
 which would therefore make every case a vanity win.
 
-Run it from the plugin directory:
+A run is many model sessions: the owner runs it, or an agent runs it after asking, naming the
+cases and why. A prompt change marks the cases it covers stale rather than running them, as
+`../README.md` → *Scope and statuses* says. Run it from the plugin directory:
 
 ```bash
 claude plugin eval . --tag define --ablation with-without --judge-model opus --allow-tools Write Bash --scaffold -j 8
@@ -28,20 +30,22 @@ opus judge matched known answers on a clean Manifest and on a copy with an unsta
 ungated rule, and an invented threshold planted in it. Keep opus here unless that check is
 repeated with a cheaper judge.
 
-## Cases added 2026-10-13 — unmeasured
+## Cases added 2026-10-13 and 2026-10-14 — unmeasured
 
 | Case | Discipline under test |
 |---|---|
-| `d18-map-gate` | A change touching a mapped feature gates that its verification-surface entry is updated and exercised live |
+| `d18-map-gate` | A change touching a feature with a recipe gates that the recipe is updated and run with the harness |
 | `d19-workaround-comment` | A workaround comment in touched code becomes a refactor target, not a deletion |
 | `d20-preparatory-slice` | When the touched area resists the change, a behavior-preserving restructuring comes first |
 | `d21-user-rule-over-default` | A rule the project states overrides a conflicting task-file Default, and the adjustment is recorded |
+| `d22-projectless-manifest-builds-no-harness` | A one-off script outside any project gets a Manifest whose gates check its output, with no harness, recipe, decision record or setup. A guard: the no-plugin arm is expected to pass it, so a Δ of zero is no reason to remove it |
 
 These have never been run; the first both-arm run decides which stay. **Every number below is stale
-as of 2026-10-13**: that change edited define's spine and its task files, so the next baseline
-replaces them. A single 2026-10-14 drive of `d01` (not a measurement) found define keeping the
+as of 2026-10-14**: the 2026-10-13 change edited define's spine and its task files, and the
+2026-10-14 change moved its verification wording to one harness, so the next baseline replaces
+them. A single 2026-10-14 drive of `d01` (not a measurement) found define keeping the
 requested layer cut as a user's call; define's slicing rule now says a requested cut is never one,
-and a re-drive came back re-cut (`docs/features/evidence/define/`).
+and a re-drive came back re-cut (`verification/evidence/define/`).
 
 ## First measurement of `d11`–`d17` — 2026-10-12
 

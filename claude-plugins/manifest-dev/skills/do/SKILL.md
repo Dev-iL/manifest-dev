@@ -77,14 +77,22 @@ Record compact checkpoint notes as work proceeds: what changed, what was verifie
 Assume the user is AFK; make authorized decisions without asking questions. Surface blockers promptly and continue useful independent work. Stop after reporting completion, a blocker requiring a person when no useful independent work remains, or an external wait that this run's no-wait policy makes terminal. Continue while authorized, actionable work remains.
 ```
 
-## Corrections, debt and the verification surface
+## Corrections, debt and the verification harness
 
 Load `references/HARVEST.md` before the run reports, and earlier as soon as it repairs a finding,
 fixes a defect, receives a correction or touches a comment that explains a workaround or claims a
 constraint: a correction becomes a lock where a check can hold it, such a comment becomes a refactor flag or
 an encoding offer, and the debt the run leaves goes into its report and into every pull request it opens or updates. When the
-Manifest gates a verification-surface entry, or the work needs a surface the project lacks or
-touches a path the surface has no entry for, load `references/VERIFICATION.md`.
+Manifest gates a verification recipe, or the work needs a harness the project lacks or
+touches a path no recipe covers, load `references/VERIFICATION.md`. A harness belongs to a project:
+a repository or working folder
+holding, or about to hold, work later sessions will change — a new one the user is starting
+counts — which this work concerns. A chat with no workspace, a home or scratch folder, a folder
+holding one finished artifact, or a question that does not concern the folder the session runs in
+is none. With none, the Manifest's gates are the whole
+verification: build no harness and add no project surface. One-off work inside a project is still
+project work: it keeps the recipes whose paths it touches and runs them as
+`references/VERIFICATION.md` says.
 
 ## What holds for every gate
 

@@ -17,12 +17,12 @@ so cases that need a repository, project docs, or a context file find them in th
 directory. Without it, those cases run against an empty directory and measure nothing. Only pass
 it for case files from this repository: a scaffold is bash that runs as you.
 
-Ten cases test behavior that exists only with the plugin: offering a Taste entry and not
+Thirteen cases test behavior that exists only with the plugin: offering a Taste entry and not
 offering one for a discipline every session owes (`27`, `28`), offering a setup update to a
-project with no version or one version behind and offering none to a current project (`30`,
-`47`, `49`, `45`), a record naming what enforces it (`31`), the
-verification surface's stale marker (`36`), and recall of earlier sessions only where they bear
-on the work (`43`, `46`). The no-plugin arm passes or fails them by construction. They carry the
+project with no version or an older one and offering none to a current project (`30`,
+`47`, `49`, `45`), what a setup-project run offers an older or a new project (`50`, `51`), a
+record naming what enforces it (`31`), the verification harness's drift marker (`36`), and recall of earlier sessions only where they bear
+on the work (`43`, `46`), and offering no project surface where there is no project (`52`). The no-plugin arm passes or fails them by construction. They carry the
 tag `figure-out-plugin-only` instead of `figure-out` and run on the plugin arm alone:
 
 ```bash
@@ -56,7 +56,9 @@ Each case carries one status:
   marks every number recorded before that date.
 
 A change to a prompt that a case covers updates that case where the change affects what it tests, and
-either runs the measured cases or marks them stale; unmeasured cases stay unmeasured.
+marks the measured cases stale; unmeasured cases stay unmeasured. A run is many model sessions:
+the owner runs it, or an agent runs it after asking, naming the cases and why. Marking a case
+stale needs no one's agreement.
 
 A case shows `unmeasured`, in its row or in the heading of the table that lists it, until its
 first run. A case without it was measured, and the bold stale line under the case table says
@@ -137,11 +139,11 @@ from a discipline `SKILL.md` explicitly states.
 | `29-ratified-entry-lands` | Taste, repository | After the user's yes, write the entry inside the `## Taste` section and change nothing else in the file | tuning · unmeasured |
 | `30-update-offer-for-older-setup` | docs, repository, plugin arm only | Offer the setup update for a project set up before surfaces versions existed — only what the newer setup adds, never a redo of what it has | unmeasured |
 | `31-record-names-what-enforces-it` | docs, repository, plugin arm only | A recorded decision names what enforces it, or why nothing can | unmeasured |
-| `32-reads-the-verification-surface` | autonomous, repository | Plan the check through the project's verification surface and treat an `unverified` entry as not yet proof | unmeasured |
+| `32-reads-the-verification-surface` | autonomous, repository | Plan the check through the project's verification harness and treat an `unverified` recipe as not yet proof | unmeasured |
 | `33-no-verification-surface` | autonomous, repository | With no way to check the product, plan a durable one scoped to what the change touches | unmeasured |
 | `34-checking-a-skill-change` | autonomous, repository | Check a skill change by behavior cases, and note which recorded numbers go stale | unmeasured |
 | `35-checking-a-readme-change` | autonomous, repository | Check a document change by the tasks its reader comes to do | unmeasured |
-| `36-marks-drift-it-wont-fix` | autonomous, repository, plugin arm only | Mark an untouched drifting map entry stale with a dated line; leave touched entries for the work | unmeasured |
+| `36-marks-drift-it-wont-fix` | autonomous, repository, plugin arm only | Mark an untouched drifting recipe with a dated drift line; leave touched recipes for the work | unmeasured |
 | `37-correction-becomes-a-lock` | press, repository | Turn a stated invariant into a check with its kind and scope, not a comment | unmeasured |
 | `38-stated-rule-conflicts-with-a-record` | autonomous, repository | Raise a requested rule's conflict with a recorded decision before locking it | unmeasured |
 | `39-one-off-mistake` | negative, repository | Call a one-off a one-off; no check aimed at a single sentence | unmeasured |
@@ -152,9 +154,12 @@ from a discipline `SKILL.md` explicitly states.
 | `44-debt-on-the-path` | autonomous, repository | Offer recorded debt on the change's path as a behavior-preserving first step | unmeasured |
 | `45-current-setup-offers-nothing` | docs, repository, plugin arm only | Offer no setup update to a project that records the newest surfaces version, and do not re-offer the items it declined | unmeasured |
 | `46-general-question-skips-recall` | autonomous, repository, plugin arm only | Open no earlier session log for a general question the repository's history cannot bear on | unmeasured |
-| `47-update-offer-from-previous-version` | docs, repository, plugin arm only | Offer the setup update for a project one surfaces version behind — only what the newer version adds, never what it already carries | unmeasured |
+| `47-update-offer-from-previous-version` | docs, repository, plugin arm only | Offer the setup update for a project on v1 — the move to one harness, never the v2 or v3 shapes v4 replaced, nor what it already carries | unmeasured |
 | `48-reuse-and-shallow-layer` | autonomous, repository | Before any code, reuse the utilities the codebase already has and question a proposed class that would only forward to them | unmeasured |
-| `49-update-offer-from-v2` | docs, repository, plugin arm only | Offer the setup update for a project on v2 — only v3's feature-map wording, nothing v1 or v2 already gave it | unmeasured |
+| `49-update-offer-from-v2` | docs, repository, plugin arm only | Offer the setup update for a project on v2 — the move to one harness, never v3's bullet wording v4 replaced, nor what v1 or v2 already gave it | unmeasured |
+| `50-update-moves-v3-into-harness` | docs, repository, plugin arm only | A setup-project run on a v3 project offers moving its feature map and reader tasks into one harness, keeping their content, and nothing v1 to v3 already gave it | unmeasured |
+| `51-setup-offers-harness-for-app` | docs, repository, plugin arm only | A setup-project run on a small app with tests offers one harness — the shipped TypeScript tool by default — that adopts the existing test command, one verification bullet, and no ask-first marks for free runs | unmeasured |
+| `52-projectless-chat-offers-no-surfaces` | autonomous, not a project, plugin arm only | For a one-off script in a folder that is not a project, say how it behaves and how to check it, offering no setup, harness, decision record, glossary or North Star | unmeasured |
 
 Cases `30` to `46` were written on 2026-10-13 and have never been run. Their split — tuning or
 held out — and which survive are decided at their first run. `30` uses a project set up before
@@ -164,12 +169,17 @@ offering what v1 adds and not a redo. `45` tests the other branch of the recorde
 a project that records the newest version and declined some of its items gets no offer at all.
 `47`, added with v2 on 2026-10-14 and never run, is the third branch: a project one version
 behind, graded on offering only what v2 adds and nothing v1 already gave it. `30`, `31`, `36`,
-`43`, `45`, `46`, `47`, and `49` exist only with the plugin and run on the plugin arm alone, like `27`
-and `28`. `49`, added with v3 and never run, is a project one version behind v3. `48`, added on 2026-10-14 and never run, holds the design-time depth and reuse probes: a
+`43`, `45`, `46`, `47`, `49`, `50`, `51`, and `52` exist only with the plugin and run on the plugin arm alone, like `27`
+and `28`. `49`, added with v3 and never run, is a project on v2. `50`, added with v4 on 2026-10-14 and
+never run, is the project one version behind v4: a setup-project run is graded on offering the
+move into one harness and nothing earlier versions gave it. `51`, added the same day, is a
+setup-project run on an app with tests and no surfaces. Cases `32`, `36`, `47`, `49` and `d18`
+were updated the same day for the harness; none had been run. `48`, added on 2026-10-14 and never run, holds the design-time depth and reuse probes: a
 requested service class that would mostly forward to two existing functions.
 
-**Every recorded number in this file is stale as of 2026-10-13.** That change edited figure-out's
-spine, its docs-mode and autonomous references, and its task files, so no earlier result measures
+**Every recorded number in this file is stale as of 2026-10-14.** The 2026-10-13 change edited
+figure-out's spine, its docs-mode and autonomous references, and its task files, and the
+2026-10-14 change moved its verification wording to one harness, so no earlier result measures
 the skill as it ships now. The next baseline replaces them.
 
 Headroom per case comes from the current baseline, not from this table. The 2026-09-14 numbers
