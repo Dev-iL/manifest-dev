@@ -10,6 +10,7 @@ the section names are read from there rather than restated here.
 from __future__ import annotations
 
 import json
+import os
 import re
 import subprocess
 from pathlib import Path
@@ -203,15 +204,18 @@ def test_drive_harness_never_reuses_an_evidence_directory(tmp_path: Path) -> Non
         )
         for _ in range(2)
     ]
-    for drive in drives:
-        try:
+    try:
+        for drive in drives:
             drive.communicate(timeout=60)
-        finally:
+    finally:
+        for drive in drives:
             drive.kill()
+            drive.wait()
     made = sorted(p.name for p in (store / "figure-out").iterdir())
     assert made == ["20990101T000000Z", "20990101T000000Z-2"], made
 
 
+@pytest.mark.skipif(os.geteuid() == 0, reason="root ignores directory permissions")
 def test_drive_harness_fails_fast_when_it_cannot_create_evidence(
     tmp_path: Path,
 ) -> None:
