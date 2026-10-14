@@ -5,8 +5,8 @@ Angles that are easy to under-weight on new functionality. Considerations, not a
 ## Blind-spot probes
 - **Beyond the happy path** *(default press when there's a runnable surface)* — Sharpens the base's verification-design probe: is the feature *exercised* — run end-to-end against its real use cases — or only inspected as present in the diff? Settle which new paths get driven, not just the demo flow. Approach, not the enumerated plan.
 - **Partial failure** — What state is left behind if it fails halfway through?
-- **Orphaned resources** — Does this create data or state that grows unbounded with no cleanup path?
-- **Rollback** — If this ships and goes wrong, how is it reversed — flag, migration rollback, manual revert?
+- **Orphaned resources** — Does this create data, state, calls or connections that grow per item or over time, at real sizes, with no bound or cleanup path?
+- **Rollback** — If this ships and goes wrong, how is it reversed — flag, migration rollback, manual revert? Can old and new versions run side by side against the same data, messages and configuration during deploy, is every persisted or sent shape versioned, and what must exist in each environment first?
 - **Slow-motion walk** — Played the use case through one step at a time, rather than at the altitude of "and then it works"? The holes sit between the steps nobody narrated.
 - **Undiscussed surface** — Which user-visible surfaces does this create — screens, output, flow — whose look and feel the conversation never touched? The mechanism gets pressed; the surface the user judges fills in from defaults.
 - **Bundled concerns** — Does the plan carry a fix together with experiments or unrelated improvements that should each stand on their own?

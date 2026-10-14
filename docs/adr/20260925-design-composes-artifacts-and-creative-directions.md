@@ -41,6 +41,9 @@ Both collections are non-exhaustive and composable. A blend has a coherent cente
 - The collections need editorial care to remain distinct and concise.
 - General visual-quality improvement is unmeasured; structural checks and brief-level exercises establish narrower properties.
 
+## Enforced by
+partly — `tests/test_design_standalone.py` — `test_entrypoint_stays_design_guidance` fails if the design entrypoint, source or Codex copy, gains build, implement, render, verify, repair or deliver vocabulary, holding the line that design guidance prescribes no implementation, verification or delivery; the guides themselves, which of them load, and how they compose stay judgment.
+
 ## Source
 
 - Amends 20260924-design-starts-from-the-person-and-their-moment: artifact use is modeled explicitly beneath the person-and-moment foundation; required external catalogs remain retired.

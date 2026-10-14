@@ -1,7 +1,7 @@
 # ADR: A rule the user states overrides a conflicting plugin Default
 
 ## Status
-Accepted
+Accepted; extended by 20261014-design-time-probes-cover-what-reviewers-can-know-and-defaults-yield-to-stated-rules: figure-out probes and reviewer standards yield too, and the context file's outcome rules shape the design
 
 ## Area
 define

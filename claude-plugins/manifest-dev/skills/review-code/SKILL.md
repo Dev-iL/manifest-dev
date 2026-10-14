@@ -14,7 +14,7 @@ Audit a change along **one** review dimension and report findings. Load only tha
 
 ## Dimensions and thresholds
 
-Load `references/<dimension>.md` for the requested dimension and follow it. The threshold is the bar a change must clear to PASS on that dimension:
+Load `references/<dimension>.md` for the requested dimension and follow it. Its standards are opinionated defaults: where a rule the user stated, in the session or a context file, or a convention the project keeps differs, that rule governs, a change following it raises no finding, and the report names the rule applied. The threshold is the bar a change must clear to PASS on that dimension:
 
 | Dimension | Reference | Role | Threshold (PASS requires) |
 |-----------|-----------|------|---------------------------|

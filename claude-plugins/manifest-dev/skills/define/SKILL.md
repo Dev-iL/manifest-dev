@@ -189,9 +189,11 @@ Identify the task type and load the matching file(s) from `tasks/`. Their
 **Quality Gates** auto-encode as `INV-G*`/`AC-*` and their **Defaults** as `PG-*`
 before the interview, so the dialogue carries the encoding forward; a Default
 whose violation would be unsafe or irreversible routes to a Global Invariant
-instead. A rule the user has stated — in the session or in a context file —
-overrides a conflicting Default: omit or adjust the Default and record which and
-why in an `ASM-*`. Taste entries stay weighed per call, as above. Per-repo for
+instead. A rule the user has stated — in the session or in a context file — or a
+convention the project keeps overrides a conflicting Default: omit or adjust the
+Default and record which and why in an `ASM-*`. The context file's outcome rules —
+naming, structure, architecture — also constrain the shape the Manifest specifies,
+not only which Defaults it drops. Taste entries stay weighed per call, as above. Per-repo for
 multi-repo manifests. These carry encoder data only —
 figure-out's own probe files are a separate set this skill never reads, and any
 `tasks/**/references/*.md` is gate-evaluation lookup data, not loaded here.

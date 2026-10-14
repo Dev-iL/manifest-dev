@@ -67,10 +67,10 @@ Where detection is genuinely balanced, say so and ask, rather than picking silen
 
 ## Precedence
 
-A project's own style sheet or `AUTHOR_VOICE.md` outranks the shipped references — this is the
-one home for that rule, and it applies to every register. Before reviewing, look for one in the
-project; where it states a rule that differs from the reference, the project's rule governs and
-the reference's version raises no finding. Say in the report which style source you applied.
+A project's own style sheet or `AUTHOR_VOICE.md`, and any rule the user stated in the session or a
+context file, outrank the shipped references — this is the one home for that rule, and it applies
+to every register. Before reviewing, look for them; where one states a rule that differs from the
+reference, it governs and the reference's version raises no finding. Say in the report which style source you applied.
 
 ## Reporting
 

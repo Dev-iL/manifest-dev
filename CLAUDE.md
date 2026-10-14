@@ -171,10 +171,12 @@ Every file setup-project copies or emits into projects — `figure-out/reference
 
 figure-out's task files and define's task files are decoupled, so a red-flag list both need lives in both. Change one, change the other:
 
-- `figure-out/tasks/CODING.md` (*Shape before build*, *A second shape*, *What the next agent copies*, *Design discipline*, and *The verification surface*'s fit-to-trust question) ↔ `define/tasks/CODING.md` Defaults (*Sketch the shape before implementing*, *Screen for what the next agent copies*, *Reshape, don't patch*, *Trust the check before relying on it*).
-- `figure-out/tasks/FEATURE.md` (*Bundled concerns*, *Remembered steps*) ↔ `define/tasks/FEATURE.md` Defaults (*One concern per change*, *No step that depends on memory*).
+- `figure-out/tasks/CODING.md` (*Shape before build*, *Already provided*, *Earned depth*, *A second shape*, *What the next agent copies*, *Design discipline*, *Recorded intent*, *Drivable and debuggable*, *Failure visibility*, *Silent regression*, *Verification design*'s independent expected values, and *The verification surface*'s fit-to-trust question) ↔ `define/tasks/CODING.md` Defaults (*Sketch the shape before implementing*, *Use what is already provided*, *Earn each module's depth*, *Screen for what the next agent copies*, *Hold the design discipline*, *Read the intent before removing a guard*, *Make failure visible and the result drivable*, *Name what could regress silently*, *Agree test seams before authoring tests*, *Reshape, don't patch*, *Trust the check before relying on it*).
+- `figure-out/tasks/FEATURE.md` (*Bundled concerns*, *Remembered steps*, *Rollback*, *Orphaned resources*) ↔ `define/tasks/FEATURE.md` Defaults (*One concern per change*, *No step that depends on memory*, *Define rollback strategy*, *Bound what grows*).
 - `figure-out/tasks/DOCUMENT.md` (*One mode*, *A fact restated*, *The same fact twice*) ↔ `define/tasks/DOCUMENT.md` Defaults (*One mode per document*, *Generate or link what code owns*, *One copy of each fact*).
-- `figure-out/tasks/PROMPTING.md` (*A rule in two files*, *An instruction where a check belongs*) ↔ `define/tasks/PROMPTING.md` Default (*One rule, one place*).
+- `figure-out/tasks/DOCUMENT.md` and `WRITING.md` (*Sources in hand*) ↔ `define/tasks/PROSE_FLOOR.md` *Accuracy* gate; `figure-out/tasks/WRITING.md` (*The author's own point*) ↔ `define/tasks/WRITING.md` gates.
+- `figure-out/tasks/UI.md` (*Every state*, *Who and where*, *Honest figures*) ↔ `define/tasks/UI.md`'s design gate, whose `review-design` standards cover functional states, access, medium and figure fidelity.
+- `figure-out/tasks/PROMPTING.md` (*A rule in two files*, including a contradicted one; *An instruction where a check belongs*) ↔ `define/tasks/PROMPTING.md` Default (*One rule, one place*).
 - `figure-out/tasks/PERF.md` ↔ `define/tasks/PERF.md` (limiter, noise floor, fair comparison, harness first, unlike scenarios).
 
 ## Slicing Discipline Ownership

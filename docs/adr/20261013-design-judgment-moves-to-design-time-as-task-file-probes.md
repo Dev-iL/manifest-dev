@@ -1,7 +1,7 @@
 # ADR: Design judgment moves to design time as task-file probes and Defaults; review dimensions stay as post-code gates
 
 ## Status
-Accepted
+Accepted; extended by 20261014-design-time-probes-cover-what-reviewers-can-know-and-defaults-yield-to-stated-rules: every reviewer category knowable at design time gets a probe or a stated reason
 
 ## Area
 Task guidance

@@ -47,6 +47,7 @@ def test_prompts_do_not_delegate_to_another_skill(skill_dir: Path) -> None:
         assert not invocation.search(text), document
 
 
+# Holds the decision in docs/adr/20260925-design-composes-artifacts-and-creative-directions.md.
 @pytest.mark.parametrize("skill_dir", SKILL_DIRS, ids=("source", "codex"))
 def test_entrypoint_stays_design_guidance(skill_dir: Path) -> None:
     # Bounded guard against the execution vocabulary removed from this prompt.

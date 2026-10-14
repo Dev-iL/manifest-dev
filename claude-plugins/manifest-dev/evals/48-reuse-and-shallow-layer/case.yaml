@@ -1,0 +1,4 @@
+schema_version: "1.0"
+name: 48-reuse-and-shallow-layer
+context:
+  scaffold_script: scaffold.sh

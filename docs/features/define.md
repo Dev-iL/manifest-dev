@@ -11,6 +11,7 @@ Status: verified (2026-10-14); not driven: the bare slash command, the descripti
 - `babysit` — `--babysit <pr-url>`: a lifecycle-only Manifest synthesized from a pull request
 - `autonomous` — `--autonomous`: no approval wait; decisions recorded as `(auto)` assumptions
 - `recall` — reads earlier work on the repository before encoding
+- `precedence` — a rule the user states or a project convention overrides a conflicting Default, recorded as an assumption; the context file's outcome rules shape the Manifest
 
 ## How to get to it (user POV)
 
@@ -23,12 +24,13 @@ Status: verified (2026-10-14); not driven: the bare slash command, the descripti
 Preconditions: the baseline in the index; a define case's prompt from `claude-plugins/manifest-dev/evals/define/`, with its scaffold where the case has one.
 
 - **New Manifest.** `scripts/features/drive.sh define <prompt>` with the prompt of `claude-plugins/manifest-dev/evals/define/d01-layer-cut/prompt.md` (it needs no scaffold). The drive's home holds `.manifest-dev/manifests/manifest-<timestamp>.md` and the reply ends with `Manifest complete: <path>`.
+- **Project rule over a Default.** `scripts/features/drive.sh define <prompt> --scaffold claude-plugins/manifest-dev/evals/define/d21-user-rule-over-default` with that case's prompt. The Manifest checks the fix only through `checks/`, keeps test files out, and records the overridden regression-test Default.
 - **Amend.** In the same prompt, after the Manifest is written, `/manifest-dev:define <that path> <one change>`. Only the named items change; IDs of the others are untouched (diff the file).
 - **Proof.** From the drive's summary and its full evidence. Every gate in the Manifest ends with `Judgment gate.` or `Deterministic gate.` and the ceiling invariant is present verbatim.
 
 ## How it is checked
 
-The define behavior suite, `claude-plugins/manifest-dev/evals/define/` cases `d01` to `d21` (tag `define`), statuses in `claude-plugins/manifest-dev/evals/define/README.md`; `tests/test_shared_blocks.py` and `tests/test_goal_contract_blocks.py` pin the blocks its handoff carries. Drive evidence: `docs/features/evidence/define/20261014T071022Z.md`.
+The define behavior suite, `claude-plugins/manifest-dev/evals/define/` cases `d01` to `d21` (tag `define`), statuses in `claude-plugins/manifest-dev/evals/define/README.md`; `tests/test_shared_blocks.py` and `tests/test_goal_contract_blocks.py` pin the blocks its handoff carries. Drive evidence: `docs/features/evidence/define/20261014T071022Z.md` (layer re-cut), `docs/features/evidence/define/20261014T080014Z.md` (project rule over a Default).
 
 ## Gotchas
 

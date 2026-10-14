@@ -8,6 +8,7 @@ Status: verified (2026-10-14); not driven: the description phrases, define's cod
 
 - `dimension` — one of: change-intent, code-bugs, code-design, code-simplicity, code-maintainability, code-testability, test-quality, type-safety, contracts, operational-readiness, docs, prose-value, defect-class, context-file-adherence
 - `scope` — a supplied range, or the diff against the remote default branch
+- `precedence` — a rule the user states or a project convention governs over the dimension's defaults; a change following it raises no finding, and the report names the rule
 
 ## How to get to it (user POV)
 
@@ -20,11 +21,12 @@ Status: verified (2026-10-14); not driven: the description phrases, define's cod
 Preconditions: the baseline in the index; a scratch repository with a commit on a branch ahead of its default branch.
 
 - **Review.** `scripts/features/drive.sh review-code <prompt>` with a prompt that commits a small change with one bug on a branch, then `/manifest-dev:review-code code-bugs`. A report naming the dimension, findings with severity and evidence, and one verdict.
+- **Project rule.** A prompt that commits a context file naming a convention a dimension would flag (a shared module-level instance), a change following it, then that dimension. No finding on the convention; the report names the rule applied.
 - **Proof.** From the drive's summary and its full evidence. Every finding points at a line inside the change.
 
 ## How it is checked
 
-This entry's recipe, driven through `scripts/features/drive.sh`; `tests/test_review_scope.py` pins how scope is resolved. No behavior case measures the review. Drive evidence: `docs/features/evidence/review-code/20261014T063700Z.md`.
+This entry's recipe, driven through `scripts/features/drive.sh`; `tests/test_review_scope.py` pins how scope is resolved. No behavior case measures the review. Drive evidence: `docs/features/evidence/review-code/20261014T063700Z.md` (planted bug), `docs/features/evidence/review-code/20261014T080014Z.md` (project rule).
 
 ## Gotchas
 

@@ -7,6 +7,7 @@ Angles that are easy to under-weight when writing or changing a document — a R
 - **How it gets checked** — Which tasks does a reader come to this document to do, and how would a reader with only the document show they can do them? Does the project already keep such a list for it?
 - **A fact restated** — Does the document copy a fact that code or configuration owns — a flag, a default, a count — where it could be generated or linked instead?
 - **The same fact twice** — Is anything stated here that another document also states, so one copy will drift?
+- **Sources in hand** — Which claims will the document make, and what source, measurement or artifact backs each one before drafting?
 - **Terms from elsewhere** — Does it lean on a term defined only in another document the reader may never open?
 
 ## Forced trade-offs

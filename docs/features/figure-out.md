@@ -7,6 +7,7 @@ Status: verified (2026-10-14); not driven: the bare slash command, the descripti
 ## Sub-features
 
 - `investigate` — attended investigation, one ask per turn, ending in a read
+- `design-probes` — task-file probes raise what reviewers would flag — reuse, module depth, ownership, hidden contracts — before code; the user's and project's rules win over them
 - `docs` — on a project: glossary captures, decision-record offers, North Star updates, the setup offer, stale markers on the verification surface
 - `recall` — reads earlier logs, Manifests, Tickets and pull requests' debt for the same repository
 - `taste` — offers to save a stated steering preference to the user's memory file
@@ -27,12 +28,13 @@ Preconditions: the baseline in the index; a prompt file holding the matching eva
 
 - **Current setup, docs mode.** `scripts/features/drive.sh figure-out <prompt> --scaffold claude-plugins/manifest-dev/evals/45-current-setup-offers-nothing` with case `45`'s prompt. The reply says the setup is current, lists nothing the project lacks, does not suggest a setup run, moves to the topic with one ask, and names a log under the drive's `~/.manifest-dev/logs/`; the summary shows no files written.
 - **Setup one version behind.** The same with case `47`. The reply offers the update and names only what v2 adds.
+- **Design before code.** The same with case `48-reuse-and-shallow-layer`. The read reuses the existing `overdue_loans` and `send_to_member` and questions the requested forwarding class, before any code.
 - **Autonomous.** Any case's prompt with `--autonomous` added. No question waits for an answer; each self-answered ask appears as a flagged assumption on the read.
 - **Proof.** The drive's summary under `docs/features/evidence/figure-out/`. The reply ends at its one ask. A full read — conclusion, confidence, evidence, what would overturn it — needs the user's answers, which a one-prompt drive does not give; that path is the eval suite's.
 
 ## How it is checked
 
-The figure-out behavior suite, `claude-plugins/manifest-dev/evals/` cases `01` to `47` (tags `figure-out`, `figure-out-plugin-only`), all `unmeasured` or stale per `claude-plugins/manifest-dev/evals/README.md`; `tests/test_eval_cases.py` keeps its case list in step. Drive evidence: `docs/features/evidence/figure-out/20261014T062318Z.md`.
+The figure-out behavior suite, `claude-plugins/manifest-dev/evals/` cases `01` to `47` (tags `figure-out`, `figure-out-plugin-only`), all `unmeasured` or stale per `claude-plugins/manifest-dev/evals/README.md`; `tests/test_eval_cases.py` keeps its case list in step. Drive evidence: `docs/features/evidence/figure-out/20261014T062318Z.md` (current setup), `docs/features/evidence/figure-out/20261014T075743Z.md` (reuse and a shallow layer, case `48`).
 
 ## Gotchas
 

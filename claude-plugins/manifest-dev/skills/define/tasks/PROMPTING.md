@@ -50,4 +50,4 @@ When the task involves creating or updating a skill, also apply:
 - **Define empty input behavior** — What happens when the prompt receives no arguments; probe: should it ask, error, or use defaults?
 - **Calibrate emotional tone** — Keep arousal low (avoid urgency language, excessive praise, pressure framing). Target "trusted advisor" tone. Normalize failure in iterative prompts. Opening framing propagates into response planning
 - **Blind behavior checks** — Behavior cases keep their own wording and rubric out of what the prompt under test sees, and grade what the run actually did — the files it opened and wrote — rather than its account of what it did
-- **One rule, one place** — A rule another file already states is not restated; where a check could hold a rule, prefer the check to another line every run must read
+- **One rule, one place** — A rule another file already states is not restated or contradicted; where a check could hold a rule, prefer the check to another line every run must read, above all for what models do unreliably (exact counts, long-range recall, a format held over long output)

@@ -160,10 +160,14 @@ you'd have brought to the user as a flagged assumption on the read.
 ## Probes
 
 Load the matching file(s) from `tasks/` for the topic's shape — coding, feature,
-bug, refactor, diagnosis, tech design, research, performance, documents, prompts.
+bug, refactor, diagnosis, tech design, research, performance, documents, prompts,
+user-visible artifacts (`UI.md`), human-voiced writing (`WRITING.md`).
 They carry only angles the
 model under-weights by default; fold in what's load-bearing and ignore the rest.
-Nothing fits → probe generally.
+Nothing fits → probe generally. The probes are opinionated starting points: a rule
+the user states, in the session or a context file, or a convention the project keeps,
+wins where it conflicts, and the context file's outcome rules — naming, structure,
+architecture — constrain the shape being designed, not only which probes apply.
 
 When the investigation turns prompt-shaped — prompts, system prompts, skills,
 agents, or a prompt-driven failure — invoke the prompt-engineering skill for its

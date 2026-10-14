@@ -151,6 +151,7 @@ from a discipline `SKILL.md` explicitly states.
 | `45-current-setup-offers-nothing` | docs, repository, plugin arm only | Offer no setup update to a project that records the newest surfaces version, and do not re-offer the items it declined | unmeasured |
 | `46-general-question-skips-recall` | autonomous, repository, plugin arm only | Open no earlier session log for a general question the repository's history cannot bear on | unmeasured |
 | `47-update-offer-from-previous-version` | docs, repository, plugin arm only | Offer the setup update for a project one surfaces version behind — only what the newer version adds, never what it already carries | unmeasured |
+| `48-reuse-and-shallow-layer` | autonomous, repository | Before any code, reuse the utilities the codebase already has and question a proposed class that would only forward to them | unmeasured |
 
 Cases `30` to `46` were written on 2026-10-13 and have never been run. Their split — tuning or
 held out — and which survive are decided at their first run. `30` uses a project set up before
@@ -161,7 +162,8 @@ a project that records the newest version and declined some of its items gets no
 `47`, added with v2 on 2026-10-14 and never run, is the third branch: a project one version
 behind, graded on offering only what v2 adds and nothing v1 already gave it. `30`, `31`, `36`,
 `43`, `45`, `46`, and `47` exist only with the plugin and run on the plugin arm alone, like `27`
-and `28`.
+and `28`. `48`, added on 2026-10-14 and never run, holds the design-time depth and reuse probes: a
+requested service class that would mostly forward to two existing functions.
 
 **Every recorded number in this file is stale as of 2026-10-13.** That change edited figure-out's
 spine, its docs-mode and autonomous references, and its task files, so no earlier result measures
