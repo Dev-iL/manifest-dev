@@ -20,7 +20,7 @@ A verdict from source inspection alone is not a complete design evaluation. Insp
 
 ## Standards
 
-Use `../design/SKILL.md` for audience-centered art direction. Treat it as guidance beneath the brief and established design system, not a style-conformance gate. Every shipped standard here is an opinionated default: where a rule the user stated, in the session or a context file, or the project's own design system differs, that rule governs, an artifact following it raises no finding, and the report names the rule applied. If the companion skill is absent, judge against the supplied brief and references without inventing its defaults.
+Use `../design/SKILL.md` for audience-centered art direction. Treat it as guidance beneath the brief and established design system, not a style-conformance gate. Every shipped standard here is an opinionated default: where a rule the user stated, in the session or a context file, or the project's own documented design system differs, that rule governs, an artifact following it raises no finding, and the report names the rule applied — except a critical functional or access failure, which is still reported, naming the rule that produced it. If the companion skill is absent, judge against the supplied brief and references without inventing its defaults.
 
 This evaluator owns the conditional standards below. Load those the artifact's medium and touched domains call for:
 

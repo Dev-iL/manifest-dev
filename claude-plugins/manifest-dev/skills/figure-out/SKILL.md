@@ -165,7 +165,7 @@ user-visible artifacts (`UI.md`), human-voiced writing (`WRITING.md`).
 They carry only angles the
 model under-weights by default; fold in what's load-bearing and ignore the rest.
 Nothing fits → probe generally. The probes are opinionated starting points: a rule
-the user states, in the session or a context file, or a convention the project keeps,
+the user states, in the session or a context file, or a convention the project states or documents,
 wins where it conflicts, and the context file's outcome rules — naming, structure,
 architecture — constrain the shape being designed, not only which probes apply.
 

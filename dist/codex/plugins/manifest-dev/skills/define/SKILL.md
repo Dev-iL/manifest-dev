@@ -190,7 +190,7 @@ Identify the task type and load the matching file(s) from `tasks/`. Their
 before the interview, so the dialogue carries the encoding forward; a Default
 whose violation would be unsafe or irreversible routes to a Global Invariant
 instead. A rule the user has stated — in the session or in a context file — or a
-convention the project keeps overrides a conflicting Default: omit or adjust the
+convention the project states or documents overrides a conflicting Default: omit or adjust the
 Default and record which and why in an `ASM-*`. The context file's outcome rules —
 naming, structure, architecture — also constrain the shape the Manifest specifies,
 not only which Defaults it drops. Taste entries stay weighed per call, as above. Per-repo for
