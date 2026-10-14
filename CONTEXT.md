@@ -70,7 +70,7 @@ An index that asserts nothing its records don't, and is rebuilt from them rather
 _Avoid_: ADR list, table of contents.
 
 **Verification Surface**:
-A project's durable means of checking that an artifact future runs will change still does its job, in the artifact's own form: a harness plus a feature map for a runnable product, a behavior eval suite for prompts and skills, a reader-task list for a living document. Each entry is unverified, verified, or stale; an eval case is unmeasured, measured, or stale. Normal runs build and repair it where the work touches it, never a separate maintenance pass.
+A project's durable means of checking that an artifact future runs will change still does its job, in the artifact's own form: a harness plus a feature map for a runnable product, a behavior eval suite for prompts and skills, a reader-task list for a living document. Where people invoke the artifact, a feature map covers it whatever the form, saying how a user reaches each feature and how to drive and check it. Each entry is unverified, verified, stale, or (a map entry) unreachable; an eval case is unmeasured, measured, or stale. Normal runs build and repair it where the work touches it, never a separate maintenance pass.
 _Avoid_: Test suite, e2e suite, control skill.
 
 **Reader Task**:

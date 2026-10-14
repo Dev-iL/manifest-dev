@@ -21,6 +21,11 @@ The form follows the artifact:
 A project with several such artifacts keeps one surface per artifact and lists each in the
 project-surfaces section of the context file.
 
+Beside whichever forms it keeps, a project whose artifact people invoke — a product's routes
+and commands, a library's public calls, a plugin's skills — keeps one feature map over all of
+it, described below. The forms above check an artifact; the map is how a run finds where to go,
+and each map entry names the check that holds it.
+
 ## Build on what exists
 
 Before writing anything, look for verification assets the project already has: end-to-end
@@ -57,24 +62,56 @@ rich `--help`; machine-readable output; and errors that say what to do instead. 
 harness its own checks, so a broken harness fails loudly instead of failing every run that
 uses it.
 
-## A runnable product: the feature map
+## The feature map
 
-One entry per user-facing feature, each answering from the user's side:
+The map lets a run go straight to the right place: place a vague report against a feature,
+then reach and drive that feature without working out its entry points again. It describes the
+artifact from the user's side only. Where in the code a feature lives is read from the code at
+run time; frozen internals are the first thing to go stale. A report that fits no entry is said
+so and gets an entry, never a guessed path.
 
-- how to reach it — every entry point;
-- how to drive it with the harness — the exact commands, from a stated precondition;
-- what observable end state proves it works;
-- gotchas that can waste or invalidate a run.
+The map is a directory: an index, plus one file per user-facing feature.
 
-Every entry carries a status:
+**The index** carries what every recipe shares:
+
+- **Baseline preconditions** — the state every recipe starts from: the instance or invocation,
+  its data, the tools on the path, the health check that must pass first, and that a run never
+  drives an instance it did not start.
+- **Driving conventions** — stable handles over positions, commands taken literally, and how a
+  mutation is undone.
+- **Proof and skip rules** — capture the action and the resulting state, not only the end;
+  record the feature and entry point with every piece of evidence; report an entry point that
+  could not be driven with the attempt and the unmet prerequisite; and never report an entry
+  point as verified because a different one worked.
+- **The list of features**, one line each, linking its file.
+
+**Each feature file** opens with a title and one paragraph on what the user sees it do, then a
+`Status:` line, then these sections in this order:
+
+1. `Sub-features` — short IDs, one line per behavior.
+2. `How to get to it (user POV)` — every entry point: menu path, shortcut, command, trigger
+   phrase, or another feature that calls it.
+3. `Driving it` — a `Preconditions:` line, then labeled steps pairing each action with its exact
+   command and observable result, ending in what proves it works.
+4. `How it is checked` — the harness recipe, behavior case, test or reader task that holds it.
+5. `Gotchas` — traps that waste or invalidate a run.
+
+An entry carries what a reader cannot get elsewhere: entry points past the obvious one, how to
+drive it, what proves it worked, its traps. An entry that restates a description the artifact
+already shows its users costs upkeep and guides nobody.
+
+The `Status:` line reads:
 
 - `unverified` — catalogued but not yet driven; not proof of anything;
-- `verified` — driven by a run, with the date;
-- `stale` — a run found it drifting from the product, with a dated line naming what differs.
+- `verified (YYYY-MM-DD)` — driven by a run on that date;
+- `stale (YYYY-MM-DD): <what differs>` — a run found it drifting from the artifact;
+- `unreachable (YYYY-MM-DD): <prerequisite>` — a run tried an entry point and could not reach
+  it, naming the prerequisite it lacked and what it tried.
 
-The first build catalogs the product from its source — routes, commands, menus, documented
-features — and marks each entry `unverified`. That gives the map its breadth, so a vague report
-about any feature can be placed. Runs then verify the entries they exercise.
+The first build catalogs the artifact from its source — routes, commands, menus, invocable
+skills, documented features — and marks each entry `unverified`. That gives the map its
+breadth, so a vague report about any feature can be placed. Runs then verify the entries they
+exercise. `feature-map-example/` beside this file is a worked map in this shape.
 
 ## Prompts, skills, agents: the eval suite
 
@@ -90,7 +127,8 @@ and with no eval wording in what the candidate sees. Each case carries a status:
 
 One entry per task a reader comes to the document to do, with what the reader needs to end up
 able to do. A check walks each task with a fresh reader that has only the document, and records
-where it got stuck. Each entry carries the same three statuses as a feature map.
+where it got stuck. Each entry carries `unverified`, `verified` or `stale`, written as a feature
+map writes them.
 
 ## Every form
 
@@ -104,10 +142,30 @@ where it got stuck. Each entry carries the same three statuses as a feature map.
 - **Location** — keep the surface with the project, where any runner that checks out the
   repository finds it, and name the location in the project-surfaces section.
 
+## Fit to trust
+
+A surface can have every part and still not be worth trusting. Judge an existing one by the
+jobs it has to do, never by how this file would have built it:
+
+- **A cold proof run passes** — one entry, driven end to end from nothing, leaves evidence that
+  is still there after cleanup.
+- **Health is checkable** — something tells a usable instance from one that merely answers.
+- **Runs are isolated** — a run cannot drive a shared instance or another run's data.
+- **PASS means the real path** — not mocks past a boundary the product does not isolate, not a
+  test-only endpoint, not a skipped entry point counted as another's success.
+
+A surface that fails one of these has a gap, however complete it looks. Scripts instead of one
+command-line tool, another test runner, another layout: those are the project's choices, not
+gaps.
+
 ## What setup creates, and what runs build
 
 Setup seeds the surface: it records the form and location, adopts existing assets, catalogs
 entries from source in the form's first status (`unverified`, or `unmeasured` for an eval
 suite), writes the README and the repository check, and wires the project-surfaces entry. It
-builds harness commands only as far as existing assets already reach. The run that first needs
-to exercise an entry builds the rest, inside the change that needs it.
+builds harness commands only as far as existing assets already reach. Then it drives one entry
+end to end by that entry's own recipe and checks the evidence survives cleanup, setting the
+entry's status; where no entry can be driven yet, its report names the entry it tried and what
+stopped it. A map nobody has driven reads as proof it is not, so it is never handed over
+unsaid. The run that first needs to exercise an entry builds the rest, inside the change that
+needs it.

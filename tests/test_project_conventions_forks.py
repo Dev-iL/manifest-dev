@@ -183,6 +183,7 @@ def _sections_behind(fork: Fork) -> list[str]:
 
 # Holds the decision in docs/adr/20260809-adr-conventions-ship-as-project-knowledge.md.
 # Holds the decision in docs/adr/20261013-decision-records-name-what-enforces-them.md.
+# Holds the decision in docs/adr/20261014-only-records-in-effect-carry-enforcement.md.
 def test_forks_reproduce_the_emitted_default() -> None:
     report = []
     for fork in FORKS:

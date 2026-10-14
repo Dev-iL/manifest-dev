@@ -93,6 +93,8 @@ ADRs follow a four-state lifecycle: `Proposed` → `Accepted` → `Deprecated` �
 - **Deprecated**: The decision no longer applies but hasn't been replaced. Use when something was true but the world moved on.
 - **Superseded**: A newer ADR replaces this one. Always paired with `Superseded by [filename]` in the Status field, and the superseding ADR carries a matching `Supersedes [filename]` line.
 
+Only an `Accepted` record is in effect, including one a later record narrows or amends. Whatever acts on records reads only those in effect: backfilling `Enforced by`, building a `not yet` check, citing a record as a binding ruling. A `Deprecated` or `Superseded` record is history; its check is retargeted or retired with the record that changed it, and its `Enforced by` line is not backfilled or kept current.
+
 ## Writing an ADR is one act, not three
 
 Adding a record means doing all three of these in the same change:

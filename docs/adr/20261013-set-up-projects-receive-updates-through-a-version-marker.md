@@ -1,7 +1,7 @@
 # ADR: Set-up projects receive updates through a recorded version, offered by figure-out
 
 ## Status
-Accepted
+Accepted; narrowed by 20261014-setup-project-audits-the-whole-setup-when-run: a setup-project run audits the whole setup whatever version is recorded, and re-offers declined items; figure-out's offer stays version-gated
 
 ## Area
 Project context

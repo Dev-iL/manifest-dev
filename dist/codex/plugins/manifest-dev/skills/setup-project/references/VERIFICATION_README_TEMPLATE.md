@@ -27,6 +27,10 @@ Every entry carries one. <For a feature map or a reader-task list:>
 - `stale` — a run found it drifting from <the product | the document>. The entry carries a
   dated line naming what differs, for example
   `stale (YYYY-MM-DD): the route moved from /settings to /preferences`.
+- <For a feature map:> `unreachable` — a run tried an entry point and could not reach it. The
+  entry carries a dated line naming the missing prerequisite and what was tried, for example
+  `unreachable (YYYY-MM-DD): needs an admin account; tried Settings > Billing`. An entry point
+  is never marked verified because a different one worked.
 
 <For an eval suite:>
 

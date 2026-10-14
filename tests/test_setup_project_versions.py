@@ -102,6 +102,7 @@ def test_surfaces_template_carries_the_latest_version() -> None:
 NEWEST_VERSION_CASE = "45-current-setup-offers-nothing"
 
 
+# Holds the decision in docs/adr/20261014-setup-project-audits-the-whole-setup-when-run.md.
 def test_eval_cases_track_the_newest_version() -> None:
     # The newest-version case is graded on no offer, so it records the newest version. From
     # v2 on, another case records the version before it, the only way to exercise the update

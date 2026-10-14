@@ -190,14 +190,15 @@ on any stack — knows the surfaces exist and how to treat them. The template be
 single source of the emitted text. Emit it adapted to what the project actually has, and
 extend an existing section rather than duplicating one; where the host supports imports,
 the session-start reads become imports. The version comment records which surfaces version
-the project carries, so a later update offers only what changed since; write the current
+the project carries, so a later update can tell what changed since; write the current
 version from `CHANGES.md` beside this file. Include the verification-surface entry only where
-the project has one, naming where it lives and which form it takes.
+the project has one, naming where it lives and which form it takes, and the feature-map entry
+only where people invoke the artifact and the map is not already that surface.
 
 ```markdown
 ## Project surfaces
 
-<!-- setup-project surfaces v1 -->
+<!-- setup-project surfaces v2 -->
 
 This project keeps its direction, vocabulary, and decision memory in the repo — shared
 ground for every contributor and agent, regardless of tooling. Read `NORTH_STAR.md` and
@@ -221,6 +222,10 @@ ground for every contributor and agent, regardless of tooling. Read `NORTH_STAR.
   a list of reader tasks>: how this project checks that its result still does its job.
   A change to anything an entry covers updates that entry and exercises it, as its README
   describes.
+- **Feature map** — `<path>`: how a user reaches each feature and how to drive and check
+  it. Start there to place a report or find what a change touches. <Omit this bullet where
+  the verification surface above is already a harness and feature map, or where nobody
+  invokes the artifact.>
 ```
 
 <!-- Fixed boundary: copying resumes at the heading below and runs to the end of the file. -->

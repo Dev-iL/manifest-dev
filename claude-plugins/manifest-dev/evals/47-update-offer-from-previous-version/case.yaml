@@ -1,0 +1,4 @@
+schema_version: "1.0"
+name: 47-update-offer-from-previous-version
+context:
+  scaffold_script: scaffold.sh

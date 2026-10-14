@@ -21,6 +21,9 @@ reader-task list, statuses, repository check — are in setup-project's
 - **Drift:** when an exercise fails because the entry is wrong about the product, repair the
   entry within scope. When an entry the change does not touch is found drifting, mark it `stale`
   with a dated line naming what differs, and leave the repair to the next run that touches it.
+- **Unfit surface:** when the work finds the surface not fit to trust for what it touches —
+  `../../setup-project/references/VERIFICATION_SURFACE.md` → *Fit to trust* — repair it within
+  scope, as for drift, and report the rest as debt.
 - **Regressions:** when an exercise fails because the product is broken, report it as debt with
   the evidence. Never weaken an entry or a journey to make it pass.
 - **Evidence:** keep exercise evidence where the harness names it, so the completion report can

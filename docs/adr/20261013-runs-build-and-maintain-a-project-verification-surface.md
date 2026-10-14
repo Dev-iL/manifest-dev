@@ -1,7 +1,7 @@
 # ADR: Runs build and maintain a verification surface for each artifact that future runs will change
 
 ## Status
-Accepted
+Accepted; narrowed by 20261014-the-feature-map-is-a-navigation-contract-over-what-users-invoke: the feature map covers whatever users invoke in a fixed shape with a proof run, and an unfit surface is repaired where work touches it
 
 ## Area
 define / do

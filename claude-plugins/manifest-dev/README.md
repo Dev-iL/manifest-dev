@@ -50,7 +50,7 @@ These set up and feed the two longer-lived tiers:
 
 | Skill | What it does |
 |-------|--------------|
-| `/setup-project` | Sets a repository up with a North Star, a glossary, decision-record conventions, and a verification surface, plus the wiring that makes every session read them. Seeds them from the project's own history where there is any, and later offers a set-up project only what changed since the surfaces version it records. `/figure-out` offers it, so you rarely type it. |
+| `/setup-project` | Sets a repository up with a North Star, a glossary, decision-record conventions, and a verification surface, plus the wiring that makes every session read them. Seeds them from the project's own history where there is any, and run again on a set-up project audits the whole setup — including whether its verification surface can be trusted — and offers each gap, marking what changed since the surfaces version it records. `/figure-out` offers it when the version is behind or a surface is broken, so you rarely type it. |
 | `/ticket-up` | Writes work into your ticket store — from a finished Manifest, a direct request, an open question, or findings from other work. |
 | `/next-ticket` | Reads the store, picks the one to work on now, claims it, and says why it leads. |
 | `/run-ticket` | Takes one specific ticket end to end and records the outcome back on it. |
