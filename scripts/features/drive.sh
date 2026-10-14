@@ -68,13 +68,17 @@ out="$store/$feature/$stamp"
 reserve() {
   mkdir -p "$store/$feature"
   local base=$out n=1
-  until mkdir "$out" 2>/dev/null; do n=$((n+1)); out="$base-$n"; done
+  until mkdir "$out" 2>/dev/null; do
+    [[ -e $out ]] || die "cannot create $out (is $store writable?)"
+    n=$((n+1)); out="$base-$n"
+  done
   chmod 777 "$out"; stamp=${out##*/}
 }
 plugins=(--plugin-dir /repo/claude-plugins/manifest-dev)
 [[ $tools == 1 ]] && plugins+=(--plugin-dir /repo/claude-plugins/manifest-dev-tools)
 
 if [[ $dry == 1 ]]; then
+  base=$out; n=1; while [[ -e $out ]]; do n=$((n+1)); out="$base-$n"; done; stamp=${out##*/}
   echo "would drive: $feature  model=$model  image=$image  scaffold=${scaffold:-none}"
   echo "evidence:    $out"
   echo "summary:     docs/features/evidence/$feature/$stamp.md"

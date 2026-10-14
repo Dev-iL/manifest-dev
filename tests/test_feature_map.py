@@ -204,6 +204,40 @@ def test_drive_harness_never_reuses_an_evidence_directory(tmp_path: Path) -> Non
         for _ in range(2)
     ]
     for drive in drives:
-        drive.communicate(timeout=60)
+        try:
+            drive.communicate(timeout=60)
+        finally:
+            drive.kill()
     made = sorted(p.name for p in (store / "figure-out").iterdir())
     assert made == ["20990101T000000Z", "20990101T000000Z-2"], made
+
+
+def test_drive_harness_fails_fast_when_it_cannot_create_evidence(
+    tmp_path: Path,
+) -> None:
+    # Only "another drive holds this directory" may be retried; any other failure stops loudly.
+    bin_dir = tmp_path / "bin"
+    bin_dir.mkdir()
+    stub = bin_dir / "docker"
+    stub.write_text("#!/bin/sh\nexit 0\n")
+    stub.chmod(0o755)
+    store = tmp_path / "store"
+    (store / "figure-out").mkdir(parents=True)
+    (store / "figure-out").chmod(0o555)
+    try:
+        result = subprocess.run(
+            [str(DRIVE), "figure-out", str(INDEX)],
+            env={
+                "PATH": f"{bin_dir}:/usr/bin:/bin",
+                "HOME": str(tmp_path),
+                "ANTHROPIC_API_KEY": "test-key",
+                "MANIFEST_DEV_FEATURES_EVIDENCE": str(store),
+                "DRIVE_STAMP": "20990101T000000Z",
+            },
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+    finally:
+        (store / "figure-out").chmod(0o755)
+    assert result.returncode != 0 and "cannot create" in result.stderr, result.stderr
