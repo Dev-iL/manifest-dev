@@ -1,4 +1,4 @@
-# Holds the decision in docs/adr/20261014-design-time-probes-cover-what-reviewers-can-know-and-defaults-yield-to-stated-rules.md — removing this case removes that record's only check; update its Enforced by line in the same change.
+# Holds the decision in docs/adr/20261014-design-time-probes-cover-what-reviewers-can-know-and-defaults-yield-to-stated-rules.md — that record's Enforced by line names this case; weakening or removing it means updating that line in the same change.
 schema_version: "1.0"
 name: 48-reuse-and-shallow-layer
 context:

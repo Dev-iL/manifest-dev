@@ -63,6 +63,8 @@ fi
 
 stamp=$(date -u +%Y%m%dT%H%M%SZ)
 out="$store/$feature/$stamp"
+# Two drives of one feature started in the same second must not share a directory.
+n=1; while [[ -e $out ]]; do n=$((n+1)); out="$store/$feature/$stamp-$n"; done; stamp=${out##*/}
 plugins=(--plugin-dir /repo/claude-plugins/manifest-dev)
 [[ $tools == 1 ]] && plugins+=(--plugin-dir /repo/claude-plugins/manifest-dev-tools)
 

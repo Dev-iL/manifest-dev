@@ -174,3 +174,26 @@ def test_drive_harness_refuses_a_feature_with_no_entry() -> None:
         text=True,
     )
     assert result.returncode != 0 and "no entry" in result.stderr
+
+
+def test_drive_harness_never_reuses_an_evidence_directory(tmp_path: Path) -> None:
+    # Two drives of one feature in the same second once shared a directory and interleaved
+    # their transcripts; the harness must pick a fresh one.
+    env = {"PATH": "/usr/bin:/bin", "MANIFEST_DEV_FEATURES_EVIDENCE": str(tmp_path)}
+    first = subprocess.run(
+        [str(DRIVE), "figure-out", str(INDEX), "--dry-run"],
+        capture_output=True,
+        text=True,
+        env=env,
+    )
+    path = re.search(r"evidence:\s+(\S+)", first.stdout)
+    assert path, first.stdout
+    Path(path.group(1)).mkdir(parents=True)
+    second = subprocess.run(
+        [str(DRIVE), "figure-out", str(INDEX), "--dry-run"],
+        capture_output=True,
+        text=True,
+        env=env,
+    )
+    again = re.search(r"evidence:\s+(\S+)", second.stdout)
+    assert again and again.group(1) != path.group(1), second.stdout
