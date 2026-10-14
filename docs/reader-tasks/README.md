@@ -48,4 +48,5 @@ entry to pass.
 ## Evidence
 
 Walking an entry saves the reader's account to `docs/reader-tasks/evidence/`, named by entry and
-date, which nothing removes.
+date, and commits it with the change that walked it, so a `verified` status always has its walk
+beside it.

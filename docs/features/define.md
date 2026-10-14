@@ -20,9 +20,9 @@ Status: unverified
 
 ## Driving it
 
-Preconditions: the baseline in the index; a scratch directory from a define case's `scaffold.sh` under `claude-plugins/manifest-dev/evals/define/`.
+Preconditions: the baseline in the index; a define case's prompt from `claude-plugins/manifest-dev/evals/define/`, with its scaffold where the case has one.
 
-- **New Manifest.** Run the case's `prompt.md` (for example `d01-layer-cut`) headless with the plugin loaded. A file `~/.manifest-dev/manifests/manifest-<timestamp>.md` appears and the reply ends with `Manifest complete: <path>`.
+- **New Manifest.** `scripts/features/drive.sh define <prompt>` with the prompt of `claude-plugins/manifest-dev/evals/define/d01-layer-cut/prompt.md` (it needs no scaffold). The drive's home holds `.manifest-dev/manifests/manifest-<timestamp>.md` and the reply ends with `Manifest complete: <path>`.
 - **Amend.** Prompt `/define <that path> <one change>`. Only the named items change; IDs of the others are untouched (diff the file).
 - **Proof.** Save the transcript and the Manifest. Every gate in the Manifest ends with `Judgment gate.` or `Deterministic gate.` and the ceiling invariant is present verbatim.
 
@@ -32,9 +32,10 @@ The define behavior suite, `claude-plugins/manifest-dev/evals/define/` cases `d0
 
 ## Gotchas
 
-- The Manifest is written outside the repository, under `~/.manifest-dev/manifests/`; look there, not in the scratch directory.
+- The Manifest is written to the home directory, not the project: in a drive it is in the evidence's `home-manifest-dev.tar`.
 - Attended, it waits for a yes after the digest; a headless drive needs `--autonomous` or a prompt that says to proceed.
 - An old Manifest with a `verify` block is refused, not migrated.
 - A yes approves the Manifest, not execution: it never runs `/do` itself.
+- "It didn't stop for approval" is define only under `--autonomous` or when called by `auto`; a whole chain that never stopped is the auto entry.
 
 Source: `claude-plugins/manifest-dev/skills/define/SKILL.md`.

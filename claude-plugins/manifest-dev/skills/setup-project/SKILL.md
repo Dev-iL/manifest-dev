@@ -31,7 +31,7 @@ Read before writing, and never overwrite a surface the project already maintains
 
 ### The surfaces version
 
-The project-surfaces section in the context file records one surfaces version, as the comment the template carries. `references/CHANGES.md` lists what each version gives an installed project. Only this skill writes that line — when it installs, and when it finishes an update — plus figure-out when the user declines a whole update offer. Content written under the surfaces — a new record, a glossary entry, a feature-map entry — never changes it.
+The project-surfaces section in the context file records one surfaces version, as the comment the template carries. Read it from the file on disk: a host that loads the context file into the session may strip HTML comments, so the copy already in context can show no version where the file records one. `references/CHANGES.md` lists what each version gives an installed project. Only this skill writes that line — when it installs, and when it finishes an update — plus figure-out when the user declines a whole update offer. Content written under the surfaces — a new record, a glossary entry, a feature-map entry — never changes it.
 
 Where the project records a version, a difference in a copy the project owns can be attributed: content the shipped text gained since that version is new and is offered, and any other difference is the project's own choice and stays. Where the project records no version, compare as *Compare, then offer* below describes.
 

@@ -11,37 +11,46 @@ how a user reaches it and how a run drives it.
 
 - A checkout of this repository at the commit under test, with the virtual environment active
   (`source .venv/bin/activate`; `scripts/setup.sh` creates it).
-- Health first: `python3 -m pytest tests/test_skill_frontmatter.py tests/test_entry_points.py -q`
-  passes. A skill whose frontmatter does not parse is absent on some hosts, so a drive of it
-  proves nothing.
-- A skill is driven in a fresh, non-interactive agent session that loads the plugin from this
-  checkout — for Claude Code, `claude -p --plugin-dir ./claude-plugins/manifest-dev "<prompt>"`
-  (add `--plugin-dir ./claude-plugins/manifest-dev-tools` for its skills) — one prompt per
-  session, from a scratch directory outside this repository.
-- Anything a skill writes to a project goes into that scratch directory, built from the matching
-  eval case's `scaffold.sh` where one exists. Never drive a skill that edits files against this
-  checkout.
+- Docker running (colima on macOS) and `ANTHROPIC_API_KEY` in the environment or the shell
+  profile.
+- Health first: `scripts/features/drive.sh doctor` exits `0`. It starts one throwaway session and
+  checks that the plugin loaded and its skills are listed. A session that only answers proves
+  nothing, so a drive whose session did not load the plugin or the named skill is reported
+  `unreachable`, never counted.
+- Skills are driven with `scripts/features/drive.sh <feature> <prompt-file> [--scaffold
+  <eval-case-dir>] [--tools]`. Each drive runs in the pinned eval container with its own home and
+  a scratch project, this checkout mounted read-only: it neither reads nor leaves anything in
+  your `~/.manifest-dev`, and the container is removed afterwards. Where an entry names
+  `~/.manifest-dev/…`, that is the drive's own home, kept with the evidence.
+- The scratch project is built from the matching eval case's `scaffold.sh` where one exists.
 - Skills that act on GitHub, Slack or a shared Ticket store are driven only against a
   throwaway repository, channel or store the run owns. Their effects reach other people and do
   not undo.
+- The design instruments are local command-line tools and run directly with `node`; see their
+  entry.
 
 ## Driving conventions
 
-- Name the skill in the prompt (`use the define skill …` or the slash command). Auto-activation
-  from a description varies by phrasing; `claude-plugins/manifest-dev/evals/README.md` →
-  *Why the prompts name the skill* says why.
+- Name the skill in the prompt (`use the define skill …` or the slash command, written
+  `/manifest-dev:<skill>`). Auto-activation from a description varies by phrasing;
+  `claude-plugins/manifest-dev/evals/README.md` → *Why the prompts name the skill* says why.
 - Take commands and flags literally. A flag counts only as a top-level argument, not quoted
   inside the topic.
-- Read what the skill did from the session transcript and the files it wrote, never from its
-  own account of what it did.
-- Delete the scratch directory after a drive; keep the evidence.
+- Read what the skill did from the transcript and the files it wrote, never from its own
+  account of what it did.
+- `scripts/features/drive.sh --dry-run` prints what a drive would start and where its evidence
+  would go, without starting it.
 
 ## Proof and skip rules
 
-- Evidence is the prompt, the transcript (`--output-format stream-json` for Claude Code), and
-  the files the skill wrote, saved under `/tmp/manifest-dev-features/<feature>/<date>/`, outside
-  the checkout so cleanup and `git clean` never touch it.
-- Record the feature, the sub-feature and the entry point with every piece of evidence.
+- Every drive keeps its full evidence — transcript, scratch-project diff and new files, the
+  session's `~/.manifest-dev` — under
+  `${MANIFEST_DEV_FEATURES_EVIDENCE:-~/.local/state/manifest-dev-features}/<feature>/<stamp>/`,
+  outside the checkout, and writes a summary — model, plugins and skills loaded, prompt, files
+  written, final reply — to `docs/features/evidence/<feature>/<stamp>.md`, which is committed.
+  A `verified` status names the summary that backs it.
+- Record the feature and the entry point with every piece of evidence; the summary carries
+  both.
 - An entry point that could not be driven — no GitHub access, no Slack, no Ticket store — is
   recorded as `unreachable` with the prerequisite and what was tried. It is never reported as
   verified because another entry point worked.

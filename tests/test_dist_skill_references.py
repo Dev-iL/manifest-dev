@@ -307,6 +307,7 @@ def test_goal_setting_backstop_is_universal_across_source_and_dist() -> None:
 
 
 # Holds the decision in docs/adr/20260806-verification-is-bookkeeping-and-a-stop-condition.md.
+# Holds the decision in docs/adr/20260624-use-outcome-gated-auto-continuation.md.
 def test_do_completion_contract_requires_auditable_gate_ledger() -> None:
     """The backstop must preserve mode, provenance, and incomplete-gate state."""
     do_files = [
@@ -382,6 +383,8 @@ def test_do_completion_contract_requires_auditable_gate_ledger() -> None:
 
 
 # Holds the decision in docs/adr/20260907-executors-own-unattended-decisions-within-explicit-bounds.md.
+# Holds the decision in docs/adr/20260709-mid-do-steering-stays-autonomous.md.
+# Holds the decision in docs/adr/20260727-gate-text-changes-on-the-users-say-so.md.
 def test_executor_amendments_preserve_verification() -> None:
     """Prospective scope authority must reach the author and invalidate evidence."""
     base = ROOT / "claude-plugins/manifest-dev/skills"
@@ -401,6 +404,7 @@ def test_executor_amendments_preserve_verification() -> None:
 
 
 # Holds the decision in docs/adr/20260914-one-skill-per-beat-built-from-the-lean-body.md.
+# Holds the decision in docs/adr/20260805-ratchet-judgment-gate-reverification.md.
 def test_manifest_schema_stays_topology_neutral() -> None:
     """The Manifest must not regain an evaluator copy, an ordering field, or an
     inferred kind. Run-level verification policy was retired with the modes."""
@@ -592,6 +596,7 @@ def test_define_task_gates_do_not_select_evaluator_topology() -> None:
 
 
 # Holds the decision in docs/adr/20260807-a-gate-is-one-text-not-two.md.
+# Holds the decision in docs/adr/20260805-ratchet-judgment-gate-reverification.md.
 def test_operational_guidance_has_no_stale_per_gate_topology() -> None:
     files = [
         ROOT / "README.md",
@@ -669,6 +674,7 @@ def test_review_pr_manifest_mode_remains_independently_per_gate() -> None:
 
 
 # Holds the decision in docs/adr/20260905-executors-own-path-bearing-continuation-goals.md.
+# Holds the decision in docs/adr/20260624-use-outcome-gated-auto-continuation.md.
 def test_auto_investigation_keeps_read_bar_without_a_phase_goal() -> None:
     """Suppress the child goal before its generic standalone/parent rules run."""
     for root in (
@@ -803,6 +809,7 @@ def test_continuation_ownership_preserves_babysit_parent() -> None:
 
 
 # Holds the decision in docs/adr/20260903-shipped-skills-are-host-neutral-and-distributions-read-source.md.
+# Holds the decision in docs/adr/20260705-keep-plugin-first-layout-npx-skills-compatible.md.
 def test_pi_package_metadata_points_to_source_skills_and_prompts() -> None:
     package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
 
@@ -938,6 +945,7 @@ def test_no_malformed_activation_forms_on_any_surface() -> None:
             assert bad not in text, f"{path}: malformed activation form {bad!r}"
 
 
+# Holds the decision in docs/adr/20260518-verifier-fail-hints-are-directives.md.
 def test_check_pr_stays_workflow_neutral_on_every_surface() -> None:
     """check-pr is a workflow-neutral reporter and should not grow caller-specific
     pending tokens or workflow routing state in source or dist copies."""

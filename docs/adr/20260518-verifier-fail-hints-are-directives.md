@@ -57,6 +57,9 @@ The multi-line FAIL form uses `Reason:` / `Suggested:` / `Context:` fields per f
 - The FAIL output format is slightly less predictable for any tooling that wants to parse it: callers can't assume a finite enum, they must handle prose. In practice the consumer is an LLM (`/do` itself), and LLMs handle both shapes naturally — but the lack of a strict schema is a real change from the rigid-vocabulary direction.
 - A reader looking at this ADR's filename (`verifier-fail-hints-are-directives`) and finding it describes "findings, not directives" will notice the mismatch. The filename is a historical artifact of the first commit; the body describes the final shipped design. The in-PR-override convention accepts this filename-vs-body mismatch as the cost of reducing `docs/adr/` clutter.
 
+## Enforced by
+partly — `tests/test_dist_skill_references.py` — `test_check_pr_stays_workflow_neutral_on_every_surface` fails if `check-pr`'s source or Codex copy gains a caller-specific pending token; that the suggested fixes stay literal GitHub-state actions is judgment.
+
 ## Source
 
 - In-PR override note: this ADR was originally written in commit `58375f6` on this branch as "Verifier FAIL hints are directives, not suggestions" with a rigid-vocabulary direction. It was rewritten in place later in the same PR to reflect the final workflow-neutral design. Per the in-PR override convention: an ADR introduced in the same PR that supersedes another ADR from that PR is rewritten in place rather than written as a separate Superseded record, to reduce `docs/adr/` clutter when a single PR's design is still iterating. Once a PR merges, the standard ADR immutability rule applies — future supersedences will use separate `Superseded by` records.

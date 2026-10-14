@@ -32,6 +32,9 @@ The field lands in this project's `docs/adr/CONVENTIONS.md` and the shipped ADR 
 - Older records carry no decider, so their provenance stays unknown.
 - Projects with their own conventions copy gain the field only when they take the updated default.
 
+## Enforced by
+partly — `tests/test_project_conventions_forks.py` — `test_forks_reproduce_the_emitted_default` fails if this project's conventions and the shipped ADR format stop carrying the same `Decided by` field and rule; whether autonomous figure-out writes the unattended value, and whether a reviewer changes it, is judgment.
+
 ## Source
 - Session: figure-out investigation of unattended decision-making.
 - Related: 20261012-unattended-runs-flag-the-users-calls-by-disagreement-not-confidence

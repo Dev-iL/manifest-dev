@@ -41,6 +41,9 @@ Four coupled choices:
 - The calibration file rots on a months scale and needs refreshing by observation.
 - `review-design`'s relative-path load (`../design/references/`) assumes whole-plugin installs; single-skill installs fall back to search-by-name and degrade to judgment without the standards when that fails.
 
+## Enforced by
+partly — `tests/test_entry_points.py` — `test_user_invocable_skills_are_the_declared_set` fails if `design` or `review-design` leaves the main plugin; `tests/test_design_standalone.py` — `test_review_support_paths_resolve` and `test_prompts_do_not_delegate_to_another_skill` fail if the checker leaves `review-design` or `design` starts invoking another skill; what the references distill, and the deferred effectiveness evaluation, are judgment.
+
 ## Source
 - Session: autonomous figure-out → define → do run, 2026-09-01, from the owner's ruling to build the skill here.
 - Related: 20260703-progressive-disclosure-triggers-live-in-loading-layer (the references' loading-table structure follows it).

@@ -753,6 +753,7 @@ def test_shipped_text_names_no_plugin_qualifier_outside_html_comments() -> None:
 
 
 # Holds the decision in docs/adr/20260903-shipped-skills-are-host-neutral-and-distributions-read-source.md.
+# Holds the decision in docs/adr/20261012-figure-out-asks-through-the-hosts-question-capability-on-request.md.
 def test_shipped_text_names_no_host_tool() -> None:
     problems = []
     for path in shipped_markdown():

@@ -73,12 +73,16 @@ _Avoid_: ADR list, table of contents.
 A project's durable means of checking that an artifact future runs will change still does its job, in the artifact's own form: a harness plus a feature map for a runnable product, a behavior eval suite for prompts and skills, a reader-task list for a living document. Where people invoke the artifact, a feature map covers it whatever the form, saying how a user reaches each feature and how to drive and check it. Each entry is unverified, verified, stale, or (a map entry) unreachable; an eval case is unmeasured, measured, or stale. Normal runs build and repair it where the work touches it, never a separate maintenance pass.
 _Avoid_: Test suite, e2e suite, control skill.
 
+**Fit to Trust**:
+Whether an existing verification surface can be relied on, judged by the jobs it does — a cold proof run of one entry passes and leaves evidence that survives cleanup, health is checkable, runs are isolated, and PASS means the real path — never by whether it has every part or the shipped tooling.
+_Avoid_: Complete, conformant, healthy.
+
 **Reader Task**:
 One entry in a living document's verification surface: a task a reader comes to the document to do, the sections the reader relies on, what the reader should end up able to do, and a status. A reader with fresh context, given only the document, walks the entry.
 _Avoid_: User story, test case, doc test.
 
 **Surfaces Version**:
-The integer, listed in setup-project's `CHANGES.md`, that a project's context file records in its project-surfaces section. Setup-project writes it when it installs or updates the surfaces, and figure-out writes it when the user declines the whole update offer. The recorded number decides what an update offers: nothing at the newest version, the later `CHANGES.md` entries at an older one, and a full comparison when the project records none. Unrelated to the plugin's own version.
+The integer, listed in setup-project's `CHANGES.md`, that a project's context file records in its project-surfaces section. Setup-project writes it when it installs or updates the surfaces, and figure-out writes it when the user declines the whole update offer. The recorded number decides whether figure-out offers an update — none at the newest version — and lets a setup-project run mark which of its offers are new since then; a setup-project run audits the whole setup whatever number is recorded, and compares in full when none is. Unrelated to the plugin's own version.
 _Avoid_: Plugin version, setup version, template version.
 
 **Lock**:
@@ -187,6 +191,10 @@ _Avoid_: Steering layer, strategy doc, business context.
 **Taste**:
 A durable personal steering preference persisted only by offer-and-ratify — captured as preference, rationale, and flip condition in a harness memory file.
 _Avoid_: Preference, style, judgment.
+
+**User's Call**:
+A decision where two careful people with the same evidence could reasonably decide it differently, and the difference would matter to the user; the run's own confidence does not settle it. A run checks the user's Taste entries at one, decides it on the evidence when none bears, and lists it first wherever decisions are reported.
+_Avoid_: Low-confidence decision, judgment call.
 
 **Ticket**:
 A self-sufficient prose work packet holding one independently schedulable lifecycle unit and everything a stranger — person or agent, with or without manifest-dev — needs to pick it up, do it, and judge it done, per the ticket convention (`skills/ticket-up/references/TICKET_CONVENTION.md`).

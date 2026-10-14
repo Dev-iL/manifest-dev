@@ -33,5 +33,8 @@ Two small follow-ups were accepted instead (tracked as work items, not part of t
 - Layout asymmetry persists: Claude Code is source, other CLIs are generated artifacts — contributors must keep learning this rule.
 - The repo depends on third-party skill-picker CLIs continuing to scan `.claude/skills/` and plugin manifests; if the ecosystem converges on a top-level `skills/` convention as the only scanned path, this decision needs revisiting.
 
+## Enforced by
+partly — `tests/test_dist_skill_references.py` — `test_pi_package_metadata_points_to_source_skills_and_prompts` and `tests/test_dist_install_uninstall.py` — `test_opencode_registers_every_source_skill_root` fail if skills leave `claude-plugins/*/skills` as the source the distributions read; picker compatibility of the layout is judgment.
+
 ## Source
 - Related: 20260611-opencode-plugin-native-distribution, 20260531-codex-plugin-native-distribution

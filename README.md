@@ -14,7 +14,7 @@ Agents can write almost anything. What they can't do is tell you whether it was 
 
 Start with one command, in any repository:
 
-```bash
+```text
 /figure-out why do half my background jobs silently stall?
 ```
 
@@ -44,12 +44,14 @@ An agent copies the nearest example and takes the easiest path that passes its c
 
 ## Install
 
-Claude Code is the primary target:
+Claude Code is the primary target. Inside a Claude Code session, run:
 
-```bash
+```text
 /plugin marketplace add doodledood/manifest-dev
 /plugin install manifest-dev@manifest-dev
 ```
+
+Then start a session in the repository you want to work on and type `/figure-out <topic>`.
 
 Every skill also works on its own. If you only want the one from the top of this page:
 
@@ -128,7 +130,7 @@ The Claude Code plugins are the source, and the same skill text serves every hos
 
 | CLI | Install |
 |-----|---------|
-| Claude Code | `/plugin install manifest-dev@manifest-dev` |
+| Claude Code | `/plugin marketplace add doodledood/manifest-dev`, then `/plugin install manifest-dev@manifest-dev` — [above](#install) |
 | Codex CLI | `codex plugin marketplace add doodledood/manifest-dev` — [details](dist/codex/README.md) |
 | Pi | `pi install git:github.com/doodledood/manifest-dev@main` — [details](dist/pi/README.md) |
 | OpenCode | clone, then add one path to your config — [details](dist/opencode/README.md) |

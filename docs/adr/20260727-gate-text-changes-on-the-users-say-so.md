@@ -44,6 +44,9 @@ Termination is scoped to match: a PASS whose criterion misdescribes what it judg
 - An unattended run that meets an impeached gate stops for a human instead of finishing. That is the intended trade: the alternative is finishing against a contract the run rewrote for itself.
 - The user carries a decision they did not previously see. The escalation payload is what makes that tractable — it names the discrepancy and the decision, rather than asking the user to re-derive it.
 
+## Enforced by
+partly — `tests/test_dist_skill_references.py` — `test_executor_amendments_preserve_verification` fails if an unattended amendment may cross a binding requirement or `/do` stops amending only through `define`; routing an impeached gate to `/escalate` is judgment.
+
 ## Source
 - Related: [20260726-only-gates-bind-process-guidance-is-advisory](20260726-only-gates-bind-process-guidance-is-advisory.md)
 - Related: [20260722-state-verification-sufficiency-not-only-necessity](20260722-state-verification-sufficiency-not-only-necessity.md)

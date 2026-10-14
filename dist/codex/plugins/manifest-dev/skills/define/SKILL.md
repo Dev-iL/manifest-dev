@@ -15,7 +15,7 @@ means amend: targeted changes only, IDs stable, no renumbering.
 Before encoding a new Manifest for work in a repository, read what earlier work left on it —
 logs and Manifests for this repository, open Tickets on the work's paths, and pull requests' "Debt left"
 sections — following `../figure-out/references/RECALL.md`. Note in the digest when the project's
-surfaces version is missing or older than setup-project's newest, without stopping to update, and
+surfaces version, read from the context file on disk, is missing or older than setup-project's newest, without stopping to update, and
 record it as an `ASM-*` entry. Record each offer flagged upstream as its own `ASM-*` entry, so the
 completion report names it.
 

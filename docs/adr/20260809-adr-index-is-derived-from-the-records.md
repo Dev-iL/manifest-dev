@@ -46,6 +46,9 @@ When size eventually justifies a split, it is live records versus superseded one
 - Rebuilding is a derivation someone must actually perform; nothing enforces freshness, and this repository runs no CI that could.
 - Link labels in the index are filenames rather than readable phrases, which is more literal and less graceful to read.
 
+## Enforced by
+partly — `tests/test_project_conventions_forks.py` — `test_forks_reproduce_the_emitted_default` keeps this project's conventions, which carry the rebuild rules and the `Area` field, in step with the shipped default; nothing checks that `docs/adr/README.md` matches a rebuild, so the index itself is judgment.
+
 ## Source
 - Session: figure-out session, 2026-08-09
 - Related: 20260809-adr-conventions-ship-as-project-knowledge

@@ -25,6 +25,9 @@ Mid-/do user messages are **Steering Messages**: fire-and-forget direction. Amen
 ### Negative
 - A wrong guess gets built until the user notices it via the digest or ASM review; steering an ambiguous ask trades precision for speed.
 
+## Enforced by
+partly — `tests/test_dist_skill_references.py` — `test_executor_amendments_preserve_verification` fails if `/define` stops treating an executor's amendment, steering included, as unattended — asking no questions and waiting for no approval — or `/do` stops routing amendments through `define`; the `(auto)` items and the one-line digest are judgment.
+
 ## Source
 - Grounding: suite-alignment review of the mid-/do amendment path (define's caller-keyed amendment autonomy and escalate's scope-change routing) against attended-use expectations.
 - Related: 20260709-do-keeps-default-execution-log-manifest-stays-contract

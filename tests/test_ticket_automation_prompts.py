@@ -126,6 +126,7 @@ def test_selector_presents_without_executing() -> None:
 
 # Holds the decision in docs/adr/20260812-human-assignment-pauses-auto-ticket-execution.md.
 # Holds the decision in docs/adr/20260812-scheduled-ticket-sweep-is-recovery-first-and-one-ticket.md.
+# Holds the decision in docs/adr/20260811-ticket-type-is-a-rollout-selector-not-a-classification.md.
 def test_sweep_tickets_recovers_first_and_runs_at_most_one() -> None:
     text = skill_text(SOURCE_SKILLS, "sweep-tickets")
 

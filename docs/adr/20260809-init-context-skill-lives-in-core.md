@@ -37,6 +37,9 @@ The rule this settles, for future placement questions: **core holds what core in
 - Core grows another skill, and core is the plugin every user installs.
 - Users who installed only `manifest-dev-tools` do not get the setup path at all.
 
+## Enforced by
+partly — `tests/test_entry_points.py` — `test_user_invocable_skills_are_the_declared_set` fails if `setup-project` (formerly `init-context`) leaves the core `manifest-dev` plugin; the general rule that core holds what core invokes is judgment.
+
 ## Source
 - Session: figure-out session, 2026-08-09
 - Related: 20260705-keep-plugin-first-layout-npx-skills-compatible

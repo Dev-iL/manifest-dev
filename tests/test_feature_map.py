@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import json
 import re
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -118,3 +119,27 @@ def test_entry_points_only_at_paths_that_exist(entry: Path) -> None:
         if not (REPO_ROOT / path.rstrip("/.,;")).exists()
     ]
     assert not missing, f"{entry.name} names paths that do not exist: {missing}"
+
+
+DRIVE = REPO_ROOT / "scripts" / "features" / "drive.sh"
+
+
+def test_drive_harness_parses_and_dry_runs() -> None:
+    # The harness's own check: a broken drive.sh fails here, not in the first run that needs it.
+    syntax = subprocess.run(["bash", "-n", str(DRIVE)], capture_output=True, text=True)
+    assert syntax.returncode == 0, syntax.stderr
+    prompt = MAP / "README.md"
+    dry = subprocess.run(
+        [str(DRIVE), "figure-out", str(prompt), "--dry-run"],
+        capture_output=True,
+        text=True,
+        env={"PATH": "/usr/bin:/bin", "HOME": "/nonexistent-home"},
+    )
+    assert dry.returncode == 0, dry.stderr
+    assert "docs/features/evidence/figure-out/" in dry.stdout
+    unknown = subprocess.run(
+        [str(DRIVE), "no-such-feature", str(prompt), "--dry-run"],
+        capture_output=True,
+        text=True,
+    )
+    assert unknown.returncode != 0 and "no entry" in unknown.stderr

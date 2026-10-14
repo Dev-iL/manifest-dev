@@ -37,6 +37,7 @@ def test_references_resolve_in_an_isolated_install(
             assert local.is_file(), (document.name, target)
 
 
+# Holds the decision in docs/adr/20260901-design-skill-pair-distills-research-eval-deferred.md.
 @pytest.mark.parametrize("skill_dir", SKILL_DIRS, ids=("source", "codex"))
 def test_prompts_do_not_delegate_to_another_skill(skill_dir: Path) -> None:
     # Guard the invocation syntax that made the original implementation a wrapper.
@@ -61,6 +62,7 @@ def test_entrypoint_stays_design_guidance(skill_dir: Path) -> None:
 
 
 # Holds the decision in docs/adr/20260924-design-starts-from-the-person-and-their-moment.md.
+# Holds the decision in docs/adr/20260901-design-skill-pair-distills-research-eval-deferred.md.
 @pytest.mark.parametrize("skill_dir", SKILL_DIRS, ids=("source", "codex"))
 def test_review_support_paths_resolve(skill_dir: Path) -> None:
     review_dir = skill_dir.with_name("review-design")

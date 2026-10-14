@@ -50,6 +50,9 @@ General rule for future goals and manifests:
 - Reviewers who want strict child-protocol compliance must inspect the phase checkpoint itself, not infer it from terminal `/auto` completion.
 - Existing docs/ADRs from 2026-06-23 remain historical context and must be read with this clarification.
 
+## Enforced by
+partly — `tests/test_dist_skill_references.py` — `test_do_completion_contract_requires_auditable_gate_ledger` fails if `/do` stops requiring every Acceptance Criterion and Global Invariant to hold on evidence from the artifacts it names, or accepts a summary claim, and `test_auto_investigation_keeps_read_bar_without_a_phase_goal` fails if figure-out under `/auto` sets its own goal or drops its Read bar; what counts as a terminal state is judgment.
+
 ## Source
 
 - Grounding: `/auto` was observed producing an acceptable final result even when the Read was not properly named; goal success criteria should focus on final outcome where possible.

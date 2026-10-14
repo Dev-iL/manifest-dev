@@ -2,7 +2,7 @@
 
 Installs a project's surfaces — North Star, glossary, ADR conventions, a verification surface, and the context-file wiring with its surfaces version — seeding them from history, and on a set-up project audits the whole setup against what its references describe and offers each gap.
 
-Status: unverified
+Status: verified (2026-10-14)
 
 ## Sub-features
 
@@ -21,15 +21,16 @@ Status: unverified
 
 ## Driving it
 
-Preconditions: the baseline in the index; a scratch directory from `claude-plugins/manifest-dev/evals/30-update-offer-for-older-setup/scaffold.sh` (no version), `47-update-offer-from-previous-version` (one behind) or `45-current-setup-offers-nothing` (current).
+Preconditions: the baseline in the index; a prompt file starting `/manifest-dev:setup-project`, followed by whether the user accepts every item; the scaffold of case `30` (no version), `47` (one behind) or `45` (current) under `claude-plugins/manifest-dev/evals/`.
 
-- **Install.** From an empty scratch git repository, `/setup-project`. `docs/adr/CONVENTIONS.md`, `CONTEXT.md`, `NORTH_STAR.md`, `docs/NORTH_STAR_CONVENTIONS.md` exist and the context file carries `<!-- setup-project surfaces vN -->` with the newest N.
-- **Audit a current project.** Scaffold case `45`, then `/setup-project`. It offers gaps item by item even though the version is current, and backfills `Enforced by` only on records in effect.
-- **Proof.** Save the transcript and `git -C <scratch> diff`. Nothing was written that the run did not offer and accept.
+- **Update one version behind.** `scripts/features/drive.sh setup-project <prompt> --scaffold claude-plugins/manifest-dev/evals/47-update-offer-from-previous-version --max-turns 80`, accepting every item. The report lists what it offered, applied, handed off and declined; the context file ends at the newest version; the summary's files include `verify/features/README.md` and the reshaped feature files.
+- **Audit a current project.** The same with case `45`. It offers gaps item by item though the version is current, and backfills `Enforced by` only on records in effect.
+- **Install.** The same with no `--scaffold`. `docs/adr/CONVENTIONS.md`, `CONTEXT.md`, `NORTH_STAR.md` and `docs/NORTH_STAR_CONVENTIONS.md` exist, and the context file carries the newest version line.
+- **Proof.** The drive's summary under `docs/features/evidence/setup-project/`. Nothing was written that the run did not offer and accept.
 
 ## How it is checked
 
-`tests/test_setup_project_versions.py` (a change to an emitted file ships a new version) and `tests/test_project_conventions_forks.py` (this repo's copies match the defaults); behavior cases `30`, `45`, `47` cover figure-out's offer of it, not a setup run.
+`tests/test_setup_project_versions.py` (a change to an emitted file ships a new version) and `tests/test_project_conventions_forks.py` (this repo's copies match the defaults); behavior cases `30`, `45`, `47` cover figure-out's offer of it, not a setup run. Drive evidence: `docs/features/evidence/setup-project/20261014T061913Z.md`.
 
 ## Gotchas
 

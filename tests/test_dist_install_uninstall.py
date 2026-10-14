@@ -252,6 +252,7 @@ console.log(JSON.stringify(cfg))
 
 
 # Holds the decision in docs/adr/20260903-shipped-skills-are-host-neutral-and-distributions-read-source.md.
+# Holds the decision in docs/adr/20260705-keep-plugin-first-layout-npx-skills-compatible.md.
 def test_opencode_registers_every_source_skill_root() -> None:
     index = (OPENCODE / "plugin" / "index.js").read_text(encoding="utf-8")
     for root in SOURCE_SKILL_ROOTS:

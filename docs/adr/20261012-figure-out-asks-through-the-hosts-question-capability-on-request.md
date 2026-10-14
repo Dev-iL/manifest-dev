@@ -36,6 +36,9 @@ Plain text stays the default. When the user's instructions ask for it and the ho
 - A user who asks for the capability accepts the rubber-stamp risk the default avoids.
 - Behavior differs between hosts that offer the capability and hosts that do not.
 
+## Enforced by
+partly — `tests/test_skill_frontmatter.py` — `test_shipped_text_names_no_host_tool` fails if shipped text names a host's question tool instead of the capability; the plain-text default and asking through the capability only on the user's request are judgment.
+
 ## Source
 - Session: figure-out investigation of how figure-out reaches its user.
 - Narrows 20260727-figure-out-adopts-a-default-turn-shape: its rejected alternative of delivering asks through the question-selection primitive is now taken on the user's request.

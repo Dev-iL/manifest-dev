@@ -38,6 +38,9 @@ The update rule is one asymmetry: **statuses move on evidence, positions move on
 - A marker per line is apparatus every reader meets; the plain provenance-line rendering is the mitigation.
 - Statuses themselves can rot if no session touches strategy for months — accepted, with dates visible on every line.
 
+## Enforced by
+partly — `tests/test_project_conventions_forks.py` — `test_forks_reproduce_the_emitted_default` keeps `docs/NORTH_STAR_CONVENTIONS.md`, which defines the four states and the update asymmetry, in step with the shipped default; that each position in `NORTH_STAR.md` carries a dated state is judgment.
+
 ## Source
 - Session: figure-out design session, 2026-08-19–20 (investigation log kept locally).
 - Related: 20260820-manifest-dev-owns-a-project-north-star

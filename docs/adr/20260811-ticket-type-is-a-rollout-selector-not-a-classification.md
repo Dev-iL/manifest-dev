@@ -55,6 +55,9 @@ The obvious source for such a property is `/define`'s task taxonomy, which alrea
 - The field is authoring cost until an automation consumes it, and none does yet. If rollout stages turn out to be bodies of work rather than kinds, the effort label already provided the dial and this is dead weight.
 - Two taxonomies now name overlapping words for different jobs — this one, and `/define`'s composable task types. Confusing them is the failure mode to watch, which is why the glossary pins them against each other.
 
+## Enforced by
+partly — `tests/test_ticket_automation_prompts.py` — `test_sweep_tickets_recovers_first_and_runs_at_most_one` fails if the sweep stops selecting granted work by a configured type filter; the closed five-value set and single-valued, optional type are judgment.
+
 ## Source
 - Session: figure-out session, 2026-08-11
 - Related: [20260810-auto-is-an-opt-in-grant-to-unattended-automation](20260810-auto-is-an-opt-in-grant-to-unattended-automation.md), [20260810-shaped-means-the-decision-space-is-closed](20260810-shaped-means-the-decision-space-is-closed.md), [20260809-group-github-tickets-by-sub-issue-membership-and-effort-label](20260809-group-github-tickets-by-sub-issue-membership-and-effort-label.md), [20260807-trim-the-manifest-schema-to-fields-that-are-read](20260807-trim-the-manifest-schema-to-fields-that-are-read.md)

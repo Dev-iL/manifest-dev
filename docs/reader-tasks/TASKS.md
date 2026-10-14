@@ -13,7 +13,7 @@ in `README.md` beside this file.
 
 - **Where:** `README.md` → *Install*
 - **Ends able to:** install the marketplace and the plugin, and start a first `/figure-out`.
-- **Status:** unverified
+- **Status:** verified (2026-10-14)
 
 ## Install it in another CLI
 
@@ -43,7 +43,7 @@ in `README.md` beside this file.
 
 - **Where:** `claude-plugins/manifest-dev/README.md` → *Project surfaces*
 - **Ends able to:** say what setting a project up installs, and how an older setup gets updates.
-- **Status:** unverified
+- **Status:** verified (2026-10-14)
 
 ## Run it unattended
 

@@ -40,6 +40,9 @@ manifest-dev owns a **North Star**: one resident, root-level `NORTH_STAR.md` per
 - Nine fields invite form-filling; the four-state marking (see `20260820-north-star-lines-carry-states`) exists to keep invented answers out, and remains untested beyond this portfolio.
 - A field nothing consults is possible; the admission bar for future fields stays "a consumer that changes behavior" per `20260807-trim-the-manifest-schema-to-fields-that-are-read`.
 
+## Enforced by
+partly — `tests/test_project_conventions_forks.py` — `test_forks_reproduce_the_emitted_default` keeps `docs/NORTH_STAR_CONVENTIONS.md`, which carries the nine fields and where the document lives, in step with the shipped default; whether `NORTH_STAR.md` itself holds them is judgment.
+
 ## Source
 - Session: figure-out design session, 2026-08-19–20 (investigation log kept locally).
 - Related: 20260820-north-star-lines-carry-states, 20260809-adr-conventions-ship-as-project-knowledge, 20260809-glossary-stays-resident-with-an-under-produced-seed, 20260727-manifest-intent-leads-with-problem-appetite-and-bounds, 20260807-trim-the-manifest-schema-to-fields-that-are-read

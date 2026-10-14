@@ -145,6 +145,9 @@ reader. Thresholds themselves do not move.
   the problem but could not name what it costs. That is the same trade the `Trigger`
   field made, with the same honest loss.
 
+## Enforced by
+partly — `tests/test_dist_skill_references.py` — `test_manifest_schema_stays_topology_neutral` fails if `/do` stops requiring each gate to declare `judgment` or `deterministic` or starts inferring it, and `test_operational_guidance_has_no_stale_per_gate_topology` fails if the README example stops showing one of each; how a judgment gate is re-read after it passes is judgment.
+
 ## Source
 - Related: `20260728-bound-the-acceptance-contract-from-above`,
   `20260730-consolidated-default-verification-mode`,
