@@ -62,6 +62,14 @@ how a user reaches it and how a run drives it.
   entry names them; a drive from this map shows the feature runs, not that it beats the
   no-plugin baseline.
 
+## Statuses
+
+Each entry's `Status:` line reads `unverified`, `verified (YYYY-MM-DD)` (with `; not driven: …`
+naming any entry point the drive did not use), `stale (YYYY-MM-DD): <what differs>`, or
+`unreachable (YYYY-MM-DD): <prerequisite>`, as `claude-plugins/manifest-dev/skills/setup-project/references/VERIFICATION_SURFACE.md`
+→ *The feature map* defines. A run that changes what an entry covers updates and drives it; a run
+that finds an entry it is not changing drifting marks it `stale` with the dated line.
+
 ## Features
 
 Workflow (`manifest-dev`):

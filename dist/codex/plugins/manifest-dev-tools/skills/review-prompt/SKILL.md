@@ -6,7 +6,7 @@ user-invocable: true
 
 Review LLM prompts. Report findings without modifying files — this skill diagnoses; it never edits the prompt.
 
-**First**: invoke the prompt-engineering skill to load the principles. Evaluate the prompt against them. They are opinionated defaults: where a rule the user stated, in the session or a context file, or a convention the project states or documents differs, that rule governs, a prompt following it raises no finding, and the report names the rule applied — except an issue that would make the prompt miss its goal or act unsafely, which is still reported, naming the rule that produced it.
+**First**: invoke the prompt-engineering skill to load the principles. Evaluate the prompt against them. They are opinionated defaults: where a rule the user stated, in the session or a context file, or a convention the project states or documents differs, that rule governs, a prompt following it raises no finding, and the report names the rule applied — except a High issue on the scale below that makes the prompt miss its goal, which is still reported, naming the rule that produced it.
 
 The provenance question leads: for each line, where did it come from — a user ruling, knowledge outside what the run will read, or a default it counteracts? A line the author could have worked out from material the run also gets is the finding. Judge a prompt by what its lines do, never by sections it lacks: a short prompt with nothing spare is the target, not a deficient one.
 

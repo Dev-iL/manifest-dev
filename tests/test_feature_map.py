@@ -177,23 +177,33 @@ def test_drive_harness_refuses_a_feature_with_no_entry() -> None:
 
 
 def test_drive_harness_never_reuses_an_evidence_directory(tmp_path: Path) -> None:
-    # Two drives of one feature in the same second once shared a directory and interleaved
-    # their transcripts; the harness must pick a fresh one.
-    env = {"PATH": "/usr/bin:/bin", "MANIFEST_DEV_FEATURES_EVIDENCE": str(tmp_path)}
-    first = subprocess.run(
-        [str(DRIVE), "figure-out", str(INDEX), "--dry-run"],
-        capture_output=True,
-        text=True,
-        env=env,
-    )
-    path = re.search(r"evidence:\s+(\S+)", first.stdout)
-    assert path, first.stdout
-    Path(path.group(1)).mkdir(parents=True)
-    second = subprocess.run(
-        [str(DRIVE), "figure-out", str(INDEX), "--dry-run"],
-        capture_output=True,
-        text=True,
-        env=env,
-    )
-    again = re.search(r"evidence:\s+(\S+)", second.stdout)
-    assert again and again.group(1) != path.group(1), second.stdout
+    # Two drives of one feature started in the same second once shared a directory and
+    # interleaved their transcripts. Start two at once with the stamp pinned and a stub `docker`
+    # that does nothing, and require two distinct evidence directories.
+    bin_dir = tmp_path / "bin"
+    bin_dir.mkdir()
+    stub = bin_dir / "docker"
+    stub.write_text("#!/bin/sh\nexit 0\n")
+    stub.chmod(0o755)
+    store = tmp_path / "store"
+    env = {
+        "PATH": f"{bin_dir}:/usr/bin:/bin",
+        "HOME": str(tmp_path),
+        "ANTHROPIC_API_KEY": "test-key",
+        "MANIFEST_DEV_FEATURES_EVIDENCE": str(store),
+        "DRIVE_STAMP": "20990101T000000Z",
+    }
+    drives = [
+        subprocess.Popen(
+            [str(DRIVE), "figure-out", str(INDEX)],
+            env=env,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+        for _ in range(2)
+    ]
+    for drive in drives:
+        drive.communicate(timeout=60)
+    made = sorted(p.name for p in (store / "figure-out").iterdir())
+    assert made == ["20990101T000000Z", "20990101T000000Z-2"], made

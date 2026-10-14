@@ -32,7 +32,7 @@ Preconditions: the baseline in the index; a define case's prompt from `claude-pl
 
 ## How it is checked
 
-The define behavior suite, `claude-plugins/manifest-dev/evals/define/` cases `d01` to `d21` (tag `define`), statuses in `claude-plugins/manifest-dev/evals/define/README.md`; `tests/test_shared_blocks.py` and `tests/test_goal_contract_blocks.py` pin the blocks its handoff carries. Drive evidence: `docs/features/evidence/define/20261014T071022Z.md` (layer re-cut), `docs/features/evidence/define/20261014T080014Z.md` (project rule over a Default), `docs/features/evidence/define/20261014T083022Z.md` (coding Defaults in a Manifest), `docs/features/evidence/define/20261014T085925Z.md` (feature Defaults: versions side by side), `docs/features/evidence/define/20261014T090155Z.md` (prompting Default: a check for what models do unreliably).
+The define behavior suite, `claude-plugins/manifest-dev/evals/define/` cases `d01` to `d21` (tag `define`), statuses in `claude-plugins/manifest-dev/evals/define/README.md`; `tests/test_shared_blocks.py` and `tests/test_goal_contract_blocks.py` pin the blocks its handoff carries. Drive evidence: `docs/features/evidence/define/20261014T071022Z.md` (layer re-cut), `docs/features/evidence/define/20261014T080014Z.md` (project rule over a Default), `docs/features/evidence/define/20261014T083022Z.md` (coding Defaults in a Manifest), `docs/features/evidence/define/20261014T085925Z.md` (feature Defaults: versions side by side), `docs/features/evidence/define/20261014T090155Z.md` (prompting Default: a check for what models do unreliably), `docs/features/evidence/define/20261014T091413Z.md` (feature Default: bound what grows).
 
 ## Gotchas
 

@@ -61,10 +61,16 @@ if [[ -n $scaffold ]]; then
   case $scaffold in "$root"/*) ;; *) die "scaffold must be inside this checkout" ;; esac
 fi
 
-stamp=$(date -u +%Y%m%dT%H%M%SZ)
+stamp=${DRIVE_STAMP:-$(date -u +%Y%m%dT%H%M%SZ)}   # DRIVE_STAMP: tests pin it
 out="$store/$feature/$stamp"
-# Two drives of one feature started in the same second must not share a directory.
-n=1; while [[ -e $out ]]; do n=$((n+1)); out="$store/$feature/$stamp-$n"; done; stamp=${out##*/}
+# Reserve the evidence directory atomically: `mkdir` without -p fails when another drive of
+# this feature, started the same second, already holds it, so each drive gets its own.
+reserve() {
+  mkdir -p "$store/$feature"
+  local base=$out n=1
+  until mkdir "$out" 2>/dev/null; do n=$((n+1)); out="$base-$n"; done
+  chmod 777 "$out"; stamp=${out##*/}
+}
 plugins=(--plugin-dir /repo/claude-plugins/manifest-dev)
 [[ $tools == 1 ]] && plugins+=(--plugin-dir /repo/claude-plugins/manifest-dev-tools)
 
@@ -87,10 +93,10 @@ export ANTHROPIC_API_KEY
 if [[ $feature == doctor ]]; then
   # Under $store, not mktemp: colima shares only the home directory with the container.
   prompt="reply with the single word ok"; max_turns=1; out="$store/doctor/$stamp"
-  mkdir -p "$out" && chmod 777 "$out"
+  reserve
 else
   prompt=$(cat "$prompt_file")
-  mkdir -p "$out" && chmod 777 "$out"
+  reserve
   printf '%s\n' "$prompt" >"$out/prompt.md"
 fi
 scaffold_in=""
