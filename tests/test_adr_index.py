@@ -43,12 +43,17 @@ def rebuild() -> str:
 
 # Holds the decision in docs/adr/20260809-adr-index-is-derived-from-the-records.md.
 def test_adr_index_equals_a_rebuild_from_the_records() -> None:
-    expected = rebuild().splitlines()
-    actual = INDEX.read_text(encoding="utf-8").splitlines()
-    differing = [
-        f"- {a}\n+ {e}" for a, e in zip(actual, expected, strict=False) if a != e
-    ] + [f"row count {len(actual)} != {len(expected)}"] * (len(actual) != len(expected))
-    assert not differing, (
+    expected = rebuild()
+    actual = INDEX.read_text(encoding="utf-8")
+    if actual == expected:
+        return
+    rows = [
+        f"- {a}\n+ {e}"
+        for a, e in zip(actual.splitlines(), expected.splitlines(), strict=False)
+        if a != e
+    ]
+    raise AssertionError(
         "docs/adr/README.md differs from a rebuild of the records (CONVENTIONS.md → "
-        "The index); rewrite it from the records:\n" + "\n".join(differing[:10])
+        "The index); rewrite it from the records:\n"
+        + ("\n".join(rows[:10]) or "rows match; line endings or row count differ")
     )
