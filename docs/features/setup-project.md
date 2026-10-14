@@ -30,7 +30,7 @@ Preconditions: the baseline in the index; a prompt file starting `/manifest-dev:
 
 ## How it is checked
 
-`tests/test_setup_project_versions.py` (a change to an emitted file ships a new version) and `tests/test_project_conventions_forks.py` (this repo's copies match the defaults); behavior cases `30`, `45`, `47` cover figure-out's offer of it, not a setup run. Drive evidence: `docs/features/evidence/setup-project/20261014T061913Z.md`.
+`tests/test_setup_project_versions.py` (a change to an emitted file ships a new version) and `tests/test_project_conventions_forks.py` (this repo's copies match the defaults); behavior cases `30`, `45`, `47` cover figure-out's offer of it, not a setup run. Drive evidence: `docs/features/evidence/setup-project/20261014T065103Z.md`.
 
 ## Gotchas
 

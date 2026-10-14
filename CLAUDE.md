@@ -22,7 +22,7 @@ ruff check --fix claude-plugins/ tests/ && black claude-plugins/ tests/ && mypy 
 ```
 
 `tests/` asserts properties of the shipped prompts themselves — that gate examples use the current
-schema, that mode mechanics stay out of the spine, and two host-neutrality invariants over every
+schema, and two host-neutrality invariants over every
 shipped Markdown file: no file names a host primitive (a plugin qualifier outside an HTML comment,
 a Claude Code tool name, `CLAUDE.md` outside a detection or comparison, "subagent" outside a
 research digest), and every skill a shipped skill names ships beside it — never marked
