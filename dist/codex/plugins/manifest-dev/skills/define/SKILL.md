@@ -85,7 +85,10 @@ That gives a floor that isn't ceremony:
   whether it exists. A slice cut along a layer ("the data model", "the sources")
   can only be gated on existence, and *it compiles* or *the file exists* are
   inspections rather than uses. A request framed as layers is the requester's
-  convenience: re-cut it, don't encode it. Order least-proven first within real
+  convenience: re-cut it, don't encode it. A requested cut, even a numbered list of
+  Deliverables, settles scope, not where the cuts fall, so keeping its layers is never a
+  user's call: keep its scope and re-cut its layers, recording the re-cut as an `(auto)`
+  choice the requester can veto. Order least-proven first within real
   dependencies, so an unworkable direction surfaces while there is room to turn.
 - **Make the change easy first.** When the shape of a change that crosses a function
   boundary — figure-out's sketch, or one drawn here for a direct request — shows that the area

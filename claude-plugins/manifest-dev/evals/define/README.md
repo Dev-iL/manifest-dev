@@ -39,7 +39,9 @@ repeated with a cheaper judge.
 
 These have never been run; the first both-arm run decides which stay. **Every number below is stale
 as of 2026-10-13**: that change edited define's spine and its task files, so the next baseline
-replaces them.
+replaces them. A single 2026-10-14 drive of `d01` (not a measurement) found define keeping the
+requested layer cut as a user's call; define's slicing rule now says a requested cut is never one,
+and a re-drive came back re-cut (`docs/features/evidence/define/`).
 
 ## First measurement of `d11`–`d17` — 2026-10-12
 

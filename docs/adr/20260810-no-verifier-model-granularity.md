@@ -1,7 +1,7 @@
 # ADR: No verifier-model granularity — the lever is round count, not model routing
 
 ## Status
-Accepted — the wholesale rejection of dropping advisory dimensions (Alternatives) is narrowed by 20260810-advisory-gates-omit-by-bearer-test: per-manifest omission of advisory gates whose findings have no bearer is now permitted. Moot since 20260914-one-skill-per-beat-built-from-the-lean-body: `--verifier-model` was retired with the verification modes it applied to
+Deprecated — `--verifier-model` was retired with the verification modes it applied to by 20260914-one-skill-per-beat-built-from-the-lean-body; its rejection of dropping advisory dimensions had already been narrowed by 20260810-advisory-gates-omit-by-bearer-test
 
 ## Area
 do

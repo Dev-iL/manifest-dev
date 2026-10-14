@@ -1,0 +1,54 @@
+"""The ADR index is a rebuild of the records, byte for byte.
+
+`docs/adr/CONVENTIONS.md` → *The index* says every column is derived from the records and a
+rebuild produces the same bytes. Nothing checked it, so rows drifted whenever a record was
+restatused without its row. This test is the rebuild: it fails with the rows that differ.
+"""
+
+from __future__ import annotations
+
+import re
+from pathlib import Path
+
+ADR = Path(__file__).resolve().parent.parent / "docs" / "adr"
+INDEX = ADR / "README.md"
+HEADER = "# Architecture Decision Records\n\n| Date | ADR | Status | Area |\n|------|-----|--------|------|\n"
+RECORD_NAME = re.compile(r"`?\[?(\d{8}-[a-z0-9-]+)\]?(?:\(\1\.md\))?`?")
+
+
+def _field(text: str, heading: str, record: Path) -> str:
+    match = re.search(rf"^## {heading}\n(.+)$", text, re.MULTILINE)
+    assert match, f"{record.name} has no `## {heading}` line"
+    return match.group(1).strip()
+
+
+def rebuild() -> str:
+    rows = []
+    for record in sorted(
+        p for p in ADR.glob("*.md") if p.name not in ("README.md", "CONVENTIONS.md")
+    ):
+        text = record.read_text(encoding="utf-8")
+        title = re.search(r"^# ADR: (.+)$", text, re.MULTILINE)
+        assert title, f"{record.name} has no `# ADR: ` heading"
+        status = RECORD_NAME.sub(
+            lambda m: f"[{m.group(1)}]({m.group(1)}.md)", _field(text, "Status", record)
+        )
+        date = f"{record.name[:4]}-{record.name[4:6]}-{record.name[6:8]}"
+        rows.append(
+            f"| {date} | [{title.group(1).strip()}]({record.name}) | {status} | "
+            f"{_field(text, 'Area', record)} |"
+        )
+    return HEADER + "\n".join(rows) + "\n"
+
+
+# Holds the decision in docs/adr/20260809-adr-index-is-derived-from-the-records.md.
+def test_adr_index_equals_a_rebuild_from_the_records() -> None:
+    expected = rebuild().splitlines()
+    actual = INDEX.read_text(encoding="utf-8").splitlines()
+    differing = [
+        f"- {a}\n+ {e}" for a, e in zip(actual, expected, strict=False) if a != e
+    ] + [f"row count {len(actual)} != {len(expected)}"] * (len(actual) != len(expected))
+    assert not differing, (
+        "docs/adr/README.md differs from a rebuild of the records (CONVENTIONS.md → "
+        "The index); rewrite it from the records:\n" + "\n".join(differing[:10])
+    )

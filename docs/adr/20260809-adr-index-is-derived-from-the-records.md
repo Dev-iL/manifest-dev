@@ -47,7 +47,7 @@ When size eventually justifies a split, it is live records versus superseded one
 - Link labels in the index are filenames rather than readable phrases, which is more literal and less graceful to read.
 
 ## Enforced by
-partly — `tests/test_project_conventions_forks.py` — `test_forks_reproduce_the_emitted_default` keeps this project's conventions, which carry the rebuild rules and the `Area` field, in step with the shipped default; nothing checks that `docs/adr/README.md` matches a rebuild, so the index itself is judgment.
+`tests/test_project_conventions_forks.py` — `test_forks_reproduce_the_emitted_default` keeps this project's conventions, which carry the rebuild rules and the `Area` field, in step with the shipped default; `tests/test_adr_index.py` — `test_adr_index_equals_a_rebuild_from_the_records` fails when `docs/adr/README.md` differs from a rebuild of the records by those rules.
 
 ## Source
 - Session: figure-out session, 2026-08-09

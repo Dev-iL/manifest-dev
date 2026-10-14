@@ -2,7 +2,7 @@
 
 Turns shared understanding into a Manifest — Problem, Appetite, Deliverables with Acceptance Criteria, Global Invariants, assumptions — written to the user's home directory, ready for `/do`.
 
-Status: unverified
+Status: verified (2026-10-14); not driven: the bare slash command, the description phrases, auto, do's amendments, babysit-pr, figure-out's offer
 
 ## Sub-features
 
@@ -28,11 +28,12 @@ Preconditions: the baseline in the index; a define case's prompt from `claude-pl
 
 ## How it is checked
 
-The define behavior suite, `claude-plugins/manifest-dev/evals/define/` cases `d01` to `d21` (tag `define`), statuses in `claude-plugins/manifest-dev/evals/define/README.md`; `tests/test_shared_blocks.py` and `tests/test_goal_contract_blocks.py` pin the blocks its handoff carries.
+The define behavior suite, `claude-plugins/manifest-dev/evals/define/` cases `d01` to `d21` (tag `define`), statuses in `claude-plugins/manifest-dev/evals/define/README.md`; `tests/test_shared_blocks.py` and `tests/test_goal_contract_blocks.py` pin the blocks its handoff carries. Drive evidence: `docs/features/evidence/define/20261014T071022Z.md`.
 
 ## Gotchas
 
-- A 2026-10-14 drive of `d01-layer-cut` (`docs/features/evidence/define/20261014T063700Z.md`) wrote the Manifest into the project instead of the home directory and kept the requested layer cut; check both when driving it again.
+- Eval prompts ask for `./manifest.md` in the working directory, so a drive of an eval case finds the Manifest in the scratch project, not the home directory.
+- A plan handed over by layer (model, API, UI) must come back re-cut into slices; keeping the layers as a "user's call" is the defect `d01-layer-cut` exists to catch.
 - The Manifest is written to the home directory, not the project: in a drive it is in the evidence's `home-manifest-dev.tar`.
 - Attended, it waits for a yes after the digest; a headless drive needs `--autonomous` or a prompt that says to proceed.
 - An old Manifest with a `verify` block is refused, not migrated.
