@@ -19,12 +19,12 @@ Status: unverified
 
 Preconditions: the baseline in the index; a prompt file in a scratch directory.
 
-- **Review.** `/review-prompt prompt.md`. A report with an assessment and findings, each with a fix.
-- **Proof.** Save the transcript and the file's checksum before and after. The file is unchanged.
+- **Review.** `scripts/features/drive.sh review-prompt <prompt> --tools` with `/manifest-dev-tools:review-prompt` and a prompt pasted inline. A report with an assessment and findings, each with a fix.
+- **Proof.** From the drive's summary and its full evidence. The file is unchanged.
 
 ## How it is checked
 
-No behavior case or test.
+This entry's recipe, driven through `scripts/features/drive.sh`; `tests/test_skill_frontmatter.py` and `tests/test_entry_points.py` hold that the skill parses and stays in the declared set. No behavior case measures it.
 
 ## Gotchas
 

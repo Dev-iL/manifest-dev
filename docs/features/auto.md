@@ -19,8 +19,8 @@ Status: unverified
 
 Preconditions: the baseline in the index; a scratch git repository and a small task with a checkable end.
 
-- **Chain.** `/auto <task>` headless. The transcript shows define reporting a Manifest path and do starting on that same path in the same run.
-- **Proof.** Save the transcript, the Manifest and the do log. The run ends in `/done` or `/escalate`, not at a handoff waiting for the user.
+- **Chain.** `scripts/features/drive.sh auto <prompt> --max-turns 150` with `/manifest-dev:auto <small task with a checkable end>`. The transcript shows define reporting a Manifest path and do starting on that same path in the same run.
+- **Proof.** From the drive's summary and its full evidence. The run ends in `/done` or `/escalate`, not at a handoff waiting for the user.
 
 ## How it is checked
 

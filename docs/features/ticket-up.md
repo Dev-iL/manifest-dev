@@ -16,14 +16,14 @@ Status: unverified
 
 - `/ticket-up <manifest path | request | question>`.
 - Phrases its description matches: "create tickets", "ticket up the plan", "hand this to a teammate".
-- figure-out when questions stop depending on each other; `run-ticket` for follow-ups; setup-project's hand-off of a surface gap.
+- figure-out when questions stop depending on each other; `run-ticket` for follow-ups.
 
 ## Driving it
 
-Preconditions: the baseline in the index; a scratch repository with a file store (`tickets/store-config.md` naming the file venue).
+Preconditions: the baseline in the index; a prompt that asks for a file store when ticket-up asks where Tickets live, so the drive creates `tickets/store-config.md` itself.
 
-- **From a Manifest.** `/ticket-up <manifest path>` in the scratch repository. One file `tickets/<effort>/NN-<slug>.md` with the convention's sections.
-- **Proof.** Save the transcript and the Ticket files. Each Ticket stands alone: a reader with no Manifest knows what to do and how it is checked.
+- **Direct request.** `scripts/features/drive.sh ticket-up <prompt>` with `/manifest-dev:ticket-up <one small request>; use a file store in this repo`. The summary's files include `tickets/store-config.md` and one `tickets/<effort>/NN-<slug>.md` with the convention's sections.
+- **Proof.** From the drive's summary and its full evidence. Each Ticket stands alone: a reader with no Manifest knows what to do and how it is checked.
 
 ## How it is checked
 

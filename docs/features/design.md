@@ -20,8 +20,8 @@ Status: unverified
 
 Preconditions: the baseline in the index; a brief, or an HTML file in a scratch directory.
 
-- **Guide.** `/design <brief>`. Guidance that names the person, the moment and the chosen direction.
-- **Proof.** Save the transcript. It produced guidance and did not claim to have built or verified anything.
+- **Guide.** `scripts/features/drive.sh design <prompt>` with `/manifest-dev:design <brief>`. Guidance that names the person, the moment and the chosen direction.
+- **Proof.** From the drive's summary and its full evidence. It produced guidance and did not claim to have built or verified anything.
 
 ## How it is checked
 

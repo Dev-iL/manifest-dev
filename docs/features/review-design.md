@@ -21,8 +21,8 @@ Status: unverified
 
 Preconditions: the baseline in the index; an HTML file and, for render checks, Playwright with Chromium.
 
-- **Review.** `/review-design page.html`. A report with findings tied to rendered evidence, or BLOCKED naming the evidence it could not get.
-- **Proof.** Save the transcript and any screenshots it took. The artifact is unchanged.
+- **Review.** `scripts/features/drive.sh review-design <prompt>` with a prompt that writes a small `page.html`, then `/manifest-dev:review-design page.html`. A report with findings tied to rendered evidence, or BLOCKED naming the evidence it could not get.
+- **Proof.** From the drive's summary and its full evidence. The artifact is unchanged.
 
 ## How it is checked
 

@@ -20,12 +20,12 @@ Status: unverified
 
 Preconditions: the baseline in the index; a short markdown file in a scratch directory.
 
-- **Review.** `/review-writing draft.md`. A report naming the register it used and findings with severity and a fix.
-- **Proof.** Save the transcript and the draft. The draft is unchanged.
+- **Review.** `scripts/features/drive.sh review-writing <prompt>` with `/manifest-dev:review-writing` and a short draft pasted inline. A report naming the register it used and findings with severity and a fix.
+- **Proof.** From the drive's summary and its full evidence. The draft is unchanged.
 
 ## How it is checked
 
-No behavior case or test.
+This entry's recipe, driven through `scripts/features/drive.sh`; `tests/test_skill_frontmatter.py` and `tests/test_entry_points.py` hold that the skill parses and stays in the declared set. No behavior case measures it.
 
 ## Gotchas
 

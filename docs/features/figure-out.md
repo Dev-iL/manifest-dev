@@ -2,7 +2,7 @@
 
 Presses on a topic with the user until both understand it, and ends with a named read: a conclusion, its confidence, the evidence, and what would overturn it. It changes nothing in the project except the docs it keeps current.
 
-Status: verified (2026-10-14)
+Status: verified (2026-10-14); not driven: the bare slash command, the description phrases, auto, define, figure-out-team
 
 ## Sub-features
 
@@ -28,7 +28,7 @@ Preconditions: the baseline in the index; a prompt file holding the matching eva
 - **Current setup, docs mode.** `scripts/features/drive.sh figure-out <prompt> --scaffold claude-plugins/manifest-dev/evals/45-current-setup-offers-nothing` with case `45`'s prompt. The reply says the setup is current, lists nothing the project lacks, does not suggest a setup run, moves to the topic with one ask, and names a log under the drive's `~/.manifest-dev/logs/`; the summary shows no files written.
 - **Setup one version behind.** The same with case `47`. The reply offers the update and names only what v2 adds.
 - **Autonomous.** Any case's prompt with `--autonomous` added. No question waits for an answer; each self-answered ask appears as a flagged assumption on the read.
-- **Proof.** The drive's summary under `docs/features/evidence/figure-out/`. The read names a conclusion, confidence, evidence and what would overturn it.
+- **Proof.** The drive's summary under `docs/features/evidence/figure-out/`. The reply ends at its one ask. A full read — conclusion, confidence, evidence, what would overturn it — needs the user's answers, which a one-prompt drive does not give; that path is the eval suite's.
 
 ## How it is checked
 

@@ -20,12 +20,12 @@ Status: unverified
 
 Preconditions: the baseline in the index; a pull request or a local range; for posting, GitHub access to a throwaway pull request.
 
-- **Walk a range.** `/walk-pr main..HEAD` in a scratch repository with two commits. The first turn covers one sub-change and asks about one topic.
-- **Proof.** Save the transcript. Nothing posts until the user confirms each comment.
+- **Walk a range.** `scripts/features/drive.sh walk-pr <prompt> --tools` with a prompt that makes two commits in the scratch project, then `/manifest-dev-tools:walk-pr HEAD~1..HEAD`. The first turn covers one sub-change and asks about one topic.
+- **Proof.** From the drive's summary and its full evidence. Nothing posts until the user confirms each comment.
 
 ## How it is checked
 
-No behavior case or test.
+This entry's recipe, driven through `scripts/features/drive.sh`; `tests/test_skill_frontmatter.py` and `tests/test_entry_points.py` hold that the skill parses and stays in the declared set. No behavior case measures it.
 
 ## Gotchas
 

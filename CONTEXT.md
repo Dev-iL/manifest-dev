@@ -77,6 +77,10 @@ _Avoid_: Test suite, e2e suite, control skill.
 Whether an existing verification surface can be relied on, judged by the jobs it does — a cold proof run of one entry passes and leaves evidence that survives cleanup, health is checkable, runs are isolated, and PASS means the real path — never by whether it has every part or the shipped tooling.
 _Avoid_: Complete, conformant, healthy.
 
+**Feature Map**:
+The index plus one file per feature that says, from the user's side only, how each thing people invoke — a route, a command, a public call, a skill — is reached, driven and checked, with a status per entry; it navigates, and each entry names the check that holds it.
+_Avoid_: Test plan, e2e list.
+
 **Reader Task**:
 One entry in a living document's verification surface: a task a reader comes to the document to do, the sections the reader relies on, what the reader should end up able to do, and a status. A reader with fresh context, given only the document, walks the entry.
 _Avoid_: User story, test case, doc test.

@@ -20,8 +20,8 @@
 # Evidence: the full transcript, the scratch project and the session's ~/.manifest-dev are kept
 # under ${MANIFEST_DEV_FEATURES_EVIDENCE:-$HOME/.local/state/manifest-dev-features}/<feature>/<stamp>/
 # (outside the checkout, so `git clean` never touches it), and a summary — prompt, loaded
-# plugins and skills, final reply, files written — goes to docs/features/evidence/<feature>/<stamp>.md
-# to commit. A drive whose session did not load the plugin or the skill is reported, not counted.
+# plugins and skills, final reply with local paths removed, files written — goes to
+# docs/features/evidence/<feature>/<stamp>.md to commit. A drive whose session did not load the plugin or the skill is reported, not counted.
 #
 # Needs: docker (colima on macOS), and ANTHROPIC_API_KEY in the environment or the shell profile.
 # MODEL selects the model (default: opus).
@@ -138,10 +138,13 @@ if prompt_path.exists():
     first = prompt_path.read_text(encoding="utf-8").lstrip().split(maxsplit=1)
     if first and first[0].startswith("/") and first[0][1:] in skills:
         used = sorted(set(used) | {first[0][1:] + " (slash command)"})
+entry_point = "slash command" if any(u.endswith("(slash command)") for u in used) else (
+    "skill named in the prompt" if used else "none observed")
 summary = {
     "model": init.get("model"),
     "plugins": sorted(f'{p["name"]}@{p.get("version", "")}' for p in init.get("plugins", []) if p["name"].startswith("manifest-dev")),
     "skills_invoked": used,
+    "entry_point": entry_point,
     "turns": result.get("num_turns"),
     "result": (result.get("result") or "").strip(),
     "files_written": (out / "files-written.txt").read_text(encoding="utf-8").strip() if (out / "files-written.txt").exists() else "",
@@ -155,9 +158,13 @@ if [[ $feature == doctor ]]; then
 fi
 dest="$root/docs/features/evidence/$feature"; mkdir -p "$dest"
 python3 - "$out" "$dest/$stamp.md" "$feature" "$stamp" <<'PY'
-import json, pathlib, sys
+import json, pathlib, re, sys
 out, dest, feature, stamp = pathlib.Path(sys.argv[1]), pathlib.Path(sys.argv[2]), sys.argv[3], sys.argv[4]
 s = json.loads((out / "summary.json").read_text(encoding="utf-8"))
+# The summary is committed to a public repository: paths that exist only on the driving machine
+# or inside the removed container mean nothing to a reader, so they are replaced.
+LOCAL = re.compile(r"`?(?:~|/home/eval|/tmp/scratch)/[^\s`]*`?")
+redact = lambda text: LOCAL.sub("[local path]", text)
 prompt = (out / "prompt.md").read_text(encoding="utf-8").strip()
 files = s["files_written"] or "(none)"
 dest.write_text(f"""# Drive: {feature} — {stamp}
@@ -165,8 +172,8 @@ dest.write_text(f"""# Drive: {feature} — {stamp}
 - **Model:** {s['model']}
 - **Plugins loaded:** {', '.join(s['plugins'])}
 - **Skills invoked:** {', '.join(s['skills_invoked']) or '(none)'}
+- **Entry point:** {s.get('entry_point', 'not recorded')}
 - **Turns:** {s['turns']}
-- **Full evidence:** `{str(out).replace(str(pathlib.Path.home()), '~', 1)}` (transcript.jsonl, scratch.diff, untracked.tar, home-manifest-dev.tar)
 
 ## Prompt
 
@@ -180,7 +187,8 @@ dest.write_text(f"""# Drive: {feature} — {stamp}
 
 ## Final reply
 
-{s['result']}
+{redact(s['result'])}
 """, encoding="utf-8")
 print(f"summary: {dest}")
+print(f"full evidence (kept on this machine, not committed): {out}")
 PY

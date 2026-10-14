@@ -20,12 +20,12 @@ Status: unverified
 
 Preconditions: the baseline in the index; a prompt file in a scratch directory.
 
-- **Diagnose.** `/prompt-engineering why does this prompt over-ask? <file>`. An answer that traces lines to their source and proposes specific edits.
-- **Proof.** Save the transcript. It cites lines from the file, not general advice.
+- **Diagnose.** `scripts/features/drive.sh prompt-engineering <prompt> --tools` with `/manifest-dev-tools:prompt-engineering why does this prompt over-ask?` and the prompt pasted inline. An answer that traces lines to their source and proposes specific edits.
+- **Proof.** From the drive's summary and its full evidence. It cites lines from the file, not general advice.
 
 ## How it is checked
 
-No behavior case or test; review-prompt applies its principles as a gate.
+This entry's recipe, driven through `scripts/features/drive.sh`; `tests/test_skill_frontmatter.py` and `tests/test_entry_points.py` hold that the skill parses and stays in the declared set. No behavior case measures it. review-prompt applies its principles as a gate.
 
 ## Gotchas
 

@@ -20,10 +20,10 @@ Status: unverified
 
 ## Driving it
 
-Preconditions: the baseline in the index; a scratch repository with a file store and one small Ticket with a checkable end.
+Preconditions: the baseline in the index; a prompt that first has ticket-up file one small Ticket with a checkable end, then runs `/manifest-dev:run-ticket` on it in the same session.
 
-- **Run.** `/run-ticket tickets/<effort>/01-<slug>.md`. The Ticket gains `<!-- manifest-dev-run-ticket-attempt -->` and, at the end, a DONE section or `<!-- manifest-dev-run-ticket-escalated -->`.
-- **Proof.** Save the transcript, the Ticket file and the scratch repository's `git log`. The landing the Ticket asks for is observed, not assumed.
+- **Run.** `scripts/features/drive.sh run-ticket <prompt> --max-turns 120`. The Ticket gains `<!-- manifest-dev-run-ticket-attempt -->` and, at the end, a DONE section or `<!-- manifest-dev-run-ticket-escalated -->`.
+- **Proof.** From the drive's summary and its full evidence. The landing the Ticket asks for is observed, not assumed.
 
 ## How it is checked
 

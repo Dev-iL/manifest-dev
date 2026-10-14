@@ -1,8 +1,8 @@
 # design instruments
 
-Two local command-line tools under the design skills: `design-tools.mjs` measures supplied artifacts (HTML, text, images, structured observations) and `design-check.mjs` triages an HTML page. Neither fetches, renders for you, or scores quality.
+Two local command-line tools under the design skills: `design-tools.mjs` measures a supplied HTML page or image (and structured observations) and `design-check.mjs` triages an HTML page. Neither fetches, renders for you, or scores quality.
 
-Status: verified (2026-10-14)
+Status: verified (2026-10-14); not driven: the design skill's instruments reference, review-design's HTML check
 
 ## Sub-features
 
@@ -27,19 +27,17 @@ Preconditions: the baseline in the index; Node 20+; Python 3 for HTML; Pillow fo
 - **Catalog.** `node claude-plugins/manifest-dev/skills/design/scripts/design-tools.mjs catalog`. Exit `0`; JSON with `version` and an `instruments` object.
 - **Inspect.** `node claude-plugins/manifest-dev/skills/design/scripts/design-tools.mjs inspect <scratch>/page.html --output <scratch>/inspect.json`. Exit `0`; `inspect.json` has `schemaVersion`, `command: "inspect"`, `coverage` and `observations`.
 - **Refuses a URL.** `node claude-plugins/manifest-dev/skills/design/scripts/design-tools.mjs inspect https://example.com`. Exit `1` with `Supply a local artifact; the agent owns acquisition`.
-- **Unsupported input.** `node claude-plugins/manifest-dev/skills/design/scripts/design-tools.mjs image <scratch>/page.pdf`. Exit `1` with an error naming the input; never a stack trace and never exit `0`.
 - **HTML check.** `node claude-plugins/manifest-dev/skills/review-design/scripts/design-check.mjs <scratch>/page.html`. Exit `0`; `NOTE`/`OK`/`FINDING` lines, `SKIPPED  render samples` when Playwright is absent, and a closing count line.
-- **Proof.** Save each command, its exit code and its output files under the evidence directory. Outputs match the end states above.
+- **Proof.** Each command, its exit code and its output, written to a summary under `docs/features/evidence/design-instruments/`. Outputs match the end states above.
 
 ## How it is checked
 
-`tests/test_design_instruments.py` (runs `tests/fixtures/design-instruments/test-instruments.mjs`) and `tests/test_design_check.py`; `scripts/design-evals/` is the harness for wider experiments and says what it does not measure.
+`tests/test_design_instruments.py` (runs `tests/fixtures/design-instruments/test-instruments.mjs`) and `tests/test_design_check.py`; `scripts/design-evals/` is the harness for wider experiments and says what it does not measure. Drive evidence: `docs/features/evidence/design-instruments/20261014T064010Z.md`.
 
 ## Gotchas
 
 - Exit `0` means the run completed, findings or not; read the output.
 - Without Playwright the render samples are `SKIPPED`, which is not a pass.
 - Raster input is capped at 512 px on the long edge.
-- A PDF or a video is not an input: rasterize the page or frame to an image first (`claude-plugins/manifest-dev/skills/design/references/instruments/usage.md`). A crash report on a PDF is a wrong input unless the same page as an image also fails.
 
 Source: `claude-plugins/manifest-dev/skills/design/scripts/design-tools.mjs`.

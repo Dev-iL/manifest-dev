@@ -22,8 +22,8 @@ Status: unverified
 
 Preconditions: the baseline in the index; `gh auth status` succeeds and a throwaway pull request in a repository the run owns.
 
-- **Review.** `/review-pr <url>`. One GitHub review whose comments each carry `<!-- manifest-dev:review-pr -->`.
-- **Proof.** Save the transcript and `gh api repos/<o>/<r>/pulls/<n>/reviews`. No `REQUEST_CHANGES` review; approval only after the user confirmed it.
+- **Review.** `scripts/features/drive.sh review-pr <prompt> --tools` with `/manifest-dev-tools:review-pr <url>`. One GitHub review whose comments each carry `<!-- manifest-dev:review-pr -->`.
+- **Proof.** From the drive's summary and its full evidence. No `REQUEST_CHANGES` review; approval only after the user confirmed it.
 
 ## How it is checked
 
@@ -32,6 +32,7 @@ Preconditions: the baseline in the index; `gh auth status` succeeds and a throwa
 ## Gotchas
 
 - Posting is public and does not undo. Never drive it on someone else's pull request to test it.
+- The drive container carries no GitHub credentials, so a drive through `scripts/features/drive.sh` reaches this entry only after a GitHub token for a throwaway repository is added to it; until then its GitHub entry points are `unreachable`.
 - Manifest mode needs the checkout at the pull request's head.
 
 Source: `claude-plugins/manifest-dev-tools/skills/review-pr/SKILL.md`.

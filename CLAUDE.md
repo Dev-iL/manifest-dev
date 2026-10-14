@@ -171,7 +171,7 @@ Every file setup-project copies or emits into projects — `figure-out/reference
 
 figure-out's task files and define's task files are decoupled, so a red-flag list both need lives in both. Change one, change the other:
 
-- `figure-out/tasks/CODING.md` (*Shape before build*, *A second shape*, *What the next agent copies*, *Design discipline*) ↔ `define/tasks/CODING.md` Defaults (*Sketch the shape before implementing*, *Screen for what the next agent copies*, *Reshape, don't patch*).
+- `figure-out/tasks/CODING.md` (*Shape before build*, *A second shape*, *What the next agent copies*, *Design discipline*, and *The verification surface*'s fit-to-trust question) ↔ `define/tasks/CODING.md` Defaults (*Sketch the shape before implementing*, *Screen for what the next agent copies*, *Reshape, don't patch*, *Trust the check before relying on it*).
 - `figure-out/tasks/FEATURE.md` (*Bundled concerns*, *Remembered steps*) ↔ `define/tasks/FEATURE.md` Defaults (*One concern per change*, *No step that depends on memory*).
 - `figure-out/tasks/DOCUMENT.md` (*One mode*, *A fact restated*, *The same fact twice*) ↔ `define/tasks/DOCUMENT.md` Defaults (*One mode per document*, *Generate or link what code owns*, *One copy of each fact*).
 - `figure-out/tasks/PROMPTING.md` (*A rule in two files*, *An instruction where a check belongs*) ↔ `define/tasks/PROMPTING.md` Default (*One rule, one place*).

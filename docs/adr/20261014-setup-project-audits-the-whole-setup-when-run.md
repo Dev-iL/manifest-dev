@@ -14,15 +14,18 @@ After 20261013-set-up-projects-receive-updates-through-a-version-marker, a proje
 
 ## Decision
 - A setup-project run audits the project against the setup its own references describe, whatever version the project records, and offers each gap on its own. What changed since the recorded version is marked as new. The references are the checklist, so no separate list grows with each release.
+- The best setup is the one the project needs now. Each offer names the need it serves today; a piece the project has no current use for is not a gap, so an audit never adds parts a project carries without using them.
 - Nothing records a decline. An item declined on an earlier run is offered again on the next run someone starts; the run is rare and deliberate, so a repeated offer costs little, and a decline list would be one more piece of state to drift.
 - Differences in a project-owned copy keep the attribution the version line gives: content the shipped text gained since that version is offered, anything else is the project's own choice and stays.
-- A gap in an existing verification surface — a proof run that fails, no health check, cleanup that removes evidence — is engineering with its own checks, so an accepted one is handed to a normal run as a Ticket or a `/define`, not built during setup. A missing surface is still seeded by setup.
+- For a verification surface, setup seeds a missing one and offers an existing one only its missing parts — statuses, README, repository check, the feature-map shape. It offers no harness, drive or proof improvement: a surface grows with the work that needs it, raised by figure-out when work touches a surface it cannot trust and built by that work's Manifest. Offering harness work at setup would grow every adopter's scope ahead of any need.
 - figure-out does not audit the whole setup. Its offer of setup-project stays gated by the version line, plus one offer per session when docs mode meets a plainly broken surface — a surfaces section naming a missing path, an index listing a missing record. A surface on the path of the work that is missing, drifting or not fit to trust is repaired as part of that work, by define and do.
 
 ## Alternatives Considered
+- **Everything the references describe, needed or not**: adds surfaces and parts a project carries without using, which is the cost a setup exists to avoid.
 - **Defects only on an explicit run**: answers whether something is broken, not whether the setup is sound, which is what someone running setup asks.
 - **A decline record beside the version line**: avoids repeated offers but adds state that drifts; worth revisiting if setup-project runs often or for a team.
 - **Fix surface gaps inside setup**: makes setup long, open-ended and hard to verify; harness work needs its own gates and proof run.
+- **Offer harness and proof gaps at setup and hand them off as Tickets or `/define`s**: turns every setup into a backlog of verification work no change has asked for yet.
 - **figure-out audits on every session**: takes over investigations that are about something else.
 
 ## Consequences

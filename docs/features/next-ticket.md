@@ -18,10 +18,10 @@ Status: unverified
 
 ## Driving it
 
-Preconditions: the baseline in the index; a scratch repository with a file store holding two or more open Tickets.
+Preconditions: the baseline in the index; a prompt that first has ticket-up file two small Tickets in a file store, then runs `/manifest-dev:next-ticket` in the same session.
 
-- **Select.** `/next-ticket` in the scratch repository. One Ticket presented with a reason; its file gains a claim line.
-- **Proof.** Save the transcript and `git -C <scratch> diff tickets/`. Only the chosen Ticket changed, and only by its claim.
+- **Select.** `scripts/features/drive.sh next-ticket <prompt>`. One Ticket presented with a reason; the summary's files show only that Ticket gaining a claim line.
+- **Proof.** From the drive's summary and its full evidence. Only the chosen Ticket changed, and only by its claim.
 
 ## How it is checked
 

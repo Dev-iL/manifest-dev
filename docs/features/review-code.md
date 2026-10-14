@@ -2,7 +2,7 @@
 
 Reviews a change along exactly one quality dimension and returns PASS, FAIL or BLOCKED with graded findings.
 
-Status: unverified
+Status: verified (2026-10-14); not driven: the description phrases, define's coding gates, review-pr's fleet
 
 ## Sub-features
 
@@ -19,12 +19,12 @@ Status: unverified
 
 Preconditions: the baseline in the index; a scratch repository with a commit on a branch ahead of its default branch.
 
-- **Review.** `/review-code code-bugs` in the scratch repository. A report naming the dimension, findings with severity and evidence, and one verdict.
-- **Proof.** Save the transcript and the diff it reviewed. Every finding points at a line inside the change.
+- **Review.** `scripts/features/drive.sh review-code <prompt>` with a prompt that commits a small change with one bug on a branch, then `/manifest-dev:review-code code-bugs`. A report naming the dimension, findings with severity and evidence, and one verdict.
+- **Proof.** From the drive's summary and its full evidence. Every finding points at a line inside the change.
 
 ## How it is checked
 
-No behavior case or runtime test; `tests/test_review_scope.py` pins how scope is resolved.
+This entry's recipe, driven through `scripts/features/drive.sh`; `tests/test_review_scope.py` pins how scope is resolved. No behavior case measures the review. Drive evidence: `docs/features/evidence/review-code/20261014T063700Z.md`.
 
 ## Gotchas
 

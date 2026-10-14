@@ -103,10 +103,13 @@ already shows its users costs upkeep and guides nobody.
 The `Status:` line reads:
 
 - `unverified` — catalogued but not yet driven; not proof of anything;
-- `verified (YYYY-MM-DD)` — driven by a run on that date;
+- `verified (YYYY-MM-DD)` — driven by a run on that date through every entry point the file
+  lists; where the drive used only some, the line names the rest after the date —
+  `verified (YYYY-MM-DD); not driven: <entry points>`;
 - `stale (YYYY-MM-DD): <what differs>` — a run found it drifting from the artifact;
 - `unreachable (YYYY-MM-DD): <prerequisite>` — a run tried an entry point and could not reach
-  it, naming the prerequisite it lacked and what it tried.
+  it, naming the prerequisite it lacked and what it tried; this wins over `verified` for the
+  file until that entry point is reached.
 
 The first build catalogs the artifact from its source — routes, commands, menus, invocable
 skills, documented features — and marks each entry `unverified`. That gives the map its
@@ -144,8 +147,10 @@ map writes them.
 
 ## Fit to trust
 
-A surface can have every part and still not be worth trusting. Judge an existing one by the
-jobs it has to do, never by how this file would have built it:
+A surface can have every part and still not be worth trusting. A run judges it only for the
+paths its own work touches, and builds only what that work needs; a surface grows with the work,
+never ahead of it. Judge it by the jobs it has to do there, never by how this file would have
+built it:
 
 - **A cold proof run passes** — one entry, driven end to end from nothing, leaves evidence that
   is still there after cleanup.
@@ -154,7 +159,12 @@ jobs it has to do, never by how this file would have built it:
 - **PASS means the real path** — not mocks past a boundary the product does not isolate, not a
   test-only endpoint, not a skipped entry point counted as another's success.
 
-A surface that fails one of these has a gap, however complete it looks. Scripts instead of one
+Judge each job by its counterpart in the surface's form: for an eval suite, one case run against
+the prompt as shipped and graded, with the harness refusing a case it cannot run; for a
+reader-task list, one entry walked by a fresh reader whose account is kept. A job with no
+counterpart in the form — an instance health check for a reader-task list — is not a gap, and
+a case left unmeasured on purpose is a status, not a failed proof run. A surface that fails a job
+it does have is not fit to trust, however complete it looks. Scripts instead of one
 command-line tool, another test runner, another layout: those are the project's choices, not
 gaps.
 
@@ -163,9 +173,9 @@ gaps.
 Setup seeds the surface: it records the form and location, adopts existing assets, catalogs
 entries from source in the form's first status (`unverified`, or `unmeasured` for an eval
 suite), writes the README and the repository check, and wires the project-surfaces entry. It
-builds harness commands only as far as existing assets already reach. Then it drives one entry
-end to end by that entry's own recipe and checks the evidence survives cleanup, setting the
-entry's status; where no entry can be driven yet, its report names the entry it tried and what
-stopped it. A map nobody has driven reads as proof it is not, so it is never handed over
+builds harness commands only as far as existing assets already reach. Then, where those assets
+can, it drives one entry end to end by that entry's own recipe and checks the evidence survives
+cleanup, setting the entry's status; where none can be driven yet, its report names the entry it
+tried and what stopped it, and builds nothing more to get there. A map nobody has driven reads as proof it is not, so it is never handed over
 unsaid. The run that first needs to exercise an entry builds the rest, inside the change that
 needs it.

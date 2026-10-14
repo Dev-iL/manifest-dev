@@ -23,9 +23,9 @@ Status: unverified
 
 Preconditions: the baseline in the index; a Manifest from a define drive, and a scratch git repository it may change.
 
-- **Execute.** `/do <manifest-path>` headless from the scratch repository. The run ends in `/done` or `/escalate`; the log file exists at the documented path.
-- **No log.** `/do <manifest-path> --no-log`. No `do-*.md` log is written for that Manifest.
-- **Proof.** Save the transcript, the log, and `git log`/`git diff` of the scratch repository. The completion report gives a basis per gate and lists the user's calls first.
+- **Execute.** `scripts/features/drive.sh do <prompt> --max-turns 120` with a small Manifest pasted into the prompt and `/manifest-dev:do` on it. The run ends in `/done` or `/escalate`; the log file exists at the documented path.
+- **No log.** The same with `--no-log`. No `do-*.md` log is written for that Manifest.
+- **Proof.** From the drive's summary and its full evidence. The completion report gives a basis per gate and lists the user's calls first.
 
 ## How it is checked
 

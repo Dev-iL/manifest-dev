@@ -77,6 +77,7 @@ def test_every_version_says_what_projects_gain() -> None:
 
 # Holds the decision in docs/adr/20261013-runs-build-and-maintain-a-project-verification-surface.md.
 # Holds the decision in docs/adr/20261013-set-up-projects-receive-updates-through-a-version-marker.md.
+# Holds the decision in docs/adr/20261014-the-feature-map-is-a-navigation-contract-over-what-users-invoke.md.
 def test_latest_version_matches_what_setup_project_emits() -> None:
     latest_number, _, latest_digest = versions()[-1]
     current = emitted_digest()

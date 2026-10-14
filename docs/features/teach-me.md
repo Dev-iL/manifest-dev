@@ -19,12 +19,12 @@ Status: unverified
 
 Preconditions: the baseline in the index; a topic: a decision record path is the easiest.
 
-- **Teach.** `/teach-me docs/adr/<record>.md`. The first turn explains the problem the record solved and ends with a check question.
-- **Proof.** Save the transcript. It does not move on before the check is answered.
+- **Teach.** `scripts/features/drive.sh teach-me <prompt> --tools` with `/manifest-dev-tools:teach-me` and a short decision record pasted inline. The first turn explains the problem the record solved and ends with a check question.
+- **Proof.** From the drive's summary and its full evidence. It does not move on before the check is answered.
 
 ## How it is checked
 
-No behavior case or test.
+This entry's recipe, driven through `scripts/features/drive.sh`; `tests/test_skill_frontmatter.py` and `tests/test_entry_points.py` hold that the skill parses and stays in the declared set. No behavior case measures it.
 
 ## Gotchas
 

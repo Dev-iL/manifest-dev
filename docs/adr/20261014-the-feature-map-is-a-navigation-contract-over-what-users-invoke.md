@@ -16,8 +16,8 @@ The user
 - A project whose artifact people invoke — routes, commands, public calls, skills — keeps one feature map over it, beside whichever verification forms it keeps. The forms check; the map navigates, and each entry names the check that holds it.
 - The map describes the artifact from the user's side only. Where in the code a feature lives is read from the code at run time.
 - The map is an index plus one file per feature, in the shape setup-project's `references/VERIFICATION_SURFACE.md` defines, with a worked example beside it. Statuses gain `unreachable`, naming the missing prerequisite, and an entry point is never reported verified because another one worked.
-- Setup drives one entry end to end before handover, or says which entry it could not drive and why.
-- An existing verification surface is judged fit to trust by its jobs — a cold proof run, a health check, isolation, the real path exercised — not by its tooling. A surface the work touches that is not fit is repaired as part of that work.
+- Setup drives one entry end to end where existing assets reach, or says which entry it could not drive and why; it builds nothing more to get there.
+- An existing verification surface is judged fit to trust by its jobs — a cold proof run, a health check, isolation, the real path exercised — not by its tooling, and only for the paths a run's work touches. A surface the work touches that is not fit is repaired as part of that work; nothing is built ahead of need.
 
 ## Alternatives Considered
 - **A map only for runnable products**: leaves a skills plugin with nowhere to place a report, though its users invoke it the same way.

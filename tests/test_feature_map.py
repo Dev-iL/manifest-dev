@@ -19,6 +19,7 @@ import pytest
 REPO_ROOT = Path(__file__).resolve().parent.parent
 MAP = REPO_ROOT / "docs" / "features"
 INDEX = MAP / "README.md"
+DRIVE = REPO_ROOT / "scripts" / "features" / "drive.sh"
 SURFACE_REFERENCE = (
     REPO_ROOT
     / "claude-plugins"
@@ -28,19 +29,21 @@ SURFACE_REFERENCE = (
     / "references"
     / "VERIFICATION_SURFACE.md"
 )
-# Features that are not skills: the map file name, and the paths that must exist for it.
+# Map entries that are not skills, by file name. `drive.sh` skips its skill-loaded check for
+# the same names.
 NON_SKILL_FEATURES = {"design-instruments"}
 
 INVOCABLE_FALSE = re.compile(r"^user-invocable:\s*false\s*$", re.MULTILINE)
 STATUS = re.compile(
     r"^Status: (unverified"
-    r"|verified \(\d{4}-\d{2}-\d{2}\)"
+    r"|verified \(\d{4}-\d{2}-\d{2}\)(?:; not driven: .+)?"
     r"|stale \(\d{4}-\d{2}-\d{2}\): .+"
     r"|unreachable \(\d{4}-\d{2}-\d{2}\): .+)$",
     re.MULTILINE,
 )
 INDEX_LINK = re.compile(r"\]\(\./([\w.-]+\.md)\)")
-REPO_PATH = re.compile(r"`((?:claude-plugins|tests|scripts|docs|dist)/[^`\s<>*|]+)`")
+CODE_SPAN = re.compile(r"`([^`\n]+)`")
+REPO_ROOTS = ("claude-plugins/", "tests/", "scripts/", "docs/", "dist/")
 
 
 def shipped_plugins() -> list[Path]:
@@ -73,6 +76,17 @@ def feature_files() -> list[Path]:
     return sorted(p for p in MAP.glob("*.md") if p != INDEX)
 
 
+def repo_paths(text: str) -> list[str]:
+    """Every repository path named in a code span, including inside a command."""
+    paths = []
+    for span in CODE_SPAN.findall(text):
+        for token in span.split():
+            token = token.strip("\"'()<>,;.")
+            if token.startswith(REPO_ROOTS) and not re.search(r"[<>*|{}$]", token):
+                paths.append(token.rstrip("/"))
+    return paths
+
+
 # Holds the decision in docs/adr/20261014-the-feature-map-is-a-navigation-contract-over-what-users-invoke.md.
 def test_every_user_invocable_skill_has_an_entry() -> None:
     entries = {p.stem for p in feature_files()}
@@ -88,6 +102,7 @@ def test_every_user_invocable_skill_has_an_entry() -> None:
     )
 
 
+# Holds the decision in docs/adr/20261014-the-feature-map-is-a-navigation-contract-over-what-users-invoke.md.
 def test_index_lists_exactly_the_feature_files() -> None:
     linked = set(INDEX_LINK.findall(INDEX.read_text(encoding="utf-8")))
     on_disk = {p.name for p in feature_files()}
@@ -105,41 +120,57 @@ def test_entry_has_the_shape_and_a_status(entry: Path) -> None:
     assert (
         headings == required_sections()
     ), f"{entry.name}: sections {headings}, expected {required_sections()} in that order"
-    assert len(STATUS.findall(text)) == 1, (
+    statuses = list(STATUS.finditer(text))
+    assert len(statuses) == 1, (
         f"{entry.name}: needs exactly one `Status:` line — unverified, verified (date), "
-        "stale (date): what differs, or unreachable (date): prerequisite"
+        "stale (date): what differs, or unreachable (date): prerequisite; a verified line names "
+        "any entry point the drive did not use after `; not driven:`"
     )
+    first_section = text.index("\n## ")
+    assert (
+        statuses[0].start() < first_section
+    ), f"{entry.name}: the `Status:` line belongs before the first section"
 
 
-@pytest.mark.parametrize("entry", feature_files(), ids=lambda p: p.stem)
-def test_entry_points_only_at_paths_that_exist(entry: Path) -> None:
+# Holds the decision in docs/adr/20261014-the-feature-map-is-a-navigation-contract-over-what-users-invoke.md.
+@pytest.mark.parametrize("page", [INDEX, *feature_files()], ids=lambda p: p.stem)
+def test_page_points_only_at_paths_that_exist(page: Path) -> None:
     missing = [
         path
-        for path in REPO_PATH.findall(entry.read_text(encoding="utf-8"))
-        if not (REPO_ROOT / path.rstrip("/.,;")).exists()
+        for path in repo_paths(page.read_text(encoding="utf-8"))
+        if not (REPO_ROOT / path).exists()
     ]
-    assert not missing, f"{entry.name} names paths that do not exist: {missing}"
+    assert not missing, f"{page.name} names paths that do not exist: {missing}"
 
 
-DRIVE = REPO_ROOT / "scripts" / "features" / "drive.sh"
+def test_path_check_sees_paths_inside_commands() -> None:
+    found = repo_paths(
+        "Run `scripts/features/drive.sh x <p> --scaffold docs/missing-case`."
+    )
+    assert found == ["scripts/features/drive.sh", "docs/missing-case"]
 
 
-def test_drive_harness_parses_and_dry_runs() -> None:
-    # The harness's own check: a broken drive.sh fails here, not in the first run that needs it.
-    syntax = subprocess.run(["bash", "-n", str(DRIVE)], capture_output=True, text=True)
-    assert syntax.returncode == 0, syntax.stderr
-    prompt = MAP / "README.md"
-    dry = subprocess.run(
-        [str(DRIVE), "figure-out", str(prompt), "--dry-run"],
+def test_drive_harness_parses() -> None:
+    # The harness's own checks: a broken drive.sh fails here, not in the first run that needs it.
+    result = subprocess.run(["bash", "-n", str(DRIVE)], capture_output=True, text=True)
+    assert result.returncode == 0, result.stderr
+
+
+def test_drive_harness_dry_run_starts_nothing() -> None:
+    result = subprocess.run(
+        [str(DRIVE), "figure-out", str(INDEX), "--dry-run"],
         capture_output=True,
         text=True,
         env={"PATH": "/usr/bin:/bin", "HOME": "/nonexistent-home"},
     )
-    assert dry.returncode == 0, dry.stderr
-    assert "docs/features/evidence/figure-out/" in dry.stdout
-    unknown = subprocess.run(
-        [str(DRIVE), "no-such-feature", str(prompt), "--dry-run"],
+    assert result.returncode == 0, result.stderr
+    assert "docs/features/evidence/figure-out/" in result.stdout
+
+
+def test_drive_harness_refuses_a_feature_with_no_entry() -> None:
+    result = subprocess.run(
+        [str(DRIVE), "no-such-feature", str(INDEX), "--dry-run"],
         capture_output=True,
         text=True,
     )
-    assert unknown.returncode != 0 and "no entry" in unknown.stderr
+    assert result.returncode != 0 and "no entry" in result.stderr

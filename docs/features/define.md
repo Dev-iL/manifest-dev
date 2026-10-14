@@ -23,8 +23,8 @@ Status: unverified
 Preconditions: the baseline in the index; a define case's prompt from `claude-plugins/manifest-dev/evals/define/`, with its scaffold where the case has one.
 
 - **New Manifest.** `scripts/features/drive.sh define <prompt>` with the prompt of `claude-plugins/manifest-dev/evals/define/d01-layer-cut/prompt.md` (it needs no scaffold). The drive's home holds `.manifest-dev/manifests/manifest-<timestamp>.md` and the reply ends with `Manifest complete: <path>`.
-- **Amend.** Prompt `/define <that path> <one change>`. Only the named items change; IDs of the others are untouched (diff the file).
-- **Proof.** Save the transcript and the Manifest. Every gate in the Manifest ends with `Judgment gate.` or `Deterministic gate.` and the ceiling invariant is present verbatim.
+- **Amend.** In the same prompt, after the Manifest is written, `/manifest-dev:define <that path> <one change>`. Only the named items change; IDs of the others are untouched (diff the file).
+- **Proof.** From the drive's summary and its full evidence. Every gate in the Manifest ends with `Judgment gate.` or `Deterministic gate.` and the ceiling invariant is present verbatim.
 
 ## How it is checked
 
@@ -32,6 +32,7 @@ The define behavior suite, `claude-plugins/manifest-dev/evals/define/` cases `d0
 
 ## Gotchas
 
+- A 2026-10-14 drive of `d01-layer-cut` (`docs/features/evidence/define/20261014T063700Z.md`) wrote the Manifest into the project instead of the home directory and kept the requested layer cut; check both when driving it again.
 - The Manifest is written to the home directory, not the project: in a drive it is in the evidence's `home-manifest-dev.tar`.
 - Attended, it waits for a yes after the digest; a headless drive needs `--autonomous` or a prompt that says to proceed.
 - An old Manifest with a `verify` block is refused, not migrated.

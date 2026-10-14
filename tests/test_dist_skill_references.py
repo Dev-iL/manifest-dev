@@ -694,6 +694,7 @@ def test_auto_investigation_keeps_read_bar_without_a_phase_goal() -> None:
         assert "Outside auto, this is the standalone-run backstop" in child
 
 
+# Holds the decision in docs/adr/20260624-use-outcome-gated-auto-continuation.md.
 def test_auto_continues_past_each_child_skills_stop() -> None:
     """A child's stop hands control back to /auto, which continues in the same turn.
 
@@ -744,6 +745,7 @@ def test_autonomous_figure_out_supplements_weak_parent_backstops() -> None:
             assert phrase not in text, f"{path}: forbidden {phrase!r}"
 
 
+# Holds the decision in docs/adr/20260611-figure-out-evidence-ledger-and-independent-rederivation.md.
 def test_autonomous_diagnosis_goal_requires_mechanism_or_earned_underdetermination() -> (
     None
 ):

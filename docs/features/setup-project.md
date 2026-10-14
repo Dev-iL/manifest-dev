@@ -2,15 +2,15 @@
 
 Installs a project's surfaces — North Star, glossary, ADR conventions, a verification surface, and the context-file wiring with its surfaces version — seeding them from history, and on a set-up project audits the whole setup against what its references describe and offers each gap.
 
-Status: verified (2026-10-14)
+Status: verified (2026-10-14); not driven: the description phrases, figure-out's offer
 
 ## Sub-features
 
 - `install` — a project with no surfaces gets all of them
 - `no-mine` — `--no-mine`: wiring and verification surface without mining history
-- `update-audit` — a set-up project: each gap against the references offered on its own, what changed since the recorded version marked new
+- `update-audit` — a set-up project: each gap the project needs now offered on its own, what changed since the recorded version marked new
 - `verification-surface` — seeds the surface and drives one entry, or says which could not be driven
-- `hand-off` — an accepted gap in an existing verification surface becomes a Ticket or a `/define`
+- `surface-parts` — an existing verification surface is offered only missing parts; its harness grows with later work
 - `empty-input` — a repository with nothing: wiring only
 
 ## How to get to it (user POV)
@@ -23,7 +23,7 @@ Status: verified (2026-10-14)
 
 Preconditions: the baseline in the index; a prompt file starting `/manifest-dev:setup-project`, followed by whether the user accepts every item; the scaffold of case `30` (no version), `47` (one behind) or `45` (current) under `claude-plugins/manifest-dev/evals/`.
 
-- **Update one version behind.** `scripts/features/drive.sh setup-project <prompt> --scaffold claude-plugins/manifest-dev/evals/47-update-offer-from-previous-version --max-turns 80`, accepting every item. The report lists what it offered, applied, handed off and declined; the context file ends at the newest version; the summary's files include `verify/features/README.md` and the reshaped feature files.
+- **Update one version behind.** `scripts/features/drive.sh setup-project <prompt> --scaffold claude-plugins/manifest-dev/evals/47-update-offer-from-previous-version --max-turns 80`, accepting every item. The report lists what it offered, applied and declined; the context file ends at the newest version; the summary's files include `verify/features/README.md` and the reshaped feature files.
 - **Audit a current project.** The same with case `45`. It offers gaps item by item though the version is current, and backfills `Enforced by` only on records in effect.
 - **Install.** The same with no `--scaffold`. `docs/adr/CONVENTIONS.md`, `CONTEXT.md`, `NORTH_STAR.md` and `docs/NORTH_STAR_CONVENTIONS.md` exist, and the context file carries the newest version line.
 - **Proof.** The drive's summary under `docs/features/evidence/setup-project/`. Nothing was written that the run did not offer and accept.
@@ -36,6 +36,6 @@ Preconditions: the baseline in the index; a prompt file starting `/manifest-dev:
 
 - It writes many project files and changes every later session's context. Scratch directory only.
 - It never overwrites a project-owned copy: differences are offered, not applied.
-- Accepting the audit does not build harness improvements; look for a Ticket or a `/define` in the report.
+- It offers no harness or drive work for an existing surface; that comes from the change that needs it.
 
 Source: `claude-plugins/manifest-dev/skills/setup-project/SKILL.md`.

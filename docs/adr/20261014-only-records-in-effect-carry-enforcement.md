@@ -35,4 +35,4 @@ partly — `tests/test_project_conventions_forks.py` keeps this repository's `do
 
 ## Source
 - Session: investigation of setup-project's update behavior.
-- Related: 20261013-decision-records-name-what-enforces-them
+- Narrows: 20261013-decision-records-name-what-enforces-them

@@ -22,8 +22,8 @@ Status: unverified
 
 Preconditions: the baseline in the index; `gh auth status` succeeds and a throwaway pull request the run may push to.
 
-- **CI pass.** `/babysit-pr <url> --ci`. One advance in the transcript, then exit; the journal file exists.
-- **Proof.** Save the transcript, the journal and `gh pr view <url> --json commits,comments`. Every push or reply on the pull request appears in the journal.
+- **CI pass.** `scripts/features/drive.sh babysit-pr <prompt> --tools` with `/manifest-dev-tools:babysit-pr <url> --ci`. One advance in the transcript, then exit; the journal file exists.
+- **Proof.** From the drive's summary and its full evidence. Every push or reply on the pull request appears in the journal.
 
 ## How it is checked
 
@@ -32,6 +32,7 @@ Preconditions: the baseline in the index; `gh auth status` succeeds and a throwa
 ## Gotchas
 
 - It pushes commits and replies on GitHub; those reach reviewers and do not undo.
+- The drive container carries no GitHub credentials, so a drive through `scripts/features/drive.sh` reaches this entry only after a GitHub token for a throwaway repository is added to it; until then its GitHub entry points are `unreachable`.
 - `--ci` is one advance, not a waiter.
 
 Source: `claude-plugins/manifest-dev-tools/skills/babysit-pr/SKILL.md`.

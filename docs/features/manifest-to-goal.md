@@ -19,12 +19,12 @@ Status: unverified
 
 Preconditions: the baseline in the index; a Manifest from a define drive.
 
-- **Convert.** `/manifest-to-goal <path>`. One goal block in the reply.
-- **Proof.** Save the reply and count its characters. At most 4,000 characters; every gate's threshold survives; nothing new is invented.
+- **Convert.** `scripts/features/drive.sh manifest-to-goal <prompt> --tools` with `/manifest-dev-tools:manifest-to-goal` and a Manifest pasted inline. One goal block in the reply.
+- **Proof.** From the drive's summary and its full evidence. At most 4,000 characters; every gate's threshold survives; nothing new is invented.
 
 ## How it is checked
 
-No behavior case or test.
+This entry's recipe, driven through `scripts/features/drive.sh`; `tests/test_skill_frontmatter.py` and `tests/test_entry_points.py` hold that the skill parses and stays in the declared set. No behavior case measures it.
 
 ## Gotchas
 

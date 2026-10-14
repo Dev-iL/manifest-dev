@@ -99,7 +99,7 @@ That gives a floor that isn't ceremony:
   durable way to check an artifact still does its job, in the form setup-project's
   `references/VERIFICATION_SURFACE.md` gives for that artifact. Find it where the context file's
   project-surfaces section names it, or among the verification assets the project keeps. Where it
-  is missing, or drifting or not fit to trust (its *Fit to trust* section) where the work touches it, cut building or repairing it, scoped to what the change touches, as the
+  is missing, or drifting or not fit to trust (`../setup-project/references/VERIFICATION_SURFACE.md` → *Fit to trust*) where the work touches it, cut building or repairing it, scoped to what the change touches, as the
   first Deliverable, ahead of any preparatory slice; unattended runs build it too. A Manifest that touches anything the surface
   maps, or a path it should map but does not, carries a gate that each touched entry is added or
   updated and exercised live, with its status set.

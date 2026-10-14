@@ -24,6 +24,8 @@ Preconditions: baseline state; no note titled `Release checklist`.
 
 - **Open the editor.** Run `control-notes browser click --role button --name "New note"`. A form
   named `Note editor` appears with focus in `Title`.
+- **Keyboard entry.** Close the editor, focus the page, run `control-notes browser press --key n`.
+  The same `Note editor` form opens and no `n` is typed into the page.
 - **Save.** Run `control-notes browser fill --role textbox --name "Title" --value "Release checklist"`,
   then `control-notes browser click --role button --name "Save note"`. A status reads `Note saved`.
 - **Read it back.** Run `control-notes browser click --role link --name "All notes"`, then open

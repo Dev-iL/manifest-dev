@@ -18,10 +18,10 @@ Status: unverified
 
 ## Driving it
 
-Preconditions: the baseline in the index; a scratch repository with a shared-store config and one ready Auto Ticket.
+Preconditions: the baseline in the index; a prompt that first has ticket-up file one Ticket granted Auto in a file store, then runs `/manifest-dev:sweep-tickets`.
 
-- **Sweep.** `/sweep-tickets` in the scratch repository. Exactly one `run-ticket` invocation in the transcript, then the run stops.
-- **Proof.** Save the transcript and the Ticket files. No second Ticket was touched.
+- **Sweep.** `scripts/features/drive.sh sweep-tickets <prompt> --max-turns 120`. Exactly one `run-ticket` invocation in the transcript, then the run stops.
+- **Proof.** From the drive's summary and its full evidence. No second Ticket was touched.
 
 ## How it is checked
 

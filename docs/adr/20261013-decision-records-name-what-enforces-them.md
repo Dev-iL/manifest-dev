@@ -1,7 +1,7 @@
 # ADR: Decision records name what enforces them, and that line is editable in place
 
 ## Status
-Accepted
+Accepted; narrowed by 20261014-only-records-in-effect-carry-enforcement: only records in effect carry, backfill or build enforcement
 
 ## Area
 ADR conventions

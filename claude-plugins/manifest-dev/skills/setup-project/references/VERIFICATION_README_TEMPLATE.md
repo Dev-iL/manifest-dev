@@ -23,7 +23,8 @@ each with what success looks like.>
 Every entry carries one. <For a feature map or a reader-task list:>
 
 - `unverified` — catalogued but not yet exercised. Not proof of anything.
-- `verified` — exercised by a run, with the date.
+- `verified` — exercised by a run, with the date. <For a feature map:> A drive that used only some of
+  an entry's entry points names the rest: `verified (YYYY-MM-DD); not driven: <entry points>`.
 - `stale` — a run found it drifting from <the product | the document>. The entry carries a
   dated line naming what differs, for example
   `stale (YYYY-MM-DD): the route moved from /settings to /preferences`.

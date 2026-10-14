@@ -46,9 +46,13 @@ how a user reaches it and how a run drives it.
 - Every drive keeps its full evidence — transcript, scratch-project diff and new files, the
   session's `~/.manifest-dev` — under
   `${MANIFEST_DEV_FEATURES_EVIDENCE:-~/.local/state/manifest-dev-features}/<feature>/<stamp>/`,
-  outside the checkout, and writes a summary — model, plugins and skills loaded, prompt, files
-  written, final reply — to `docs/features/evidence/<feature>/<stamp>.md`, which is committed.
-  A `verified` status names the summary that backs it.
+  on the machine that drove it, and writes a summary — model, plugins and skills loaded,
+  prompt, files written, final reply with local paths removed — to
+  `docs/features/evidence/<feature>/<stamp>.md`, which is committed. A `verified` status names
+  the summary that backs it; the full evidence is for the person who drove it, not for the
+  repository. A local tool driven without the container (the design instruments) gets the same
+  kind of summary by hand: each command, its exit code and its output, in that feature's
+  evidence folder.
 - Record the feature and the entry point with every piece of evidence; the summary carries
   both.
 - An entry point that could not be driven — no GitHub access, no Slack, no Ticket store — is

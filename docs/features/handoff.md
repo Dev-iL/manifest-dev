@@ -19,12 +19,12 @@ Status: unverified
 
 Preconditions: the baseline in the index; a session with some work to hand over.
 
-- **Write.** `/handoff continue the parser migration`. A new file under `~/.manifest-dev/handoffs/` whose path the reply names.
-- **Proof.** Save the file. A fresh session given only that file can state the goal, the state and the next step.
+- **Write.** `scripts/features/drive.sh handoff <prompt> --tools` with `/manifest-dev-tools:handoff continue the parser migration`. The drive's home holds a new `.manifest-dev/handoffs/handoff-*.md` whose path the reply names.
+- **Proof.** From the drive's summary and its full evidence. A fresh session given only that file can state the goal, the state and the next step.
 
 ## How it is checked
 
-No behavior case or test.
+This entry's recipe, driven through `scripts/features/drive.sh`; `tests/test_skill_frontmatter.py` and `tests/test_entry_points.py` hold that the skill parses and stays in the declared set. No behavior case measures it.
 
 ## Gotchas
 

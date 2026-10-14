@@ -44,6 +44,9 @@ Adopt an evidence-ledger trust core in the spine, mode-general:
 - Spine weight increases; ledger upkeep and the re-derivation pass cost tokens (accepted: quality-first per CUSTOMER.md, since absorbed into NORTH_STAR.md).
 - The cheap re-derivation checks evidence→conclusion fit only; evidence-gathering blind spots remain partially open.
 
+## Enforced by
+partly — `tests/test_dist_skill_references.py` — `test_autonomous_diagnosis_goal_requires_mechanism_or_earned_underdetermination` fails if autonomous figure-out's diagnosis Read may stop at localization or declare "underdetermined" without the distinguishing probes it ran; the tiered claim discipline, Read anatomy, status decay and re-derivation in the spine are judgment, measured by the figure-out eval suite.
+
 ## Source
 - Related: PR #189.
 - Related: 20260606-harden-figure-out-truth-seeking-inline-defer-independent-pass (un-defers its deferred independent pass; its inline-rigor decision stands); 20260606-figure-out-process-trust-vs-define-do-artifact-trust (process-trust boundary unchanged); 20260611-figure-out-spine-owns-epistemics-mode-refs-thin

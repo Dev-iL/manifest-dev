@@ -20,16 +20,17 @@ Status: unverified
 
 Preconditions: the baseline in the index; `gh auth status` succeeds and a pull request the run may read.
 
-- **Inspect.** `/check-pr <url of a throwaway pull request>`. One PASS or FAIL report with a line per gate.
-- **Proof.** Save the report and `gh pr view <url> --json state,mergeStateStatus`. The report's mergeability matches GitHub's; no comment, label or merge appeared on the pull request.
+- **Inspect.** `scripts/features/drive.sh check-pr <prompt>` with `/manifest-dev:check-pr <url of a throwaway pull request>`. One PASS or FAIL report with a line per gate.
+- **Proof.** From the drive's summary and its full evidence. The report's mergeability matches GitHub's; no comment, label or merge appeared on the pull request.
 
 ## How it is checked
 
-No behavior case or test exercises its report; referenced by define's lifecycle task file.
+This entry's recipe, driven through `scripts/features/drive.sh`; `tests/test_skill_frontmatter.py` and `tests/test_entry_points.py` hold that the skill parses and stays in the declared set. No behavior case measures it. define's pull-request lifecycle task file names it as a gate.
 
 ## Gotchas
 
 - Without GitHub access every entry point is `unreachable`.
+- The drive container carries no GitHub credentials, so a drive through `scripts/features/drive.sh` reaches this entry only after a GitHub token for a throwaway repository is added to it; until then its GitHub entry points are `unreachable`.
 - GitHub's `UNKNOWN` merge state is a wait, not a PASS.
 - PASS means mergeable, not authorized to merge.
 
