@@ -11,3 +11,4 @@ in `upgrades/` says; it records the newest version once the user has answered.
 - v3 — `changes/v3.md`: the feature-map entry says where its commands live and that a changed feature's entry is updated and driven.
 - v4 — `changes/v4.md`: one verification harness of recipes replaces the surface, map and reader tasks.
 - v5 — `changes/v5.md`: the harness is optional, controls what it checks, holds run time against creep, and reads as a default shape.
+- v6 — `changes/v6.md`: every check a harness project keeps is a recipe, the checks run across the whole tree included, and the evidence a change rests on comes through the harness.

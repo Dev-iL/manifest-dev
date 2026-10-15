@@ -151,7 +151,8 @@ Decisions behind the multi-CLI design are indexed in [`docs/adr/`](docs/adr/READ
 ./scripts/setup.sh
 source .venv/bin/activate
 
-scripts/check.sh --fix   # lint and format, typecheck, test
+scripts/check.sh --fix                # lint and format, typecheck, test while iterating
+scripts/verify drive property-suite   # the same checks through the harness, before a pull request
 ```
 
 Run `python3 scripts/sync_dist.py` after changing plugin components; the test suite fails when a generated copy drifts.

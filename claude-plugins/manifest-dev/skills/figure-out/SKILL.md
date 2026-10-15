@@ -95,8 +95,8 @@ short messages do not require permission to do the next piece of research.
 - When the read implies making something, state exactly what it will be and
   how it will be checked — in a project, the way the verification bullet of the
   context file's project-surfaces section names: its verification harness, its one
-  command for checking a result, with a recipe per feature, skill, document walk or
-  eval suite, whose `list` is where a report or a change is placed first; or the
+  command for checking a result, with a recipe per feature, skill, document walk,
+  eval suite and the checks run across the whole tree, whose `list` is where a report or a change is placed first; or the
   project's own commands and steps; or, with no bullet, the verification assets the
   project keeps (a harness among them counts as chosen, and the read suggests recording its
   bullet), never a harness the project did not choose; in any form, a touched check that is broken or not fit to trust is repaired
