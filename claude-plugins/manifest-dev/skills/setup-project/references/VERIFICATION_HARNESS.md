@@ -60,9 +60,11 @@ skills, prompts with behavior cases, and living documents are all recipes in the
   covers), and `raise` and `freeze` (move or hold a time line, below). A port that keeps these
   subcommands and what they print keeps every skill's instructions working unchanged; one that
   departs from them says so in its own `--help`.
-- **Recipes.** One Markdown file per thing a user reaches or a reader relies on, in the recipes
-  directory (`verification/recipes/` by default). Front matter: `kind` (a free label — feature,
-  skill, walk, eval, …), `covers` (the paths whose change makes its evidence stale), `ask-first`
+- **Recipes.** Every check the project keeps is a recipe: one Markdown file per thing a user
+  reaches or a reader relies on, and one for the checks the project runs across the whole tree —
+  its lint, type checks, test suite, build or gate runner — in the recipes directory
+  (`verification/recipes/` by default). Front matter: `kind` (a free label — feature, skill, walk,
+  eval, suite, …), `covers` (the paths whose change makes its evidence stale), `ask-first`
   with a one-line reason when it applies, and `dry-run: honored` when its commands obey
   `VERIFY_DRY_RUN=1`. Body: a title and one paragraph on what the user sees it do; *How a user
   reaches it* — every entry point past the obvious one; *Scenarios* — each a `### name` heading
@@ -77,8 +79,9 @@ skills, prompts with behavior cases, and living documents are all recipes in the
   started), `headroom:` (25% by default, at least 1 s) and `raise:` (`run` lets an agent raise a
   line with its reason, `ask` needs a person) for time lines, and notes `--help` prints — what every run
   starts from, what it needs (a running service, a credential), driving conventions. `harness/`
-  beside this file carries an example settings file and three example recipes: a free
-  browser-and-CLI feature, an ask-first agent skill, and an ask-first document walk.
+  beside this file carries an example settings file and four example recipes: a free
+  browser-and-CLI feature, an ask-first agent skill, an ask-first document walk, and the free
+  checks the project runs across the whole tree.
 - **Control.** `verify start` (an isolated instance in a known state), `running`, `logs`, `reset`
   and `stop` each run a command the project declares under that key in `harness.md`, as `doctor:`
   does. They are offered where they fit, never required: a project declares only the ones that
@@ -158,6 +161,19 @@ the existing command (`npm run e2e -- --grep checkout`, a Makefile target, an ev
 there is still one way to verify each thing. A second runner beside an existing one gives the
 next run two ways to check the same thing, and it will pick either.
 
+The checks a project runs across the whole tree — lint, type checks, its test suite, a build — are
+assets too, whatever else the project already has. They become one recipe of kind `suite` that
+`covers` the whole tree: where a gate runner already runs them, its scenarios call that runner or
+its subsets; otherwise each check is a scenario calling the project's own command. It is adopted
+on every path that builds or audits a harness: a first install, an upgrade that moves an older
+surface into recipes, and an audit of a harness that lacks it. Because it covers every path, it
+is always among the recipes `verify affected` names and never marks a path as covered: a changed
+path a user reaches is judged covered or not by the other recipes alone. A verification command
+the context file names outside its verification bullet, run by no recipe, teaches a second way
+in, which an audit offers to close. Calling a command directly while iterating stays fine; the
+evidence a run reports a change on comes through the harness, so its statuses speak for every
+check.
+
 An adopted asset keeps the scope the project gave it. Setup adds no recipes for what that scope
 leaves out: an eval suite that covers two skills on purpose is not a gap for every other skill.
 Measurement suites — behavior evals with baselines and noise floors — stay what they are; a
@@ -217,7 +233,8 @@ gaps, as long as one command still tells a newcomer how to verify.
 Where setup installs the harness (the user did not opt out), it seeds it in this default shape, fitted to what the project already has: it copies and adapts the tool in the language *The parts* sets, asks the
 ask-first choice (default `ask`) and writes it to `harness.md`, declares the control commands
 the project's existing scripts already provide (and none where nothing runs), adopts existing
-assets as recipes that delegate to them, catalogs recipes
+assets as recipes that delegate to them — the checks it runs across the whole tree among them
+(*Build on what exists*) — catalogs recipes
 from source (routes, commands, menus, invocable skills, the tasks readers bring to the documents)
 so a vague report about any of them can be placed, adds the repository check, and wires the context-file bullet. It writes
 scenarios only as far as existing assets already reach. Then, where one can run without asking,

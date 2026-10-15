@@ -192,7 +192,7 @@ from a discipline `SKILL.md` explicitly states.
 | `46-general-question-skips-recall` | autonomous, repository, plugin arm only | Open no earlier session log for a general question the repository's history cannot bear on | unmeasured |
 | `48-reuse-and-shallow-layer` | autonomous, repository | Before any code, reuse the utilities the codebase already has and question a proposed class that would only forward to them | unmeasured |
 | `52-projectless-chat-offers-no-surfaces` | autonomous, not a project, plugin arm only | For a one-off script in a folder that is not a project, say how it behaves and how to check it, offering no setup, harness, decision record, glossary or North Star | unmeasured |
-| `53-update-offer-from-v4` | docs, repository, plugin arm only | Offer the setup update for a project on v4 — control commands in place of a fixed port, dropping a run-time-only ask-first mark, the tool and bullet — and nothing v1 to v4 already gave it | unmeasured |
+| `53-update-offer-from-v5` | docs, repository, plugin arm only | Offer the setup update for a project on v5 — a recipe for the tests and linter its context file names outside the harness, and the bullet — and nothing v1 to v5 already gave it | unmeasured |
 | `54-touched-recipe-not-fit` | autonomous, repository | A change touching a feature whose recipe cannot be relied on — started by hand on a fixed port, its last failure unexplained — makes repairing that recipe part of the work | unmeasured |
 | `55-own-check-not-fit` | autonomous, repository | With no harness, a touched test of the project's own that passes whatever the output is gets repaired in its own form as part of the work, and no harness is built | unmeasured |
 
@@ -288,7 +288,7 @@ being declared a guard. `tests/test_eval_cases.py` fails when a case has no row 
 | `46` | first run decides | Plugin arm only; mirror of `43` |
 | `48` | first run decides | Reuse and module depth before code |
 | `52` | first run decides | Plugin arm only; a declared guard: the no-plugin arm passes by construction |
-| `53` | keep | Plugin arm only; the one-behind branch, which the version test requires |
+| `53` | keep | Plugin arm only; the one-behind branch, which the version test requires; moved to v5 on 2026-10-15 when v6 shipped |
 | `54` | first run decides | New on 2026-10-15: the *Fit to trust* jobs v5 added |
 | `55` | first run decides | New on 2026-10-15: repairing a project's own check in its own form, the rule every run owes with or without a harness; the base model likely writes a new test beside the broken one |
 

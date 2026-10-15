@@ -11,7 +11,10 @@ its own `--help`.
   `../../setup-project/references/VERIFICATION_HARNESS.md` → *What setup creates, and what runs build*
   describes, unattended too: it is verification for the change, like a regression test.
 - **Touched recipes:** `verify affected` lists the recipes the change touches and the changed
-  paths no recipe covers; an uncovered path a user reaches gets a recipe. Update each touched
+  paths no recipe covers; an uncovered path a user reaches gets a recipe. A recipe covering the whole
+  tree, for the project's lint, types or test suite, never counts as covering such a path, and
+  where one exists `affected` lists no uncovered path, so check each changed path a user reaches
+  against the other recipes' `covers`. Update each touched
   recipe to match the change, run it, and commit its evidence. A recipe marked ask-first runs
   only with the agreement `../../setup-project/references/VERIFICATION_HARNESS.md` → *Ask first*
   describes; otherwise update it, leave it unrun, and name the run it owes in the report. A

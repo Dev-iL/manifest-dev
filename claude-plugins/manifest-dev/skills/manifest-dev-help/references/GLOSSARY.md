@@ -302,10 +302,14 @@ the `/setup-project` setup the project has. When the number is older than the ne
 ## Verification
 
 ### Verification Harness
-<!-- context: 3307d91dd337 -->
+<!-- context: 66b62e2201b2 -->
 The Verification Harness is the one command in a project that agents and people use to find if the
 work still does its job. Its `--help` says all about it. It reads one Recipe for each feature,
-skill, document walk or eval suite. It calculates each status from Evidence in the repository, not
+skill, document walk or eval suite. It also reads one Recipe for the checks that run on all of the
+project, such as lint, types and tests. Thus each check that the project keeps is in one place.
+
+While you work, you can run a check command directly. The Evidence that a change works comes from
+the harness. It calculates each status from Evidence in the repository, not
 from a list that a person keeps. It can also start, observe, reset and stop what it examines.
 
 It exists because without it each session must find again how to test the project, and a test that
@@ -330,12 +334,15 @@ must also give statuses from Evidence, an ask-first mark that follows cost, and 
 jobs.
 
 ### Recipe
-<!-- context: d0e2af5ff7af -->
+<!-- context: bb7b3ec98333 -->
 A Recipe is one Markdown file in the Verification Harness. It says what one part is, how a user
-reaches it, the Scenarios that exercise it, and its traps. A walk recipe gives a document to a new
-reader, who must do a task from that document alone. An eval recipe starts a suite of behavior
-tests. Recipes exist so that each part of the project has one place that says how to examine it. A
-change then finds the recipes that it touches.
+reaches it, the Scenarios that exercise it, and its traps. Recipes exist so that each part of the
+project has one place that says how to examine it. A change then finds the recipes that it touches.
+
+A walk recipe gives a document to a new reader, who must do a task from that document alone. An
+eval recipe starts a suite of behavior tests. A suite recipe runs the checks that apply to all of
+the project, such as lint and tests. Each of its Scenarios calls the command that the project
+already has.
 
 ### Scenario
 <!-- context: 010d556fdb11 -->

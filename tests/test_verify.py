@@ -1,7 +1,7 @@
 """This repository's verification harness stays sound.
 
-`scripts/verify` reads one recipe per thing a user reaches or a reader relies on, from
-`verification/recipes/`. A recipe that no longer parses, or names a path that moved, sends the
+`scripts/verify` reads one recipe per thing a user reaches or a reader relies on, and one for
+the checks run across the whole tree, from `verification/recipes/`. A recipe that no longer parses, or names a path that moved, sends the
 next run to nothing; a skill with no recipe cannot place a report about it; a walk pointing at a
 renamed section cannot run. The tool itself is the one setup-project ships, so the two must not
 drift apart.
