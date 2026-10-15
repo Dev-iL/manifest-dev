@@ -225,8 +225,8 @@ ground for every contributor and agent, regardless of tooling. Read `NORTH_STAR.
 - **Verification** — `<command>`: how this project checks that its work still does its job.
   Run it before saying a change works, when reproducing a reported problem, and when a change
   touches something one of its recipes covers (`<command> list` shows them); a change that
-  needs a check no recipe has adds one. Every check this project keeps is a recipe, its lint, types
-  and tests among them: call their commands directly while iterating, and drive the recipe for the
+  needs a check no recipe has adds one. Every check this project keeps is a recipe, the checks it
+  runs across the whole tree among them: call their commands directly while iterating, and drive the recipe for the
   evidence a change rests on. Recipes without the ask-first mark are free: run them as often as
   they help.
   Recipes marked ask-first cost money, quota, load on shared systems or effects outside the

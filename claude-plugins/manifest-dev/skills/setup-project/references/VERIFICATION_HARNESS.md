@@ -161,14 +161,18 @@ the existing command (`npm run e2e -- --grep checkout`, a Makefile target, an ev
 there is still one way to verify each thing. A second runner beside an existing one gives the
 next run two ways to check the same thing, and it will pick either.
 
-The checks a project runs across the whole tree — lint, type checks, its test suite, a build, a
-gate runner that runs them all — are assets too, whatever else the project already has. Each
-becomes a scenario of a recipe of kind `suite` that `covers` the whole tree and calls the
-project's own command, adopted on every path that builds or audits a harness: a first install, an
-upgrade that moves an older surface into recipes, and an audit of a harness that lacks them. A
-context file that names a verification command no recipe runs teaches a second way in, which an
-audit offers to close. Calling the command directly while iterating stays fine; the evidence a
-run reports a change on comes through the harness, so its statuses speak for every check.
+The checks a project runs across the whole tree — lint, type checks, its test suite, a build — are
+assets too, whatever else the project already has. They become one recipe of kind `suite` that
+`covers` the whole tree: where a gate runner already runs them, its scenarios call that runner or
+its subsets; otherwise each check is a scenario calling the project's own command. It is adopted
+on every path that builds or audits a harness: a first install, an upgrade that moves an older
+surface into recipes, and an audit of a harness that lacks it. Because it covers every path, it
+is always among the recipes `verify affected` names and never marks a path as covered: a changed
+path a user reaches is judged covered or not by the other recipes alone. A verification command
+the context file names outside its verification bullet, run by no recipe, teaches a second way
+in, which an audit offers to close. Calling a command directly while iterating stays fine; the
+evidence a run reports a change on comes through the harness, so its statuses speak for every
+check.
 
 An adopted asset keeps the scope the project gave it. Setup adds no recipes for what that scope
 leaves out: an eval suite that covers two skills on purpose is not a gap for every other skill.

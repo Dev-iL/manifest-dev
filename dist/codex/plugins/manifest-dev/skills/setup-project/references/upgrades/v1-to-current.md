@@ -16,7 +16,7 @@ commands and steps, so no figure-out, define or do run builds or offers one:
    only an `Accepted` record is in effect, and backfilling `Enforced by`, building a `not yet`
    check, and citing a record as a ruling read only records in effect.
 2. **The harness**, per `MOVE_TO_HARNESS.md` beside this file: the tool, `harness.md`, a recipe
-   for each entry the v1 surface carries with its content and evidence, a recipe for the checks the project runs across the whole tree — its lint, type checks, test suite, build or gate runner — calling its own commands (`../VERIFICATION_HARNESS.md` → *Build on what exists*), the `ask-first` marks,
+   for each entry the v1 surface carries with its content and evidence, a recipe for the checks the project runs across the whole tree — its lint, type checks, test suite, build or gate runner — calling its own commands (`../VERIFICATION_HARNESS.md` → *Build on what exists*, which also offers a scenario for each verification command the context file names that no recipe runs), the `ask-first` marks,
    and the removal of the old surface, its README and its repository check — except an eval suite,
    which stays as it is. Where the project has
    no surface and holds something future runs will change, recommend a new harness seeded per

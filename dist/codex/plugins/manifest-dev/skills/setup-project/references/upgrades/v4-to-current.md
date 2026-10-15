@@ -29,8 +29,8 @@ commands and steps, so no figure-out, define or do run builds or offers one:
    variation never reads as creep.
 5. **A recipe for the checks run across the whole tree** — its lint, type checks, test suite,
    build or gate runner, each a scenario calling the project's own command, per
-   `../VERIFICATION_HARNESS.md` → *Build on what exists*; and each verification command the
-   context file names that no recipe runs, offered as a scenario so the file teaches one way in.
+   `../VERIFICATION_HARNESS.md` → *Build on what exists*, which also offers a scenario for each
+   verification command the context file names that no recipe runs, so the file teaches one way in.
 6. **The context-file bullet** — v6's wording from `../NORTH_STAR_FORMAT.md` → *The
    project-surfaces section*: unmarked recipes are free to run as often as they help, the
    ask-first reason is cost, never time, and the evidence a change rests on comes through the

@@ -12,9 +12,10 @@ already does the job:
    build or gate runner, each a scenario calling the project's own command, per
    `../VERIFICATION_HARNESS.md` → *Build on what exists*. Where the project already has such a
    recipe, report it as in place.
-2. **One way in** — each verification command the project context file names, outside its
-   verification bullet, that no recipe runs: offered as a scenario of that recipe, with the
-   context file's wording pointing at the scenario so a reader meets one way to check each thing.
+2. **One way in** — each verification command the project context file names that no recipe
+   runs, offered as a scenario of that recipe as `../VERIFICATION_HARNESS.md` → *Build on what
+   exists* says, with the context file's wording pointing at the scenario so a reader meets one
+   way to check each thing.
 3. **The context-file bullet** — v6's wording from `../NORTH_STAR_FORMAT.md` → *The
    project-surfaces section*: the evidence a change rests on comes through the command, and the
    project's own commands stay usable while iterating.

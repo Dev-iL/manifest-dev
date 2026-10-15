@@ -13,19 +13,19 @@ Installs a project's surfaces — North Star, glossary, ADR conventions, a verif
 - `/setup-project [--no-mine]`; `--no-mine` installs the wiring and the verification harness without mining history.
 - Phrases its description matches: "set up the project", "bootstrap ADRs", "check whether the setup is sound".
 - figure-out's docs mode offers it: no surfaces at all, a missing or older surfaces version, or a broken surface met on the way.
-- On a project recording an older surfaces version it follows that version's upgrade guide: from v4, control commands, the tool update and the ask-first marks narrowed to cost; from earlier, moving an existing verification surface, feature map and reader tasks into one harness of recipes. A repository with nothing gets the wiring only.
+- On a project recording an older surfaces version it follows that version's upgrade guide: from v5, a recipe for the checks run across the whole tree and one way in; from v4, also control commands, the tool update and the ask-first marks narrowed to cost; from earlier, moving an existing verification surface, feature map and reader tasks into one harness of recipes. A repository with nothing gets the wiring only.
 
 ## Scenarios
 
-### update-from-v4
-Run: `scripts/drive-skill.sh setup-project verification/prompts/setup-project-update-one-behind.md --scaffold claude-plugins/manifest-dev/evals/53-update-offer-from-v4 --max-turns 80`
-Proves: it follows the v4 guide: the tool update shown as a difference from the project's copy, `start`/`stop` (and `logs`) declared over `scripts/serve.sh` and `scripts/stop.sh` on `VERIFY_RUN_ID` in place of port 8000, `full-suite`'s run-time-only ask-first mark offered for removal, the bullet's v5 wording, and the version line at v5. Nothing v1 to v4 gave is offered again.
+### update-from-v5
+Run: `scripts/drive-skill.sh setup-project verification/prompts/setup-project-update-one-behind.md --scaffold claude-plugins/manifest-dev/evals/53-update-offer-from-v5 --max-turns 80`
+Proves: it follows the v5 guide: a recipe of kind `suite` covering the whole tree whose scenarios run `python3 -m pytest tests/` and `ruff check src tests`, the *Before merging* section pointed at it, the bullet's v6 wording, and the version line at v6. Nothing v1 to v5 gave is offered again.
 Check: read
 Workload: varies
 
 ### update-from-v3
 Run: `scripts/drive-skill.sh setup-project verification/prompts/setup-project-update-one-behind.md --scaffold verification/scaffolds/project-at-v3 --max-turns 80`
-Proves: the report lists what it offered, applied and declined; the context file ends at the newest version with one verification bullet; the summary's files include `scripts/verify`, `verification/harness.md`, a recipe per former feature-map entry and reader task (the checkout recipe keeps its *Club notes*), the moved evidence, and the removal of `docs/features/` and `docs/reader-tasks/`. Nothing was written that the run did not offer and accept.
+Proves: the report lists what it offered, applied and declined; the context file ends at the newest version with one verification bullet; the summary's files include `scripts/verify`, `verification/harness.md`, a recipe per former feature-map entry and reader task (the checkout recipe keeps its *Club notes*), a recipe for the checks run across the whole tree, the moved evidence, and the removal of `docs/features/` and `docs/reader-tasks/`. Nothing was written that the run did not offer and accept.
 Check: read
 Workload: varies
 

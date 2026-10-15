@@ -26,7 +26,6 @@ Proves: the TypeScript program compiles with no error.
 ### tests
 Run: `npm test`
 Proves: every unit test passes.
-Workload: varies
 
 ## Gotchas
 
