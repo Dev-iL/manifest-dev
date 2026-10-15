@@ -1,10 +1,10 @@
 ---
-tags: [figure-out-plugin-only]
+tags: [figure-out]
 max_turns: 40
 timeout_seconds: 900
 allowed_tools: [Skill, Read, Glob, Grep, Write, Edit, Bash]
 model: opus
-runs: 12
+runs: 1
 ---
 use the figure-out skill with --autonomous for this. the project is this repo; its context file is ./CLAUDE.md.
 

@@ -13,8 +13,8 @@ Set the bar there and no lower. Incidental working detail is fine and not worth 
 ## Development Commands
 
 ```bash
-# Lint, format, typecheck, test (scripts/verify needs Node 22.18+; `npm --prefix scripts ci` once)
-ruff check --fix claude-plugins/ tests/ && black claude-plugins/ tests/ && mypy && npm --prefix scripts run typecheck && python3 -m pytest tests/
+# Lint and format (fixing), typecheck, test across every CPU; `scripts/setup.sh` once
+scripts/check.sh --fix        # or one group: scripts/check.sh lint|types|tests
 
 # Test plugin locally
 /plugin marketplace add /path/to/manifest-dev
@@ -35,7 +35,7 @@ the source tree it copies. It also fails when a shipped file points to a section
 `claude-plugins/manifest-dev/evals/` holds behavioral eval suites for `figure-out` and, under
 `evals/define/` with its own README, for `define`. Each run is many model sessions, so the
 owner runs a suite, or an agent runs one after asking and naming the cases and why; it runs with
-`claude plugin eval . --tag <figure-out|define> --ablation with-without --allow-tools Write Bash --scaffold` with the judge model each README names (on macOS, inside the container `evals/Dockerfile` defines — `scripts/evals/run_eval.sh` starts it; its `README.md` also covers hill-climbing a prompt with the scripts beside it)
+`claude plugin eval . --tag <figure-out|define> --ablation with-without --allow-tools Write Bash --scaffold` with the judge model and cost ceiling each README names (on macOS, inside the container `evals/Dockerfile` defines — `scripts/evals/run_eval.sh` starts it; its `README.md` also covers hill-climbing a prompt with the scripts beside it)
 from the plugin directory. It measures **uplift** — every case runs with the plugin and without
 it, and the headline number is Δ, not pass rate — so a case both arms pass teaches nothing and is
 removed. `tests/` is a property suite that must stay green; the eval suite is a measurement whose
@@ -53,7 +53,7 @@ Read before building plugins:
 
 ## Project Surfaces
 
-<!-- setup-project surfaces v4 -->
+<!-- setup-project surfaces v5 -->
 
 This project keeps its direction, vocabulary, and decision memory in the repo — shared ground for every contributor and agent, regardless of tooling.
 
@@ -65,7 +65,7 @@ This project keeps its direction, vocabulary, and decision memory in the repo �
 
 **Writing a decision record is one act, not three** — the record, the restatus, and the index, in one change. Step two is the one that gets dropped, and dropping any of them leaves the corpus asserting something untrue. Open `docs/adr/CONVENTIONS.md` before you start: it carries the bar, the template, and what each step actually requires.
 
-**Verification — `scripts/verify`: how this project checks that its work still does its job.** Run it before saying a change works, when reproducing a reported problem, and when a change touches something one of its recipes covers (`scripts/verify list` shows them); a change that needs a check no recipe has adds one. Recipes marked ask-first cost money, time, shared resources or effects outside the repository: run those only when a person runs them or has agreed — ask first, naming the recipe and why. `scripts/verify --help` gives the rest. The behavior suites its `eval` recipes start cover `figure-out` and `define` only, on purpose; a change to a prompt that a case covers updates that case where the change affects what it tests, and marks it stale or, with the owner's agreement, runs it, as `claude-plugins/manifest-dev/evals/README.md` describes. `scripts/design-evals/` is the harness for the code instruments the `design` skill ships; its README says how to run it and what it does not measure.
+**Verification — `scripts/verify`: how this project checks that its work still does its job.** Run it before saying a change works, when reproducing a reported problem, and when a change touches something one of its recipes covers (`scripts/verify list` shows them); a change that needs a check no recipe has adds one. Recipes without the ask-first mark are free: run them as often as they help — `property-suite` after every change. Recipes marked ask-first cost money, quota, load on shared systems or effects outside the repository: run those only when a person runs them or has agreed — ask first, naming the recipe and why. `scripts/verify --help` gives the rest. The behavior suites its `eval` recipes start cover `figure-out` and `define` only, on purpose; a change to a prompt that a case covers updates that case where the change affects what it tests, and marks it stale or, with the owner's agreement, runs it, as `claude-plugins/manifest-dev/evals/README.md` describes. `scripts/design-evals/` is the harness for the code instruments the `design` skill ships; its README says how to run it and what it does not measure.
 
 ## Repository Structure
 
@@ -163,7 +163,7 @@ Distributed skill files stay repo-agnostic — maintainer/governance notes like 
 
 ## Setup-Project Surfaces Version
 
-Every file setup-project copies or emits into projects — `figure-out/references/ADR_FORMAT.md`, `setup-project/references/NORTH_STAR_FORMAT.md`, and the verification harness under `setup-project/references/harness/` (the tool and its example settings and recipes) — is pinned to the latest surfaces version in `setup-project/references/CHANGES.md`. A change to any of them needs a new `## vN` entry in the same change. The entry lists what an installed project gains and carries the digest the version test prints on failure, and the version comment in the surfaces template of `NORTH_STAR_FORMAT.md` moves to `vN`. Installed projects record the version they carry, and an update offers only the entries after it, so a change shipped without a version never reaches them. HTML comments are outside the digest, so maintainer notes need no version. Each change that adds a version also adds an eval case for a project recording the version before it, graded on offering only the entries after that version. While v1 is the only version, no project can be one version behind, so that path has no case. `tests/test_setup_project_versions.py` fails when `45-current-setup-offers-nothing` does not record the newest version, or, from v2 on, no eval case records the version before it. A new version also updates every upgrade guide in `setup-project/references/upgrades/` — one `vN-to-current.md` per older version, each taking a project straight to the newest — and adds the guide for the version it supersedes; the same test fails when a guide is missing, exists for the newest version, or names an older target. This repository's `scripts/verify` and `scripts/verify.mts` are copies of the shipped tool, and the eval scaffolds that seed a harness embed it, so edit the shipped copy and run `python3 scripts/sync_dist.py`, which copies it to the others; `tests/test_verify.py` and `sync_dist.py --check` fail when any differs. `scripts/tsconfig.json` type-checks both `verify.mts` copies in strict mode (`npm --prefix scripts run typecheck`), with its dev dependencies in `scripts/package.json`, never in the root `package.json`, which Pi installs from.
+Every file setup-project copies or emits into projects — `figure-out/references/ADR_FORMAT.md`, `setup-project/references/NORTH_STAR_FORMAT.md`, and the verification harness under `setup-project/references/harness/` (the tool and its example settings and recipes) — is pinned to the latest surfaces version. `setup-project/references/CHANGES.md` lists one line per version and `setup-project/references/changes/vN.md` holds each version's items, so an update reads only the versions it offers and the always-read list grows by a line, not by every version's items. A change to any emitted file needs a new `changes/vN.md` and its line in `CHANGES.md` in the same change. The file lists what an installed project gains and carries the digest the version test prints on failure, and the version comment in the surfaces template of `NORTH_STAR_FORMAT.md` moves to `vN`. Installed projects record the version they carry, and an update offers only the entries after it, so a change shipped without a version never reaches them. HTML comments are outside the digest, so maintainer notes need no version. Each change that adds a version moves the one-behind eval case to the version before it — replacing that case, never adding one beside it, since every such case tests the same offer and each run is paid — graded on offering only the entries after that version, and moves `45-current-setup-offers-nothing` to the newest. `tests/test_setup_project_versions.py` fails when `45` does not record the newest version, when no case records the version before it, and when a case records an older version or two cases record that one. A new version also updates every upgrade guide in `setup-project/references/upgrades/` — one `vN-to-current.md` per older version, each taking a project straight to the newest — and adds the guide for the version it supersedes; the same test fails when a guide is missing, exists for the newest version, or names an older target. This repository's `scripts/verify` and `scripts/verify.mts` are copies of the shipped tool, and the eval scaffolds that seed a harness embed it, so edit the shipped copy and run `python3 scripts/sync_dist.py`, which copies it to the others; `tests/test_verify.py` and `sync_dist.py --check` fail when any differs. `scripts/tsconfig.json` type-checks both `verify.mts` copies in strict mode (`npm --prefix scripts run typecheck`), with its dev dependencies in `scripts/package.json`, never in the root `package.json`, which Pi installs from.
 
 ## Red-Flag Mirror Pairs
 
@@ -180,6 +180,10 @@ figure-out's task files and define's task files are decoupled, so a red-flag lis
 ## Slicing Discipline Ownership
 
 The rule that a slice must be exercisable end-to-end on its own — put in front of its real use rather than inspected as present — lives in two shipped skills: `/define`'s Deliverable cutting and `ticket-up`'s Ticket cutting (stated in both its `SKILL.md` and `references/TICKET_CONVENTION.md`). The duplication is deliberate: a shipped skill stands alone, and `ticket-up` authors Tickets from direct requests and figure-out handoffs that never pass through `/define`, so it cannot defer the rule there. Change one, change the others — a sharpening that lands in only one home leaves the other paths cutting by layer, which is the defect the rule exists to prevent. What the rule governs is where a cut falls, never how many Deliverables or Tickets come out; count stays with each skill's own unit test.
+
+## manifest-dev-help Glossary Ownership
+
+`manifest-dev-help/references/GLOSSARY.md` restates `CONTEXT.md`'s product terms for users, close to ASD-STE100 (about 90% of it) and with the why behind each, because no installed skill can read this repository's glossary. Every change to a `CONTEXT.md` entry rereads its manifest-dev-help entry in the same change: each manifest-dev-help entry records the fingerprint of the `CONTEXT.md` entry it was written from, and `tests/test_manifest_dev_help_skill.py` fails — printing the new fingerprint — when the two differ, when a term is added or removed on one side only, or when manifest-dev-help breaks STE's counted limits. A term only maintainers use goes in that test's `MAINTAINER_TERMS` instead. See `docs/adr/20261015-manifest-dev-help-answers-questions-about-manifest-dev-in-simplified-english.md`.
 
 ## Project Definition Ownership
 
@@ -244,8 +248,8 @@ Prefer `cp` and `mv` bash commands over the Write tool when duplicating or movin
 ## Before PR
 
 ```bash
-# Lint, format, typecheck, test (scripts/verify needs Node 22.18+; `npm --prefix scripts ci` once)
-ruff check --fix claude-plugins/ tests/ && black claude-plugins/ tests/ && mypy && npm --prefix scripts run typecheck && python3 -m pytest tests/
+# Lint and format (fixing), typecheck, test across every CPU; `scripts/setup.sh` once
+scripts/check.sh --fix        # or one group: scripts/check.sh lint|types|tests
 ```
 
 Bump plugin version if plugin files changed.

@@ -8,7 +8,7 @@ Command-line tool that tracks books a reading club has borrowed.
 
 ## Project surfaces
 
-<!-- setup-project surfaces v4 -->
+<!-- setup-project surfaces v5 -->
 
 This project keeps its direction, vocabulary, and decision memory in the repo. Read
 `NORTH_STAR.md` and `CONTEXT.md` at the start of every session.
@@ -17,6 +17,12 @@ This project keeps its direction, vocabulary, and decision memory in the repo. R
 - **CONTEXT.md** — what words mean here.
 - **docs/adr/** — why decisions went the way they did. Write new records per
   `docs/adr/CONVENTIONS.md`.
+- **Verification** — how this project checks that its work still does its job: run each
+  `python -m shelfnote` command the README lists on a copy of `data/loans.json` and check that
+  the loans it reads and writes are the ones the command names. Run them before saying a change works and when reproducing a
+  reported problem; a change that needs a check none of them has adds one in the same form, and a
+  change that finds one of them broken, flaky or slow repairs it. This project verifies its own way
+  by choice: add no separate verification tool to it.
 EOF
 cat > CONTEXT.md <<'EOF'
 # Shelfnote

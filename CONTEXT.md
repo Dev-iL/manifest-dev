@@ -19,9 +19,17 @@ _Avoid_: Test, check, requirement.
 A property that must hold across all Deliverables in a Manifest.
 _Avoid_: Constraint, rule.
 
+**Gate**:
+An Acceptance Criterion or a Global Invariant — something `/do` must make hold, with evidence, before it reports completion. Each gate is one Gate Text of one declared kind, judgment or deterministic.
+_Avoid_: Check, test, requirement.
+
 **Process Guidance**:
 An advisory recommendation on HOW to work during execution, weighed by `/do` rather than enforced; departing from one is legitimate and is named on whichever terminal path the run reaches — completion, escalation, or pending — and in the Execution Log too when one is kept. Only Acceptance Criteria and Global Invariants bind.
 _Avoid_: Constraint, requirement, gate.
+
+**Known Assumption**:
+A Manifest entry (`ASM-*`) recording a decision taken with a default instead of a question — its value, its reason and the impact if wrong. An autonomous choice is marked `(auto)` and a User's Call opens with that label, so a reader can review what was decided for them.
+_Avoid_: Note, caveat.
 
 **Quality Gate**:
 A verifiable task-file item that `/define` encodes as an acceptance-style gate.
@@ -65,6 +73,14 @@ _Avoid_: CLAUDE.md (that is one harness's instance of it).
 A session with no project behind its topic — a chat with no workspace, a home or scratch folder, a folder holding one finished artifact, a question that does not concern the folder it runs in. One-off work inside a project is project work. A project is a repository or working folder holding, or about to hold, work later sessions will change; a new one the user is starting counts. The workflow skills offer, build, read for and gate on no project surface in a projectless session and still run whole.
 _Avoid_: No repo (a project need not be a git repository).
 
+**Project Surfaces**:
+The files a project keeps for every session and contributor — its North Star, Glossary, Decision Records under its ADR Conventions, and, where it chose one, Verification Harness — plus the project-surfaces section of the Project Context File that points sessions at them and records the Surfaces Version. `/setup-project` installs them; normal runs keep them current where their work touches them.
+_Avoid_: Setup files, scaffolding.
+
+**Glossary**:
+The project's vocabulary file (`CONTEXT.md` by default), made resident in every session through the Project Context File, defining each term the project has settled so no session silently misreads one. A term is added when the project settles it.
+_Avoid_: Dictionary, docs.
+
 **ADR Conventions**:
 A project-owned file stating what deserves a decision record and how to write one, self-contained so a reader with no tooling can follow it; where it exists it outranks any tool's shipped default on everything except cadence.
 _Avoid_: ADR format, ADR template.
@@ -73,20 +89,36 @@ _Avoid_: ADR format, ADR template.
 An index that asserts nothing its records don't, and is rebuilt from them rather than edited alongside them — so staleness is a repairable lag rather than lost information.
 _Avoid_: ADR list, table of contents.
 
+**Decision Record**:
+One file (an ADR) recording a decision with downstream impact — its context, the alternatives, the consequences, who decided, and the check that enforces it — append-only once published, so a later session meets why the project decided something before it decides again. A newer record supersedes or amends it; the old record's Status says so.
+_Avoid_: Design doc, meeting notes.
+
 **Verification Harness**:
-A project's one command for checking that what future runs will change still does its job — `--help` says everything — reading one Recipe per feature, skill, document walk or eval suite. Statuses (unverified, verified, failed, unreachable, unjudged, stale) are worked out from committed evidence, never kept by hand. Normal runs build and repair it where the work touches it, never a separate maintenance pass. It replaced the verification surface, feature map and reader-task list of earlier setups.
+A project's recommended but optional one command, for agents and people alike, for controlling what future runs will change — starting it in a known state, driving it, observing it, stopping it — and for checking that it still does its job — `--help` says everything — reading one Recipe per feature, skill, document walk or eval suite. Statuses (unverified, verified, failed, unreachable, unjudged, stale) are worked out from committed evidence, never kept by hand. The shape setup-project ships — the tool, its subcommands, control commands such as `reset`, the settings and recipe fields — is a default each project adapts to fit itself and its people; what every harness owes is one place to learn how to verify, statuses from evidence, ask-first following cost, and the Fit to Trust jobs. Normal runs build it and keep its control, its speed and its checks sound where the work touches it, never a separate maintenance pass. Setup installs it by default, and a project may opt out and verify its own way; the verification bullet of the Project Context File records which, and runs then verify through that way and never build or gate on a harness the project did not choose — while still keeping sound, in their own form, the checks the project has, since the line is build versus maintain. A harness on disk with no bullet counts as chosen. It replaced the verification surface, feature map and reader-task list of earlier setups.
 _Avoid_: Verification surface, feature map, reader-task list, test suite, control skill.
 
 **Recipe**:
 One Markdown file in the Verification Harness: what a thing is, how a user reaches it, the scenarios that exercise it (each an exact command and what it proves), and its traps. A walk recipe has a fresh reader do a task from a document alone; an eval recipe starts a behavior suite without redefining its statuses.
 _Avoid_: Feature-map entry, reader task, test case.
 
+**Scenario**:
+One exercise in a Recipe — an exact command and what it proves — which the Verification Harness runs, keeping its Evidence and working out its status.
+_Avoid_: Test case, step.
+
+**Evidence**:
+What a gate verdict or a Scenario status rests on — a command's output, a committed scenario summary in the harness's evidence directory, or a quoted region of an artifact. A summary claim is not evidence. In a North Star, evidence is also one of the four states, in the same sense: something observed, not asserted.
+_Avoid_: Proof, claim, report.
+
+**Time Line**:
+The run time a fixed-workload Scenario is held to — set from its first verified run plus headroom, lowered when a run is faster, moved up only by a raise carrying its reason, or held by a freeze naming a debt Ticket. A Scenario is over its line after two crossings in a row; the line lives in its latest Evidence, so parallel branches never conflict over it.
+_Avoid_: Budget, timeout, SLA.
+
 **Ask-first**:
-The mark on a Recipe whose run costs something a person should weigh — money or quota, long run time, shared environments, effects outside the repository — with its reason. By default the harness runs it only with `--yes`, given when a person ran it or agreed; the project's setting can change that. It follows what a run costs, not its kind: a local browser or CLI drive is unmarked.
+The mark on a Recipe whose run costs something a person should weigh — money or quota, load on shared systems, effects outside the repository — with its reason; run time alone is not a cost. By default the harness runs it only with `--yes`, given when a person ran it or agreed; the project's setting can change that. It follows what a run costs, not its kind: a local browser or CLI drive is unmarked.
 _Avoid_: Paid, model-session, slow.
 
 **Fit to Trust**:
-Whether an existing Verification Harness can be relied on for the recipes a change touches, judged by the jobs it does — a cold proof run of one scenario passes and leaves evidence that survives cleanup, health is checkable, runs are isolated, and PASS means the real path — never by whether it has every part or the shipped tooling.
+Whether a check a project keeps — a Verification Harness recipe, or a test, script or checklist step in the project's own form — can be relied on for what a change touches, judged by the jobs it does — a cold proof run of one scenario passes and leaves evidence that survives cleanup, health is checkable, runs are isolated, PASS means the real path, touched checks are fast enough (none over its time line without a reason), what the change touches is controllable through the harness or the project's own scripts, and a failure explains itself — never by whether it has every part or the shipped tooling. A touched check that fails a job is repaired within scope in its own form.
 _Avoid_: Complete, conformant, healthy.
 
 **Surfaces Version**:
@@ -98,7 +130,7 @@ A check installed from a correction so the corrected class of mistake fails for 
 _Avoid_: Rule (that is prose), guard, concurrency lock.
 
 **Debt**:
-What a run found and did not fix: unfixed lock hits, refactor flags from workaround comments, constraint comments awaiting encoding, new suppressions, reshapes outside the change's scope, product regressions the verification harness exposed, and a new verification harness the user may remove. A run names it in its completion report, in the "Debt left" section of every pull request it opens, and on its Ticket. A later run whose work reaches the same area offers to fold it in.
+What a run found and did not fix: unfixed lock hits, refactor flags from workaround comments, constraint comments awaiting encoding, new suppressions, reshapes outside the change's scope, and product regressions the verification harness exposed. A run names it in its completion report, in the "Debt left" section of every pull request it opens, and on its Ticket. A later run whose work reaches the same area offers to fold it in.
 _Avoid_: Tech debt (too broad), TODO, backlog.
 
 **Seed**:
@@ -196,6 +228,10 @@ The full understanding-first loop (figure-out → define → do) that every Door
 The standing project-level strategy surface — a project's diagnosis and the assumptions it rests on, who it is for and not for, its promise, how people arrive, how it makes money or what it feeds, what winning means and the number watched, its standing nevers, and the open questions no field holds — resident in every session and informing rather than binding, every position carrying one of four states (evidence, hypothesis, ruled, or empty with its filling condition), and positions moving only on the owner's ruling.
 _Avoid_: Steering layer, strategy doc, business context.
 
+**Autonomy Ladder**:
+The levels at which manifest-dev is adopted, each useful without the ones above it and without anyone else on the team adopting it: one Skill on its own; one piece of work understood, defined and verified; Project Surfaces kept by every run; a shared Ticket Store; and unattended runs that take Auto Tickets from the store and ticket up what they find, with people stepping in only for a blocker, judgment, taste or authority.
+_Avoid_: Maturity model, adoption funnel, tiers (those are the North Star, Ticket and Manifest).
+
 **Taste**:
 A durable personal steering preference persisted only by offer-and-ratify — captured as preference, rationale, and flip condition in a harness memory file.
 _Avoid_: Preference, style, judgment.
@@ -267,11 +303,13 @@ _Avoid_: Batch runner, label pulse, dependency controller.
 - Trigger adapters serialize **Run Ticket** by canonical Ticket identity, bound infrastructure retries, and assign a person with run evidence after retry exhaustion; claims and labels do not duplicate host liveness state.
 - The **Auto** grant requires that neither doing a **Ticket** nor judging it done needs any human's knowledge, taste, or authority — necessary but never sufficient: the author still chooses to grant.
 - A **Ticket** remains the identity of its work across execution attempts: a successful attempt closes it, while an escalated attempt records its evidence and releases the same open **Ticket**'s claim under an **Escalation Mark**; a follow-up **Ticket** represents only separate work.
-- A follow-up **Ticket** receives **Auto** only when its source **Ticket** carries **Auto** and the follow-up independently meets the grant criterion; an ungranted source can create only ungranted follow-ups.
+- A follow-up **Ticket** receives **Auto** only when a person grants it at its `ticket-up` boundary after it meets the grant criterion; whatever its source carries, an agent never grants **Auto** to work it found.
 - Absence of **Auto** is one fence covering untrusted **Tickets**, **Tickets** with a designed-in human step, and venue items never written as **Tickets** at all.
 - **Auto** says whether automation may touch a **Ticket** at all and is the author's call; a **Ticket Type** says which granted work an operator runs today and is the query's — keeping rollout schedule out of the grant, whose silence already carries three meanings.
 - Every venue a **Ticket Store** runs on has a **Venue Reference**.
 - A **Ticket Store** holds one or more **Efforts**, each with its own front file and destination — so the priority rule's "impact" is measured within an **Effort**, and comparing across them takes the **North Star**'s winning definition, the measure the destinations alone don't supply.
+- Each level of the **Autonomy Ladder** works without the ones above it; at the top, **Run Ticket** and **Ticket Sweep** take **Auto** **Tickets** unattended, and a person steps in at an **Escalation Mark**, a **User's Call** or a **Taste** offer.
+- **Project Surfaces** live in the project and are read by every session through the **Project Context File**; the **Glossary** and the **Decision Records** are two of them, and the **Verification Harness** runs one **Scenario** at a time, keeping **Evidence** that carries each **Time Line**.
 - A **North Star** informs every session by residency and never binds; the one binding route is `/define` routing an unsafe or irreversible Never to a **Global Invariant**.
 - A project-owned North Star conventions file (emitted by `setup-project` beside the doc) governs the **North Star**'s form wherever it exists, with the plugin's shipped default applying otherwise — the same precedence the **ADR Conventions** carry; cadence stays with figure-out.
 - `setup-project` installs and seeds a **North Star**; figure-out's docs mode keeps it current under the update asymmetry — evidence lowers a position's state, only the owner's ruling changes a position, and each position change is remembered as a decision record.

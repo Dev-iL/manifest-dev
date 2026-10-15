@@ -2,10 +2,11 @@
 
 setup-project copies or emits a few files into every project it sets up. A project records
 the surfaces version it carries in its context file, and a later update offers only the
-changes listed in `CHANGES.md` after that version. So an edit to an emitted file that does
+changes listed for the versions after it: `CHANGES.md` holds one line per version, and each
+version's items live in its own file under `changes/`, so an update reads only what it offers. So an edit to an emitted file that does
 not add a version leaves every installed project unable to learn about it.
 
-This test pins a digest of the emitted text to the latest version in `CHANGES.md`. HTML
+This test pins a digest of the emitted text to the latest version's file. HTML
 comments are left out of the digest: they are maintainer notes the copy drops, and the
 template's own version comment would otherwise make the digest depend on itself.
 """
@@ -20,6 +21,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 SKILLS = REPO_ROOT / "claude-plugins" / "manifest-dev" / "skills"
 SETUP = SKILLS / "setup-project" / "references"
 CHANGES = SETUP / "CHANGES.md"
+CHANGES_DIR = SETUP / "changes"
 NORTH_STAR_FORMAT = SETUP / "NORTH_STAR_FORMAT.md"
 EVALS = REPO_ROOT / "claude-plugins" / "manifest-dev" / "evals"
 UPGRADES = SETUP / "upgrades"
@@ -37,7 +39,8 @@ EMITTED = (
 )
 
 HTML_COMMENT = re.compile(r"<!--.*?-->", re.DOTALL)
-VERSION_HEADING = re.compile(r"^## v(\d+)\s*$", re.MULTILINE)
+INDEX_LINE = re.compile(r"^- v(\d+) — `changes/v\1\.md`: \S", re.MULTILINE)
+VERSION_FILE = re.compile(r"^v(\d+)\.md$")
 DIGEST_LINE = re.compile(r"^Digest: ([0-9a-f]{64})\s*$", re.MULTILINE)
 TEMPLATE_VERSION = re.compile(r"<!-- setup-project surfaces v(\d+) -->")
 
@@ -54,25 +57,46 @@ def emitted_digest() -> str:
 
 
 def versions() -> list[tuple[int, str, str]]:
-    """Each `CHANGES.md` entry as (version, body, digest), in file order."""
-    text = CHANGES.read_text(encoding="utf-8")
-    headings = list(VERSION_HEADING.finditer(text))
-    assert headings, f"{CHANGES} lists no `## vN` entries"
+    """Each version as (version, body, digest), in the order `CHANGES.md` lists them."""
+    listed = [int(m.group(1)) for m in INDEX_LINE.finditer(CHANGES.read_text("utf-8"))]
+    assert listed, f"{CHANGES} lists no `- vN — `changes/vN.md`: …` lines"
     entries = []
-    for index, heading in enumerate(headings):
-        end = headings[index + 1].start() if index + 1 < len(headings) else len(text)
-        body = text[heading.end() : end]
+    for number in listed:
+        path = CHANGES_DIR / f"v{number}.md"
+        assert path.is_file(), f"{CHANGES} lists v{number}, but {path} does not exist"
+        body = path.read_text(encoding="utf-8")
         digest = DIGEST_LINE.search(body)
-        assert digest, f"{CHANGES} entry v{heading.group(1)} has no `Digest:` line"
-        entries.append((int(heading.group(1)), body, digest.group(1)))
+        assert digest, f"{path} has no `Digest:` line"
+        entries.append((number, body, digest.group(1)))
     return entries
+
+
+def test_every_version_file_is_listed_and_every_listed_version_has_a_file() -> None:
+    # The index and the files are one list read two ways; a reader finds the newest version in
+    # the index, so a file it does not list would never be offered.
+    files = sorted(
+        int(m.group(1))
+        for p in CHANGES_DIR.iterdir()
+        if (m := VERSION_FILE.match(p.name))
+    )
+    listed = sorted(number for number, _, _ in versions())
+    assert files == listed, (
+        f"{CHANGES_DIR.relative_to(REPO_ROOT)} holds versions {files}, but "
+        f"{CHANGES.relative_to(REPO_ROOT)} lists {listed}: add the missing line or file"
+    )
+    stray = sorted(
+        p.name for p in CHANGES_DIR.iterdir() if not VERSION_FILE.match(p.name)
+    )
+    assert (
+        not stray
+    ), f"{CHANGES_DIR.relative_to(REPO_ROOT)} holds non-version files: {stray}"
 
 
 def test_versions_count_up_from_one() -> None:
     numbers = [number for number, _, _ in versions()]
     assert numbers == list(
         range(1, len(numbers) + 1)
-    ), f"{CHANGES} versions must run 1, 2, 3, … in order; found {numbers}"
+    ), f"{CHANGES} must list versions 1, 2, 3, … in order; found {numbers}"
 
 
 # Holds the decision in docs/adr/20261013-set-up-projects-receive-updates-through-a-version-marker.md.
@@ -80,7 +104,7 @@ def test_every_version_says_what_projects_gain() -> None:
     for number, body, _ in versions():
         assert re.search(
             r"^- \S", body, re.MULTILINE
-        ), f"{CHANGES} entry v{number} lists nothing an installed project gains"
+        ), f"{CHANGES_DIR}/v{number}.md lists nothing an installed project gains"
 
 
 # Holds the decision in docs/adr/20261013-runs-build-and-maintain-a-project-verification-surface.md.
@@ -91,8 +115,9 @@ def test_latest_version_matches_what_setup_project_emits() -> None:
     current = emitted_digest()
     assert latest_digest == current, (
         f"A file setup-project emits into projects changed since surfaces v{latest_number}. "
-        f"Add `## v{latest_number + 1}` to {CHANGES.relative_to(REPO_ROOT)} listing what an "
-        f"installed project gains, with `Digest: {current}`, and set the version comment "
+        f"Add {CHANGES_DIR.relative_to(REPO_ROOT)}/v{latest_number + 1}.md listing what an "
+        f"installed project gains, with `Digest: {current}`, its line in "
+        f"{CHANGES.relative_to(REPO_ROOT)}, and set the version comment "
         f"in {NORTH_STAR_FORMAT.relative_to(REPO_ROOT)}'s surfaces template to "
         f"v{latest_number + 1}."
     )
@@ -111,18 +136,23 @@ def test_surfaces_template_carries_the_latest_version() -> None:
 NEWEST_VERSION_CASE = "45-current-setup-offers-nothing"
 
 
+def recorded_versions() -> dict[str, set[int]]:
+    """The surfaces versions each eval case's scaffold records, by case, across both suites."""
+    return {
+        p.parent.name: {
+            int(v) for v in TEMPLATE_VERSION.findall(p.read_text(encoding="utf-8"))
+        }
+        for p in EVALS.rglob("scaffold.sh")
+    }
+
+
 # Holds the decision in docs/adr/20261014-setup-project-audits-the-whole-setup-when-run.md.
 def test_eval_cases_track_the_newest_version() -> None:
     # The newest-version case is graded on no offer, so it records the newest version. From
     # v2 on, another case records the version before it, the only way to exercise the update
     # for a project recording an older version.
     newest = versions()[-1][0]
-    recorded = {
-        p.parent.name: {
-            int(v) for v in TEMPLATE_VERSION.findall(p.read_text(encoding="utf-8"))
-        }
-        for p in EVALS.glob("*/scaffold.sh")
-    }
+    recorded = recorded_versions()
     assert newest in recorded.get(
         NEWEST_VERSION_CASE, set()
     ), f"{NEWEST_VERSION_CASE} must record the newest version, v{newest}"
@@ -130,6 +160,26 @@ def test_eval_cases_track_the_newest_version() -> None:
         assert any(
             newest - 1 in found for found in recorded.values()
         ), f"no eval case records v{newest - 1}, one behind"
+
+
+def test_a_new_version_replaces_the_one_behind_case_instead_of_adding_one() -> None:
+    # Each version used to add a case beside the last, so the suite grew by one paid case per
+    # version while every one of them tested the same offer. One case stays one behind; a new
+    # version moves it (or replaces it) rather than leaving the old one in place.
+    newest = versions()[-1][0]
+    behind = {
+        case: sorted(v for v in found if v < newest)
+        for case, found in recorded_versions().items()
+        if any(v < newest for v in found)
+    }
+    assert all(found == [newest - 1] for found in behind.values()), (
+        f"eval cases behind the newest version, v{newest}: {behind}. Only one may stay, at "
+        f"v{newest - 1}: move the one-behind case there and retire the others"
+    )
+    assert len(behind) <= 1, (
+        f"more than one eval case records v{newest - 1}: {sorted(behind)}. A new version "
+        "replaces the one-behind case rather than adding one"
+    )
 
 
 GUIDE = re.compile(r"^v(\d+)-to-current\.md$")

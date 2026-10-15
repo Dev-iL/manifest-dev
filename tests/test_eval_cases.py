@@ -210,6 +210,28 @@ def _case_table_rows(readme: Path) -> set[str]:
     }
 
 
+CLASSIFICATION_ROW = re.compile(
+    r"^\| `([^`]+)` \| (keep|first run decides) \| \S", re.MULTILINE
+)
+
+
+@pytest.mark.parametrize(
+    "suite", [EVALS, EVALS / "define"], ids=["figure-out", "define"]
+)
+def test_every_case_is_classified_with_a_reason(suite: Path) -> None:
+    # A run is expensive, so each case says why it stays — measured uplift, a declared guard,
+    # or a first run still owed — and a case nobody can justify is the one to retire.
+    sections = re.split(
+        r"^## ", (suite / "README.md").read_text(encoding="utf-8"), flags=re.MULTILINE
+    )
+    (section,) = [s for s in sections if s.startswith("Classification\n")]
+    rows = set(CLASSIFICATION_ROW.findall(section))
+    ids = {case_id for case_id, _ in rows}
+    dirs = {name.split("-", 1)[0] for name in _case_dirs(suite)}
+    assert not dirs - ids, f"cases with no classification row: {sorted(dirs - ids)}"
+    assert not ids - dirs, f"classification rows with no case: {sorted(ids - dirs)}"
+
+
 # Holds the decision in docs/adr/20261013-runs-build-and-maintain-a-project-verification-surface.md.
 @pytest.mark.parametrize(
     "suite", [EVALS, EVALS / "define"], ids=["figure-out", "define"]
@@ -220,3 +242,50 @@ def test_suite_readme_lists_exactly_its_cases(suite: Path) -> None:
     dirs, rows = _case_dirs(suite), _case_table_rows(suite / "README.md")
     assert not dirs - rows, f"cases with no README row: {sorted(dirs - rows)}"
     assert not rows - dirs, f"README rows with no case: {sorted(rows - dirs)}"
+
+
+# The owner's 2026-10-15 call: every case runs once per arm under a sonnet judge, and the
+# suites' READMEs say how to read a result at that depth. A case left at another count, or a
+# documented command naming another judge, would make one baseline mix depths or judges.
+RUNS_PER_ARM = 1
+JUDGE = "sonnet"
+JUDGE_DOCS = [
+    EVALS / "README.md",
+    EVALS / "define/README.md",
+    ROOT / "verification/recipes/figure-out-evals.md",
+    ROOT / "verification/recipes/define-evals.md",
+    ROOT / "scripts/evals/run_eval.sh",
+]
+
+
+def test_every_case_runs_the_agreed_depth() -> None:
+    off = {
+        _case_id(p.parent): data.get("runs")
+        for p in sorted(EVALS.rglob("prompt.md"))
+        for data, _ in [_frontmatter(p)]
+        if data.get("runs") != RUNS_PER_ARM
+    }
+    assert not off, f"cases not at runs: {RUNS_PER_ARM}: {off}"
+
+
+def test_every_documented_run_uses_the_agreed_judge() -> None:
+    found = {
+        f"{doc.relative_to(ROOT)}: {model}"
+        for doc in JUDGE_DOCS
+        for model in re.findall(r"--judge-model (\S+)", doc.read_text(encoding="utf-8"))
+        if model != JUDGE and not model.startswith("<")
+    }
+    assert not found, f"commands naming another judge: {sorted(found)}"
+
+
+def test_every_documented_run_carries_a_cost_ceiling() -> None:
+    # A documented command copied without `--max-cost-usd` runs a whole suite with no stop.
+    bare = [
+        f"{doc.relative_to(ROOT)}: {command.strip()[:80]}"
+        for doc in JUDGE_DOCS
+        for command in re.sub(
+            r"\\\n#?\s*", " ", doc.read_text(encoding="utf-8")
+        ).splitlines()
+        if "--judge-model" in command and "--max-cost-usd" not in command
+    ]
+    assert not bare, f"documented eval runs with no cost ceiling: {bare}"

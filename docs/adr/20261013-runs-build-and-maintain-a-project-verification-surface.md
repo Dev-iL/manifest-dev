@@ -1,7 +1,7 @@
 # ADR: Runs build and maintain a verification surface for each artifact that future runs will change
 
 ## Status
-Accepted; narrowed by 20261014-the-feature-map-is-a-navigation-contract-over-what-users-invoke: the feature map covers whatever users invoke in a fixed shape with a proof run, and an unfit surface is repaired where work touches it; amended by 20261014-one-verification-harness-per-project: one harness reading recipe files replaces the per-artifact forms
+Accepted; narrowed by 20261014-the-feature-map-is-a-navigation-contract-over-what-users-invoke: the feature map covers whatever users invoke in a fixed shape with a proof run, and an unfit surface is repaired where work touches it; amended by 20261014-one-verification-harness-per-project: one harness reading recipe files replaces the per-artifact forms; amended by 20261015-runs-keep-the-harness-fit-for-speed-control-and-diagnosis: what runs keep fit to trust now covers speed, control and diagnosis, not only correctness; amended by 20261015-the-verification-harness-is-optional: runs build a harness only where the project chose one, keep sound whatever checks the project has in their own form, and otherwise recommend the harness in their report
 
 ## Area
 define / do
@@ -54,7 +54,7 @@ The need is not limited to code. A prompt or skill is checked by behavior cases 
 - figure-out gains one more exception to its read-only stance: the stale marker.
 
 ## Enforced by
-partly — `tests/test_setup_project_versions.py` (`test_latest_version_matches_what_setup_project_emits`) fails when the shipped harness changes without a new surfaces version; `tests/test_verify.py` fails when a recipe in this repository's harness stops parsing or names a missing path; `tests/test_eval_cases.py` (`test_suite_readme_lists_exactly_its_cases`) fails if a suite README's case tables and its case directories disagree; eval cases `32` to `36` and `d18-map-gate` measure the behavior once run. Which projects need a harness, and whether a recipe is run when a change touches it, stays judgment.
+partly — `tests/test_setup_project_versions.py` (`test_latest_version_matches_what_setup_project_emits`) fails when the shipped harness changes without a new surfaces version; `tests/test_verify.py` fails when a recipe in this repository's harness stops parsing or names a missing path; `tests/test_eval_cases.py` (`test_suite_readme_lists_exactly_its_cases`) fails if a suite README's case tables and its case directories disagree; eval cases `32` to `36` and `d23-unfit-recipe-repaired-first` (which carries the gate `d18-map-gate` held before it was folded in) measure the behavior once run. Which projects need a harness, and whether a recipe is run when a change touches it, stays judgment.
 
 ## Source
 - Session: figure-out investigation of steering agents toward maintainable first versions.

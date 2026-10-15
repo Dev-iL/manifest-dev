@@ -2,7 +2,7 @@
 
 The workflow: understand the problem, write down what you'd accept, then build and verify against it. Plus the surfaces that keep a project's direction and its queue of work out of any one person's head.
 
-[See it explained →](https://doodledood.github.io/manifest-dev/)
+[See it explained →](https://doodledood.github.io/manifest-dev/) Each part works on its own, and nobody else on your team has to use it; the repository README shows [how far to take it](../../README.md#how-far-to-take-it).
 
 ```bash
 /plugin install manifest-dev@manifest-dev
@@ -16,9 +16,9 @@ Run them in order, though each works on its own:
 |-------|--------------|
 | `/figure-out` | Presses on a problem until you both understand it. Investigates on its own, asks when your contribution changes the answer, and carries acknowledgments forward into the next question. Holds a position under pushback and changes it on evidence. Useful on its own, whether or not anything gets built after. |
 | `/define` | Turns that understanding into a Manifest — the deliverables, the criteria each has to meet, and the rules holding across all of them. Calls `/figure-out` first if understanding isn't there yet. |
-| `/do` | Implements against the Manifest and verifies every criterion before reporting completion. Verification runs independently of the work by default. |
+| `/do` | Implements against the Manifest and verifies every criterion before reporting completion. |
 
-`/done` reports completed `/do` work. `/escalate` is the terminal handoff for either executor when unresolved blockers need outside intervention and no useful independent work remains.
+`/do` finishes through `done`, which reports the completed work, or `escalate`, the terminal handoff when unresolved blockers need outside intervention and no useful independent work remains. Neither is invoked by hand.
 
 The workflow favors durable outcomes and makes ease of subsequent correct work part of acceptance. Existing quality reviews judge concrete burdens; sound structure needs no redesign. Defect repair review requires proportionate prevention or an evidenced reason for weaker protection.
 
@@ -26,13 +26,11 @@ The workflow favors durable outcomes and makes ease of subsequent correct work p
 
 `/do` assumes you are away for the entire execution, even after you send a steering message. It decides without asking follow-up questions and reports material choices and their rationale afterward. A failed approach calls for another approach; a blocker requires something the executor cannot responsibly supply. Blockers are reported promptly while useful independent work continues.
 
-Both may revise Appetite — the planned size of the change — before broader work starts when the benefit to your requested outcome justifies added complexity and maintenance. Explicit exclusions and binding requirements stay fixed. Unrelated improvements and changing the contract to excuse excess work are outside that delegation.
+`/do` may revise Appetite — the planned size of the change — before broader work starts when the benefit to your requested outcome justifies added complexity and maintenance. Explicit exclusions and binding requirements stay fixed. Unrelated improvements and changing the contract to excuse excess work are outside that delegation.
 
-These entrypoints extend unattended work through planning or reduce its process:
+`/auto` extends unattended work through planning: it chains figure-out, define and do without stopping for approval between them.
 
-| Skill | What it does |
-|-------|--------------|
-| `/auto` | Chains figure-out, define and do without stopping for approval between them. |
+Before implementation, `/do` arms a completion backstop: it sets a goal naming the Manifest's absolute path through the host's goal-setting or continuation capability, or prints the same contract for you to apply where the host has neither. `/auto` sets no goal during understanding and definition, so an interruption there needs a restart.
 
 ## What the workflow maintains
 
@@ -41,20 +39,20 @@ Nothing new to remember: the same commands move a codebase toward one the workfl
 - **Design before code** — figure-out sketches the shape of a change, compares a second one, and screens both for patterns the next agent would copy; define puts a behavior-preserving restructuring first when the area resists the change.
 - **Corrections become checks** — `/do` turns a caught mistake into a scoped type, lint, or test, and the decision record names it.
 - **Debt in `done` and in pull requests** — what a run leaves unfixed is listed at the end and in a "Debt left" section of each pull request; the next change on that path is offered the fix.
-- **One verification harness kept fresh by runs** — a command whose `--help` says how to check the project, with a recipe per feature, skill, document walk or eval suite, built when missing and repaired when drifting; costly checks are marked to ask first.
+- **A recommended, optional verification harness kept fresh by runs** — one command that can start, drive and check what runs change, with a recipe per feature, skill, document walk or eval suite and its results kept as evidence. `/setup-project` installs it by default, and a project that verifies its own way can opt out: runs then verify through the project's own tests and scripts and never add one. Where it is kept, runs extend it and repair it when it drifts; a check that costs money, quota or effects outside the repository asks first. The shipped shape is a default each project adapts.
 - **Recall and update offers** — sessions working on a repository, whether on a bug, a change, a design, or a decision, start from earlier work on it, and set-up projects are offered what changed since their recorded surfaces version.
 
-## Project surfaces
+## The project and its queue
 
-These set up and feed the two longer-lived tiers:
+These keep what the project is becoming and what is worth doing next:
 
 | Skill | What it does |
 |-------|--------------|
-| `/setup-project` | Sets a repository up with a North Star, a glossary, decision-record conventions, and a verification harness, plus the wiring that makes every session read them. Seeds them from the project's own history where there is any, and run again on a set-up project audits the whole setup and offers each gap for you to accept or decline, marking what changed since the surfaces version it records in your context file. `/figure-out` offers it when the version is behind or a surface is broken, so you rarely type it. |
-| `/ticket-up` | Writes work into your ticket store — from a finished Manifest, a direct request, an open question, or findings from other work. |
+| `/setup-project` | Sets a repository up with a North Star, a glossary, decision-record conventions, and a verification harness you can opt out of, plus the wiring that makes every session read them. Seeds them from the project's own history where there is any, and run again on a set-up project audits the whole setup and offers each gap for you to accept or decline, marking what changed since the surfaces version it records in your context file. `/figure-out` offers it when the version is behind or a surface is broken, so you rarely type it. |
+| `/ticket-up` | Writes work into your ticket store — from a finished Manifest, a direct request, an open question, or findings from other work. A follow-up carries Auto only when a person grants it here. |
 | `/next-ticket` | Reads the store, picks the one to work on now, claims it, and says why it leads. |
 | `/run-ticket` | Takes one specific ticket end to end and records the outcome back on it. |
-| `/sweep-tickets` | Picks up or resumes a single unattended ticket, for scheduled runs. |
+| `/sweep-tickets` | Resumes or starts a single ticket a person granted Auto, for the scheduler you already run. |
 
 ## Review and verification
 
@@ -93,13 +91,17 @@ These shape where a session's answers land:
 | `/figure-out-team` | Runs the same deliberation in a Slack channel or thread, for people who can't all sit in one session. |
 | `poll-slack` | Reports what's new in a channel or thread since a cursor. Called by `/figure-out-team` rather than invoked by hand. |
 
+## Help
+
+| Skill | What it does |
+|-------|--------------|
+| `/manifest-dev-help` | Explains manifest-dev in plain, simplified English: what it is for, the workflow, the autonomy ladder from one skill to unattended runs, every term you meet with why it exists, and good practice. Ask it what a recipe, a gate or a Lock is, or point it at a Manifest or a pull request and ask what something means. |
+
 ## How it fits together
 
 A Manifest separates *what to build* — deliverables, each with criteria — from *what must hold throughout*. `/do` can't call it finished while any criterion lacks evidence, which is what makes "done" a finding rather than a claim.
 
 The Manifest is the source of truth for a run. Feedback during `/do`, or after it finishes, amends the Manifest rather than being applied straight to the code.
-
-For an unattended run, `/do` sets a host-native goal-setting or continuation contract before implementation, with the Manifest’s absolute path included. Where a host offers neither capability, the executor prints the same contract for you to apply manually. `/auto` leaves this to the executor: understanding and definition have no continuation goal, so an interruption there needs a restart.
 
 ## Manifest sections
 
