@@ -28,7 +28,7 @@ commands and steps, so no figure-out, define or do run builds or offers one:
    `Workload: varies`, per `../VERIFICATION_HARNESS.md` → *Time lines*, so ordinary run-to-run
    variation never reads as creep.
 5. **A recipe for the checks run across the whole tree** — its lint, type checks, test suite,
-   build or gate runner, each a scenario calling the project's own command, per
+   build or gate runner, as scenarios calling the project's own commands, per
    `../VERIFICATION_HARNESS.md` → *Build on what exists*, which also offers a scenario for each
    verification command the context file names that no recipe runs, so the file teaches one way in.
 6. **The context-file bullet** — v6's wording from `../NORTH_STAR_FORMAT.md` → *The

@@ -9,7 +9,7 @@ Offer, each as its own item and as a default the project may adapt or decline wh
 already does the job:
 
 1. **A recipe for the checks run across the whole tree** — its lint, type checks, test suite,
-   build or gate runner, each a scenario calling the project's own command, per
+   build or gate runner, as scenarios calling the project's own commands, per
    `../VERIFICATION_HARNESS.md` → *Build on what exists*. Where the project already has such a
    recipe, report it as in place.
 2. **One way in** — each verification command the project context file names that no recipe

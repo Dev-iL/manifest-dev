@@ -26,7 +26,7 @@ Keep everything the project wrote; change only its shape:
 - **Existing harness commands are adopted by delegation**: a scenario's `Run:` calls the
   project's existing script rather than a rewrite of it.
 - **The checks the project runs across the whole tree get a recipe too** — its lint, type checks,
-  test suite, build or gate runner, each a scenario calling the project's own command, per
+  test suite, build or gate runner, as scenarios calling the project's own commands, per
   `../VERIFICATION_HARNESS.md` → *Build on what exists*. An old surface listed only what users
   reach, so moving its entries alone would leave these checks outside the harness.
 - **Evidence keeps its files and gains a summary the tool reads.** The tool reads only
