@@ -228,6 +228,31 @@ def test_a_drive_runs_the_cli_isolated_on_a_copy_of_the_plugin(
     assert (out / "manifest-dev" / "logs" / "figure-out-log-1.md").exists()
 
 
+def test_a_drive_keeps_only_the_records_its_session_wrote(
+    tmp_path: Path, toolbox: Path
+) -> None:
+    # The drive runs on the user's own home, which already holds records from earlier work;
+    # only what this session writes belongs in its evidence.
+    env = setup(
+        tmp_path,
+        toolbox,
+        STANDIN_TRANSCRIPT=lines(GOOD),
+        STANDIN_WRITES_RECORD="logs/figure-out-log-1.md",
+    )
+    earlier = Path(env["HOME"]) / ".manifest-dev" / "logs" / "earlier.md"
+    earlier.parent.mkdir(parents=True)
+    earlier.write_text("an earlier session's log\n", encoding="utf-8")
+    old = time.time() - 3600
+    os.utime(earlier, (old, old))
+    result = drive(env)
+    assert result.returncode == 0, result.stderr
+    out = (tmp_path / "store" / "figure-out" / STAMP).resolve()
+    summary = json.loads((out / "summary.json").read_text(encoding="utf-8"))
+    assert summary["manifest_dev_records"] == ["logs/figure-out-log-1.md"]
+    assert not (out / "manifest-dev" / "logs" / "earlier.md").exists()
+    assert earlier.exists()
+
+
 def test_a_drive_with_tools_hands_in_a_copy_of_each_plugin(
     tmp_path: Path, toolbox: Path
 ) -> None:
