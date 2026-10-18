@@ -88,7 +88,9 @@ Otherwise invoke `auto` with the Ticket's complete prose anatomy, kind, definiti
 source reference, durable progress, and relevant project context as the task. The Ticket bounds
 the work. As soon as define reports the Manifest path, write the Manifest into the attempt record,
 before do starts work. Keep the Ticket's identity available throughout the run so results return
-to the same store item.
+to the same store item. Record in the progress the step the run is at whenever it changes:
+`understand` while the work is worked out, `define` while its Manifest is written, `build` and
+`verify` while do works and checks its gates, and `ready` once the pull request is ready.
 
 Push coherent checkpoints after completed implementation or verification milestones. A checkpoint
 is a useful recovery state, not a timer: do not push every edit or knowingly broken arbitrary work.

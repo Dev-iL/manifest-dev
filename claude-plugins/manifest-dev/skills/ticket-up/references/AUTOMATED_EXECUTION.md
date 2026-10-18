@@ -40,7 +40,7 @@ adds a second one. It holds:
 | Branch | The canonical Ticket, its one stable branch, and the recovery purpose | The run, before substantial work |
 | Run facts | The run ID; the session that runs it, where the host names one; when it started; the launch count, counting launches in a row whose run ended without an outcome | The launcher — `orchestrate`, or `run-ticket` itself on a hand run — just before the run starts |
 | | The base commit the run's gates last passed against; whether it is ready to land, naming the head commit, or the drafted answer for a Question Ticket | The run, at each pushed checkpoint and when it finishes |
-| Progress | The gates passed and at which commit, what remains, the decisions taken, the dead ends | The run, at each pushed checkpoint |
+| Progress | The step the run is at — `understand`, `define`, `build`, `verify` or `ready` — the gates passed and at which commit, what remains, the decisions taken, the dead ends | The run, when its step changes and at each pushed checkpoint |
 | Manifest | The run's full Manifest, refreshed when it is amended | The run, as soon as define reports it |
 
 Each fact has one writer. A launcher writes only while no live run holds the Ticket. A run

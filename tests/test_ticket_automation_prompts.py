@@ -144,9 +144,15 @@ def test_attempt_record_carries_the_manifest_progress_and_run_facts() -> None:
 
     assert "| Manifest | The run's full Manifest" in record
     assert (
-        "The gates passed and at which commit, what remains, the decisions taken, "
+        "the gates passed and at which commit, what remains, the decisions taken, "
         "the dead ends" in record
     )
+    # The status page shows each run's step, read from this record's progress.
+    assert (
+        "The step the run is at — `understand`, `define`, `build`, `verify` or `ready`"
+        in record
+    )
+    assert "Record in the progress the step the run is at whenever it changes" in run_ticket
     for fact in (
         "The run ID",
         "the launch count",
