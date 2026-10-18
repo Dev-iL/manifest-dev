@@ -274,7 +274,7 @@ button.row:active { background: var(--fill); }
 .copyline code { flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap; background: var(--fill); border-radius: 9px; padding: 8px 10px; }
 
 @media (min-width: 760px) {
-  .sheet { top: max(16px, env(safe-area-inset-top)); right: max(16px, env(safe-area-inset-right)); width: 360px; max-height: calc(100dvh - 32px); border-radius: 20px; }
+  .sheet { top: max(16px, env(safe-area-inset-top)); right: max(16px, env(safe-area-inset-right)); width: 360px; max-height: calc(100dvh - 32px - 60px - env(safe-area-inset-bottom, 0px)); border-radius: 20px; } /* stops above the dock */
   .scrim { display: none; }
 }
 @media (max-width: 759px) {
@@ -852,6 +852,13 @@ button.row:active { background: var(--fill); }
       clearTimeout(wheelT);
       wheelT = setTimeout(function () { settle(null, wheelC); wheelC = null; }, 160);
     }, { passive: false });
+    // Tabbing to a card off screen brings it into view. A pointer press focuses the card too, and must not move it.
+    s.addEventListener("focusin", function (e) {
+      var g = hitAt(e.target), kb = true;
+      try { kb = g && g.matches(":focus-visible"); } catch (x) {}
+      var p = kb && B.spec && B.spec.center(g.getAttribute("data-id"));
+      if (p) reveal(p, !reduced);
+    });
     // Keyboard zoom and pan are instant: they repeat, and motion would only slow them down.
     s.addEventListener("keydown", function (e) {
       var g = hitAt(e.target);
@@ -1043,7 +1050,8 @@ button.row:active { background: var(--fill); }
         if (an && !R && n.status === "landed" && o.status !== "landed" && n.pulse) pulse(o, n.pulse, dl + MS.glide * 0.6);
       }
       o.cx = n.cx; o.cy = n.cy; o.tx = n.x; o.ty = n.y; o.status = n.status;
-      if (!n.deco) o.g.setAttribute("aria-label", n.label);
+      if (n.label) o.g.setAttribute("aria-label", n.label);
+      if (n.deco && n.label) o.g.setAttribute("role", "img");
     });
     // Keyboard and reading order follow plan order, whatever order the nodes were created in. A Ticket still growing
     // out of its source keeps its place under it until the next check-in; focus survives the move.
@@ -1098,7 +1106,9 @@ button.row:active { background: var(--fill); }
   }
   function curve(x1, y1, x2, y2) { var mx = x1 + (x2 - x1) / 2; return "M" + r2(x1) + "," + r2(y1) + " C" + r2(mx) + "," + r2(y1) + " " + r2(mx) + "," + r2(y2) + " " + r2(x2) + "," + r2(y2); }
   function flow(m) {
-    var W = 212, GX = 78, GY = 12, H = 64, GH = 96, d = m.d;
+    var W = 212, GX = 78, GY = 12, H = 64, d = m.d;
+    // The goal grows to hold its whole destination, up to twelve lines; a screen reader hears it in full either way.
+    var dest = wrap(d.effort.destination || "", 12, 400, W - 32, 12), GH = Math.max(96, 80 + 16 * (dest.length - 1));
     var maxD = 0;
     d.tickets.forEach(function (t) { maxD = Math.max(maxD, m.depth[t.id]); });
     var cols = [];
@@ -1151,12 +1161,13 @@ button.row:active { background: var(--fill); }
       return { id: t.id, x: pos[t.id].x, y: pos[t.id].y, cx: W / 2, cy: H / 2, from: firstParent(t), status: t.status, label: aria(m, t), parts: parts,
         pulse: { x: 15, y: 15.5, r: 3.6, tone: "done" } };
     });
-    nodes.push({ id: "goal", deco: true, x: goal.x, y: goal.y, cx: W / 2, cy: GH / 2, status: d.state, parts: [
+    nodes.push({ id: "goal", deco: true, x: goal.x, y: goal.y, cx: W / 2, cy: GH / 2, status: d.state,
+      label: "Done when: " + d.effort.name + (d.effort.destination ? ". " + d.effort.destination : ""), parts: [
       P("goal", "goal|" + d.effort.name + "|" + (d.effort.destination || ""), function (g) {
         sv("rect", { width: W, height: GH, rx: 16 }, g);
         sv("text", { "class": "g-k", x: 16, y: 24, text: "DONE WHEN" }, g);
         sv("text", { "class": "g-t", x: 16, y: 44, text: clip(d.effort.name, 15, 700, W - 32) }, g);
-        wrap(d.effort.destination || "", 12, 400, W - 32, 2).forEach(function (line, k) { sv("text", { "class": "g-d", x: 16, y: 63 + k * 16, text: line }, g); });
+        dest.forEach(function (line, k) { sv("text", { "class": "g-d", x: 16, y: 63 + k * 16, text: line }, g); });
       }, { cls: "goal" })
     ] });
     var edges = [];
@@ -1371,6 +1382,14 @@ button.row:active { background: var(--fill); }
     TONES.forEach(function (c) { sh.classList.remove(c); });
     if (tn) sh.classList.add("tone-" + tn);
   }
+  // A phone sheet covers the page and dims it, so it is modal: the rest leaves the keyboard and the screen reader
+  // until it closes. The wide panel leaves the graph usable beside it.
+  function syncModal() {
+    var modal = !!S.sheet && innerWidth < WIDE, sh = $("sheet");
+    if (modal) sh.setAttribute("aria-modal", "true"); else sh.removeAttribute("aria-modal");
+    ["stage", "hud", "dock"].forEach(function (id) { $(id).toggleAttribute("inert", modal); });
+    if (modal && !sh.contains(document.activeElement)) $("sheetDone").focus({ preventScroll: true });
+  }
   function openSheet(kind, id, refresh, instant) {
     var m = S.m, body = $("sheetBody"), kick = $("sheetKick"), keep = refresh ? body.scrollTop : 0;
     if (!refresh && !S.sheet) {
@@ -1441,6 +1460,7 @@ button.row:active { background: var(--fill); }
     body.scrollTop = 0;
     if (instant) { Sheet.jump(1); $("sheetDone").focus({ preventScroll: true }); }
     else Sheet.go(1, null, false);
+    syncModal();
   }
   function refreshSheet() {
     if (!S.sheet) return;
@@ -1451,9 +1471,11 @@ button.row:active { background: var(--fill); }
     if (!S.sheet) return;
     var had = $("sheet").contains(document.activeElement), opener = S.opener;
     S.sheet = null; S.sel = null; S.sheetSig = null; S.opener = null;
+    syncModal();
     if (instant) Sheet.jump(0); else Sheet.go(0, vel == null ? null : vel, false);
     markSelected();
     if (had && opener && document.contains(opener)) opener.focus({ preventScroll: true });
+    else if (had) document.activeElement.blur(); // never leave focus on a sheet that is gone
   }
   function markSelected() {
     var B = S.board;
@@ -1493,9 +1515,11 @@ button.row:active { background: var(--fill); }
   // lands on the scrim too, and must not close it again.
   var scrimDown = false;
   $("scrim").addEventListener("pointerdown", function () { scrimDown = true; });
+  // The mouse press a phone sends after a tap lands on the scrim and would pull focus out of the sheet just opened.
+  $("scrim").addEventListener("mousedown", function (e) { e.preventDefault(); });
   $("scrim").addEventListener("click", function () { if (scrimDown) closeSheet(); scrimDown = false; });
   document.addEventListener("keydown", function (e) { if (e.key === "Escape" && S.sheet) closeSheet(true); });
-  window.addEventListener("resize", function () { Sheet.draw(); if (S.board) S.board.contain(); });
+  window.addEventListener("resize", function () { Sheet.draw(); syncModal(); if (S.board) S.board.contain(); });
 
   /* ================= The one path every snapshot takes ================= */
   function strings(a) { return a == null || (Array.isArray(a) && a.every(function (x) { return typeof x === "string"; })); }
