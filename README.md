@@ -21,7 +21,7 @@ Claude Code is the primary target. Inside a Claude Code session, run:
 /plugin install manifest-dev@manifest-dev
 ```
 
-Codex, Pi and OpenCode install it too ([other CLIs](#other-clis)). Every skill also works on its own: `npx skills add doodledood/manifest-dev --skill figure-out` installs just one.
+Codex, Pi, and OpenCode install it too ([other CLIs](#other-clis)). Every skill also works on its own: `npx skills add doodledood/manifest-dev --skill figure-out` installs just one.
 
 ## Start with one real question
 
@@ -43,13 +43,13 @@ Ask about the bug you keep putting off. When a term or a step is unclear, ask `/
 
 `/auto` runs all three steps in one go.
 
-**What you review: a pull request that shows the change working.** When the work ships as a pull request, its top reads in about a minute: what changed and why, screenshots or command output showing it work, the calls it made for you, and the debt it left — what it found and didn't fix.
+**What you review: a pull request that shows the change working.** When the work ships as a pull request, its top reads in about a minute. It says what changed and why, shows the change working with screenshots or command output, and lists the calls it made for you and the debt it left — what it found and didn't fix.
 
 ## A project that remembers
 
-`/setup-project`, run once, gives your project a **North Star**: one file that says what the project is becoming, who it's for, what winning means and what it never does. Every session reads it before it decides what's worth doing.
+`/setup-project`, run once, gives your project a **North Star**: one file that says what the project is becoming, who it's for, what winning means, and what it never does. Every session reads it before it decides what's worth doing.
 
-It also keeps the project's words, decisions and checks: a glossary of its terms, a record of each decision and why it was made, and one command that checks the project still works. That command is recommended, not required; a project that already verifies its own way keeps it. Every run keeps these current where its work touches them, turns a mistake someone caught into a check that catches it next time, and offers the debt it left to the next change that passes through that code.
+It also keeps the project's words, decisions, and checks: a glossary of its terms, a record of each decision and why it was made, and one command that checks the project still works. That command is recommended, not required: a project that already verifies its own way keeps doing so. Every run keeps these current where its work touches them. It also turns a mistake someone caught into a check that catches it next time, and offers the debt it left to the next change through that code.
 
 ## A shared queue
 
@@ -61,11 +61,11 @@ It also keeps the project's words, decisions and checks: a glossary of its terms
 
 ## The queue runs
 
-**Many Tickets at once, in the order between them.** `/orchestrate` proposes a plan and runs it once you approve: each Ticket in its own session, landed one at a time. Auto Tickets land on their own; the rest stop at a ready pull request for you to land. The debt they leave becomes new Tickets. One status page shows what is running and what waits on you.
+**Many Tickets at once, each after the work it depends on.** `/orchestrate` proposes a plan and runs it after you approve: each Ticket in its own session, landed one at a time. Auto Tickets land on their own; the rest stop at a ready pull request for you to land. The debt they leave becomes new Tickets. One status page shows what is running and what waits on you.
 
-**With `--autonomous`, it keeps going on its own.** A scheduler you already run starts `/orchestrate --autonomous`. It fills free slots while work remains, and gives Auto to Tickets that agents wrote, wherever no one's judgment is needed.
+**With `--autonomous`, it keeps going on its own.** A scheduler you already run starts `/orchestrate --autonomous`. It starts a new run whenever one finishes, up to the number it may run at once, until no ready work remains. It gives Auto to Tickets that agents wrote, wherever no one's judgment is needed.
 
-The loop keeps turning, and you step in where it needs you — for judgment, taste or authority:
+The loop keeps turning, and you step in where it needs you — for judgment, taste, or authority:
 
 | Runs without you | Waits for you |
 |---|---|
@@ -76,7 +76,7 @@ The loop keeps turning, and you step in where it needs you — for judgment, tas
 
 ## What to run at each level
 
-Each level works without the ones above it, and without anyone else on your team using manifest-dev. What it adds to a shared repository is plain files and plain instructions.
+Each level works without the ones above it, and without anyone else on your team using manifest-dev. What it adds to a shared repository is plain files and plain instructions. Run these to reach each level:
 
 1. **One skill** — install the plugin, then `/figure-out` with a question.
 2. **One piece of work** — `/auto` with a task (or `/figure-out`, `/define`, `/do` one step at a time).
@@ -84,7 +84,7 @@ Each level works without the ones above it, and without anyone else on your team
 4. **A shared queue** — `/ticket-up` writes work as Tickets; `/next-ticket` picks the next one.
 5. **The queue runs** — `/orchestrate`, then approve its plan; or `/orchestrate --autonomous` from a scheduler you already run. Mark a Ticket Auto when it needs no one's judgment.
 
-That is everything to remember. The rest — flags, the status page, landing, debt Tickets — the skills do for you, and their reference docs explain.
+That is everything to remember. The skills handle the rest themselves, and the [plugin README](claude-plugins/manifest-dev/README.md) explains each one.
 
 ## What it costs
 
@@ -97,7 +97,7 @@ Two plugins ship from this repository:
 | Plugin | What it covers |
 |--------|----------------|
 | [`manifest-dev`](claude-plugins/manifest-dev) | The workflow itself, project setup, ticket authoring and execution, first-principles design with composable guides and optional measurement tools (`/design`), artifact review, and the review skills the criteria call on |
-| [`manifest-dev-tools`](claude-plugins/manifest-dev-tools) | Pull-request collaboration, prompt work, standalone goals from Manifests (`/manifest-to-goal`, at most 4,000 characters), teaching, explaining, and handoff between sessions — plus `review-pr-thread-verify`, `review-pr-holistic`, and `review-pr-judgment`, called by `/review-pr` rather than invoked by hand |
+| [`manifest-dev-tools`](claude-plugins/manifest-dev-tools) | Pull-request collaboration, prompt work, standalone goals from Manifests (`/manifest-to-goal`), teaching, explaining, and handoff between sessions |
 
 Each plugin's README lists what it ships.
 

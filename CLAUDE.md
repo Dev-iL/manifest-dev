@@ -37,11 +37,11 @@ the source tree it copies. It also fails when a shipped file points to a section
 `claude-plugins/manifest-dev/evals/` holds behavioral eval suites for `figure-out` and, under
 `evals/define/` with its own README, for `define`. Each run is many model sessions, so the
 owner runs a suite, or an agent runs one after asking and naming the cases and why. Every model
-session this repository starts — an eval suite, a skill drive (`scripts/drive-skill.sh`) or a
+session this repository starts — an eval suite, a skill drive (`scripts/drive-skill.sh`), or a
 document walk (`scripts/walk.sh`) — runs the `claude` CLI directly, with no container, the same
-way locally and in a cloud session: it needs only `claude` on PATH, signed in, and starts each
-session from a scratch directory outside the checkout, on a copy of the plugin, without the user's
-settings, installed plugins or MCP servers, recording the CLI version rather than pinning it.
+way locally and in a cloud session. It needs only `claude` on PATH and signed in. Each session
+starts from a scratch directory outside the checkout, on a copy of the plugin, without the user's
+settings, installed plugins, or MCP servers, and records the CLI version rather than pinning it.
 Drives and walks run through their recipes (`scripts/verify drive|walk <recipe>`, ask-first). A
 suite runs from the repository root with
 `scripts/evals/run_eval.sh <name> <out-json> --tag <figure-out|define> --ablation with-without --scaffold`

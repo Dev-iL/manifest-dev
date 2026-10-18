@@ -406,12 +406,13 @@ through. It has a declared scope. When it finds existing violations that the run
 run reports them as Debt.
 
 ### Debt
-<!-- context: b6fe5e7cd832 -->
+<!-- context: a4cc9cb5c9ce -->
 Debt is what a run found and did not fix. Examples are existing violations of a Lock, a comment
 about a workaround, and a new suppression. A product regression that the harness found is also Debt.
 
 A run names its Debt in its report, in a "Debt left" section of each pull request, and on its
-Ticket. A later run that changes the same code offers to fix it. Thus nobody forgets the Debt.
+Ticket. A later run that changes the same code offers to fix it. `/orchestrate` also writes the Debt of
+the runs that it lands as new Tickets. Thus nobody forgets the Debt.
 
 ## Tickets
 
@@ -449,9 +450,9 @@ This occurs only when the author can write to the repository and no person is as
 Ticket.
 
 ### Ticket Type
-<!-- context: 162eaa73bbc9 -->
+<!-- context: fc28de71e25e -->
 A Ticket Type is an optional name for the main kind of a Ticket. An operator uses it to select which
-granted Tickets automation does now. A Ticket with no type never matches a type query.
+Tickets automation does now. A Ticket with no type never matches a type query.
 
 ### Effort
 <!-- context: 441c3358d642 -->
@@ -477,10 +478,10 @@ finished Manifest, a direct request, an open question or a follow-up. A Manifest
 Ticket by default. It becomes one Ticket for each Deliverable only when you ask for that.
 
 ### Run Ticket
-<!-- context: 69163697f4e9 -->
+<!-- context: c44e6129f57b -->
 Run Ticket is the step that takes one exact Ticket, claims it and does it with `/auto`. It stops
-when the pull request is ready. It merges only when you tell it to. It records DONE or ESCALATED on
-that Ticket. The `/run-ticket` skill does it. It does not select work from the store.
+when the pull request is ready. It merges only when you tell it to. It leaves a completion record or
+an escalation record on that Ticket. The `/run-ticket` skill does it. It does not select work from the store.
 
 Run Ticket keeps a record on the Ticket: the branch, the progress and the Manifest. Thus a later run
 can continue the work.

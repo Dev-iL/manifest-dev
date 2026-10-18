@@ -18,12 +18,13 @@ doctor: scripts/drive-skill.sh preflight
 - Health first: `scripts/verify doctor` runs `scripts/drive-skill.sh preflight`, which checks
   that `claude` is on PATH and signed in and starts no model session. `scripts/drive-skill.sh
   doctor` goes further: it starts one throwaway session (model quota) and checks that the plugin
-  loaded and its skills are listed. A drive that cannot start, or whose session did not load the
-  plugin or the named skill, exits 3 and is recorded `unreachable`, never counted.
-- Each drive runs `claude` directly, its working directory a scratch project in the drive's
-  evidence directory outside this checkout, handed a copy of the plugin rather than the checkout's
-  own, and started with no user settings and no MCP servers of yours (`--setting-sources
-  project,local --strict-mcp-config`), so your settings, hooks and installed plugins do not load.
+  loaded and its skills are listed. A drive that cannot start, whose session did not load the
+  plugin or the named skill, or whose session ended in an error, exits 3 and is recorded
+  `unreachable`, never counted.
+- Each drive runs `claude` directly. Its working directory is a scratch project in the drive's
+  evidence directory, outside this checkout, and it is handed a copy of the plugin rather than the
+  checkout's own. It starts with no user settings and no MCP servers of yours (`--setting-sources
+  project,local --strict-mcp-config`), so your settings, hooks, and installed plugins do not load.
   Whether your personal memory file stays out is not something `claude --help` states. The
   scratch project is built from the matching eval case's `scaffold.sh` where a scenario passes
   `--scaffold`, with the checkout's path in `DRIVE_CHECKOUT`; a scaffold that seeds a home

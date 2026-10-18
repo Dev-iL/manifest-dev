@@ -119,7 +119,7 @@ container. The script:
   Write Bash -j 8 --no-publish --trust-plugin`;
 - detaches the run, so it keeps going after the shell that started it exits.
 
-`<out-json>` is relative to this directory unless it is absolute. The run directory is
+`<out-json>` is relative to the plugin directory, `claude-plugins/manifest-dev`, unless it is absolute. The run directory is
 `~/.local/state/manifest-dev-evals/<name>/<stamp>/` (`MANIFEST_DEV_EVAL_RUNS` moves it): its
 `eval.log` opens with the CLI version and follows the run, and `exit-code` appears when the run
 ends. Put `--wait` first to block until then and exit with the suite's status. A run writes its

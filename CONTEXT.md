@@ -130,7 +130,7 @@ A check installed from a correction so the corrected class of mistake fails for 
 _Avoid_: Rule (that is prose), guard, concurrency lock.
 
 **Debt**:
-What a run found and did not fix: unfixed lock hits, refactor flags from workaround comments, constraint comments awaiting encoding, new suppressions, reshapes outside the change's scope, and product regressions the verification harness exposed. A run names it in its completion report, in the "Debt left" section of every pull request it opens, and on its Ticket. A later run whose work reaches the same area offers to fold it in.
+What a run found and did not fix: unfixed lock hits, refactor flags from workaround comments, constraint comments awaiting encoding, new suppressions, reshapes outside the change's scope, and product regressions the verification harness exposed. A run names it in its completion report, in the "Debt left" section of every pull request it opens, and on its Ticket. A later run whose work reaches the same area offers to fold it in, and `orchestrate` tickets up the debt of the runs it lands.
 _Avoid_: Tech debt (too broad), TODO, backlog.
 
 **Seed**:
@@ -256,7 +256,7 @@ An opt-in grant on either kind of Ticket permitting unattended automation to tak
 _Avoid_: Autonomous ticket, agent-ready.
 
 **Ticket Type**:
-An optional, single-valued naming of a Ticket's chief nature, carried so an operator's automation policy can select granted work without re-reading it — absent where none of the store's values fits, and never matched by a type query when absent.
+An optional, single-valued naming of a Ticket's chief nature, carried so an operator's automation policy can select which work automation runs now without re-reading it — absent where none of the store's values fits, and never matched by a type query when absent.
 _Avoid_: Task type (that is /define's composable gate-loading taxonomy), category, label.
 
 **Effort**:
@@ -276,7 +276,7 @@ The single Ticket-authoring boundary: turns a finished Manifest, direct work req
 _Avoid_: Breakdown, sharding.
 
 **Run Ticket**:
-The harness-neutral execution move that receives one exact Ticket, claims or recovers it, invokes `auto` — or resumes the Manifest its attempt record carries — and works it to a ready pull request, keeping the attempt record (its branch, run facts, progress and Manifest) on that same Ticket; it lands only when told to, through the one landing procedure, and records DONE or ESCALATED evidence; dispatch and backlog selection stay outside it.
+The harness-neutral execution move that receives one exact Ticket, claims or recovers it, invokes `auto` — or resumes the Manifest its attempt record carries — and works it to a ready pull request, keeping the attempt record (its branch, run facts, progress and Manifest) on that same Ticket; it lands only when told to, through the one landing procedure, and leaves its completion record or its escalation record on the Ticket; dispatch and backlog selection stay outside it.
 _Avoid_: Auto picker, ticket trigger.
 
 **Escalation Mark**:
@@ -297,7 +297,7 @@ _Avoid_: Ticket sweep, batch runner, scheduler.
 - **Ticket-up** is the only workflow boundary that authors **Tickets** in a **Ticket Store**. A finished **Manifest** becomes one **Shaped Ticket** by default; explicit delegation may split it on existing **Deliverable** boundaries.
 - A separate **Question Ticket** exists only when its question needs independent assignment, priority, blocking, or closure; related questions sharing one lifecycle stay grouped.
 - `next-ticket` claims and presents the **Ticket** it names, which is what makes several sessions reading one **Ticket Store** get different ones — and it separates them only where the store's venue is a live surface every worker reads, never across separate checkouts of a file store. It never executes the pick.
-- **Run Ticket** receives one exact **Ticket** from a person or dispatcher and invokes `auto` for one attempt; it never selects from the store or enforces **Auto** eligibility at dispatch. For repository work it uses one durable branch and pull request across attempts, and DONE follows the required landing rather than a merely mergeable branch.
+- **Run Ticket** receives one exact **Ticket** from a person or dispatcher and invokes `auto` for one attempt; it never selects from the store or enforces **Auto** eligibility at dispatch. For repository work it uses one durable branch and pull request across attempts, and its Ticket closes only once a landing is observed, never on a merely mergeable branch.
 - **Orchestrate** passes each **Ticket** it launches to **Run Ticket** in a session of its own, and takes each finished run's landing turn itself, one **Ticket** at a time; a run started by hand stops at its ready pull request the same way. A file store gets no parallel runs: **Orchestrate** runs its **Tickets** one at a time in its own session.
 - **Orchestrate** never launches a **Ticket** carrying an **Escalation Mark**; a human picker applies no such filter, which is what lets escalated work compete for attention on the ordinary priority rule. A third failed launch in a row hands the **Ticket** to a person through an **Escalation Mark**.
 - The **Auto** grant requires that neither doing a **Ticket** nor judging it done needs any human's knowledge, taste, or authority — necessary but never sufficient: the author still chooses to grant.
