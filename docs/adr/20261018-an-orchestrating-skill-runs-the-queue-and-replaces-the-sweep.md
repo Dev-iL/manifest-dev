@@ -51,7 +51,11 @@ position: the sweep gives too little control and is too slow.
   landing, a run whose base moved reads what landed and checks the cross-cut both ways; it extends
   its work when the extension fits its Ticket, and otherwise writes a follow-up for a person.
 - Planning splits by size. A quick ticket-up happens in the orchestrator's conversation. Deep
-  planning runs in its own session, which tells the orchestrator when its Tickets are written.
+  planning runs in its own session: figure-out with the person, whose read `ticket-up` turns into
+  Tickets in the effort. The orchestrator hands the person a ready start line naming the topic and
+  the effort, and starts that session itself where the host lets it start one the person can
+  open. In `--autonomous`, the start line waits on the person's list. The orchestrator learns of
+  the new Tickets from the store at its next check-in, so the planning session sends it nothing.
 - A person follows the run on a status page: a view rebuilt from the store at each check-in, never
   a record of its own, linked from the effort's front item so later plans update the same page.
   The orchestrator keeps one list of what waits on the person — held pull requests, escalations,
