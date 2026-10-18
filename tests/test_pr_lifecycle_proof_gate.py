@@ -2,8 +2,9 @@
 
 Holds the decision in docs/adr/20261018-every-pull-request-shows-the-change-working.md: the
 proof gate's templated Acceptance Criterion keeps the one-minute top of the description, the rule
-that proof never comes from production, media attached with `--attach`, and the stated fallback
-where the upload is unavailable — and a rule that drops the `check-pr` lifecycle gate does not
+that proof never comes from production, media attached with `--attach`, media that still reaches
+the pull request through a kept `pr-media/<number>` branch where the upload is unavailable, and
+text alone only when neither works — and a rule that drops the `check-pr` lifecycle gate does not
 drop it.
 """
 
@@ -49,10 +50,17 @@ CLAUSES = {
         "attached to the pull request with `--attach` on `gh pr create`, `gh pr edit` or "
         "`gh pr comment` (`gh` 2.99 or later)"
     ),
-    "fallback where the upload is unavailable": (
-        "Where that upload is unavailable — `gh` older than 2.99, GitHub Enterprise Server, or "
-        "a token the upload refuses — the description says the media could not be attached "
-        "and why, and the proof is command output."
+    "media reaches the pull request without the upload": (
+        "Where that upload is unavailable — `gh` older than 2.99, GitHub Enterprise Server, a "
+        "token the upload refuses, or a network that blocks it — the media still reaches the "
+        "pull request. It is committed to a branch named `pr-media/<pull request number>` that "
+        "shares no history with the code and is never merged, and each file is linked by that "
+        "commit"
+    ),
+    "media branch kept": "The branch stays after the pull request closes",
+    "text alone only as a last resort": (
+        "Only when neither way works is the proof command output alone, and the description "
+        "names what was tried."
     ),
     "judged on the live pull request": "read fresh from GitHub on every evaluation",
     "declared kind": "Judgment gate.",

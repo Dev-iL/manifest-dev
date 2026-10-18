@@ -53,13 +53,19 @@ Done when the pull request's description shows the change working:
 - The proof comes from runs of the checks the change touches, on a local or dev instance, or on a
   preview deploy the project's CI already makes — never on production. The description, or a
   comment it links, carries each run's command and the output that shows the result.
-- A user path in a UI shows as screenshots, and motion as a short GIF or video. Each image or
-  video is attached to the pull request with `--attach` on `gh pr create`, `gh pr edit` or
-  `gh pr comment` (`gh` 2.99 or later), so GitHub stores it as it stores a file dropped into the
-  web editor, never on a branch, in another repository or on another service.
-- Where that upload is unavailable — `gh` older than 2.99, GitHub Enterprise Server, or a token the
-  upload refuses — the description says the media could not be attached and why, and the proof is
-  command output.
+- A user path in a UI shows as screenshots, and motion as a short GIF or video, visible in the
+  pull request itself. Each image or video is attached to the pull request with `--attach` on
+  `gh pr create`, `gh pr edit` or `gh pr comment` (`gh` 2.99 or later), so GitHub stores it as it
+  stores a file dropped into the web editor.
+- Where that upload is unavailable — `gh` older than 2.99, GitHub Enterprise Server, a token the
+  upload refuses, or a network that blocks it — the media still reaches the pull request. It is
+  committed to a branch named `pr-media/<pull request number>` that shares no history with the
+  code and is never merged, and each file is linked by that commit
+  (`https://github.com/<owner>/<repo>/raw/<commit>/<path>`). The description says why the media is
+  linked rather than attached. The branch stays after the pull request closes, since the links
+  depend on it.
+- Only when neither way works is the proof command output alone, and the description names what
+  was tried.
 
 PR: https://github.com/<owner>/<repo>/pull/<N>
 Branch: <branch-name>
