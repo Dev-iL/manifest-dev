@@ -26,9 +26,9 @@ sets. GitHub offers no official way for an agent to attach an image to a pull re
 - The proof comes from runs of the checks the change touches, on a local or dev instance, or on a
   preview deploy where the project's CI already makes one — never production. A user path in a UI
   shows as screenshots, and motion as a short GIF.
-- Images live on one orphan evidence branch, one folder per pull request, linked by commit so the
-  links survive later pushes. On a private repository, such links render for viewers with access
-  to it, by third-party accounts; this is not yet tested here.
+- Images live on one orphan evidence branch in the project's own repository, one folder per pull
+  request, linked by commit so the links survive later pushes. No other repository or service is
+  involved, and on a private repository only people with access see the images.
 
 ## Alternatives Considered
 - **Only for `run-ticket`'s pull requests**: every pull request has a reader who needs the proof.
