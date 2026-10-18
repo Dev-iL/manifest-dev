@@ -58,6 +58,11 @@ position: the sweep gives too little control and is too slow.
   the new Tickets from the store at its next check-in, so the planning session sends it nothing.
 - A person follows the run on a status page: a view rebuilt from the store at each check-in, never
   a record of its own, linked from the effort's front item so later plans update the same page.
+  It is one fixed template shipped with `orchestrate` that reads a single data block, and each
+  check-in rewrites only that block. It shows the Tickets as a graph of the order between them,
+  with what waits on the person listed apart. The orchestrator publishes it on the page surface
+  the host offers, such as an Artifact or a hosted page, and writes it as a local file where the
+  host offers none.
   The orchestrator keeps one list of what waits on the person — held pull requests, escalations,
   follow-ups awaiting a person's grant, the next plan — ordered by what waiting costs.
 - The person's answers count by where they come from. The orchestrator writes an answer given in
