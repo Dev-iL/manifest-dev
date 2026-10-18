@@ -371,7 +371,7 @@ a duplicate, an out-of-scope skill, or an undeclared floor in both arms retires 
 | `d22` | keep | Declared guard: the no-plugin arm is expected to pass; run once for status |
 | `d23` | first run decides | New on 2026-10-15: define's rule that an unfit touched recipe is repaired first, plus the touched-recipe gate `d18` held |
 | `d24` | first run decides | New on 2026-10-15: the same rule for a check of the project's own, with no harness |
-| `d25` | first run decides | New on 2026-10-18: a vague speed want encoded as a floor plus an aim, the case for define's floor-plus-aim rule and its fresh review |
+| `d25` | first run decides | New on 2026-10-18: a vague speed want encoded as a floor plus an aim, the case for define's floor-plus-aim rule. The review runs in a fresh context only where the suite allows one; the `define` recipe's `fresh-review` drive covers that |
 
 Retired on 2026-10-15: `d18-map-gate`, folded into `d23`, which has the same prompt and project
 and now carries its grader.
@@ -390,7 +390,7 @@ bounds.
 | 4 | `d20` | 2 | Headroom likely |
 | 5 | `d21` | 2 | |
 | 6 | `d22` | 2 | Guard; status only |
-| 7 | `d25` | 2 | Covers the floor-plus-aim rule and the fresh review; the base model likely binds an invented frame rate |
+| 7 | `d25` | 2 | Covers the floor-plus-aim rule; the base model likely binds an invented frame rate |
 
 All of it is 14 runs, under $25. A full baseline also re-measures the 12 kept cases, another 24
 runs, under $40, since every recorded number is stale. **A smaller budget** runs `d23` and `d24`

@@ -334,14 +334,16 @@ unattended; an amendment gets none. The context that wrote the gates reads them
 as it meant them, which is how an invented number, a dropped point or two gates
 that cannot both hold survive the reread above. Hand a fresh context the paths of
 `references/REVIEW.md` — its brief — this file, `references/SCHEMA.md`, the task
-files this session loaded, the Manifest, and the session record: the figure-out
-log when one exists, and the transcript where the host keeps one the fresh
-context can read, else the conversation passed verbatim. Where no isolated
-context is available, review against that brief yourself and say in the digest
-that the review was self-graded. Settle every finding in one pass — fix it or
-reject it; a fix that changes what the user agreed is a user's call, asked when
-attended and recorded as an `(auto)` `ASM-*` when unattended. No second review
-follows.
+files this session loaded, the project context file and any loaded memory file
+holding Taste entries, the Manifest, and the session record: the figure-out log
+when one exists, and the transcript where the host keeps one the fresh context
+can read, else the conversation passed verbatim. Where no isolated context is
+available, review against that brief yourself and say in the digest that the
+review was self-graded. Settle every finding in one pass: fix it, or reject it
+and name it with the reason in the digest (unattended, in an `(auto)` `ASM-*`).
+A fix that changes what the user agreed is a user's call — asked when attended;
+unattended, not applied, so what the user agreed stands and the finding goes in
+an `(auto)` `ASM-*`. No second review follows.
 
 Give a plain-language digest — the pain, the plan, what gets built, the
 guardrails, how it is verified, and every number a gate holds the work to (each

@@ -56,7 +56,7 @@ Workload: varies
 
 ### fresh-review
 Run: `scripts/drive-skill.sh define claude-plugins/manifest-dev/evals/define/d25-vague-target/prompt.md`
-Proves: before the reply's digest, the session hands a fresh context `references/REVIEW.md` with the Manifest and the session record, and settles its findings in one pass; the digest lists every number a gate binds; the Manifest's speed gate binds a floor such as faster than the measured baseline, and any frame rate appears only as an aim or a recorded assumption.
+Proves: before the reply's digest, the session hands a fresh context `references/REVIEW.md` with the Manifest and the session record, and settles its findings in one pass — each fixed in the Manifest or named with its reason as rejected; the digest lists every number a gate binds; the Manifest's speed gate binds a floor such as faster than the measured baseline, and any frame rate appears only as an aim or a recorded assumption.
 Check: read
 Workload: varies
 
