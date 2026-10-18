@@ -43,7 +43,7 @@ The user
 - Each new surfaces version updates every upgrade guide.
 
 ## Enforced by
-partly — `tests/test_verify.py` holds this repository's harness: every recipe parses and names only existing paths, every user-invocable skill has a recipe, the shipped tool and this repository's copy are identical, ask-first recipes are refused without `--yes`, and statuses follow evidence. `tests/test_setup_project_versions.py` (`test_one_upgrade_guide_per_older_version_each_to_the_newest`, `test_latest_version_matches_what_setup_project_emits`) holds the guides and the shipped harness. Whether a recipe is marked when its run is costly stays judgment.
+partly — `tests/test_verify.py` holds this repository's harness: every recipe parses and names only existing paths, every user-invocable skill has a recipe, the shipped tool and this repository's copy are identical, ask-first recipes are refused without `--yes`, and a drive says what it found (`test_a_drive_says_what_it_found_and_keeps_it_here`); statuses no longer exist, under 20261018-the-harness-commits-no-evidence-and-time-lines-live-in-recipes. `tests/test_setup_project_versions.py` (`test_one_upgrade_guide_per_older_version_each_covering_only_the_next`, `test_setup_project_follows_every_guide_from_the_recorded_version_on`, `test_latest_version_matches_what_setup_project_emits`) holds the guides and the shipped harness. Whether a recipe is marked when its run is costly stays judgment.
 
 ## Source
 - Related: Supersedes 20261014-the-feature-map-is-a-navigation-contract-over-what-users-invoke; amends 20261013-runs-build-and-maintain-a-project-verification-surface

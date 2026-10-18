@@ -130,7 +130,7 @@ That gives a floor that isn't ceremony:
     fit to trust, cut building or repairing it, scoped to what the change touches, as the first Deliverable, ahead of
     any preparatory slice; unattended runs build it too. A Manifest that touches anything a recipe
     covers, or a path one should cover but does not, carries a gate that each touched recipe is
-    added or updated and run, its evidence committed. A recipe marked ask-first is run only where
+    added or updated and run, and what it found reported. A recipe marked ask-first is run only where
     the project's setting or the user allows — a user who approves a Manifest whose gate runs it has
     agreed; otherwise its gate holds that the recipe is updated and that the run it still owes is
     named in the report.

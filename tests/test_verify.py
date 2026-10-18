@@ -263,63 +263,6 @@ TWO_SCENARIOS = "### one\nRun: `true`\n\n### two\nRun: `true`\n"
 ONCE = "### once\nRun: `true`\n"
 
 
-# Holds the decision in docs/adr/20261014-one-verification-harness-per-project.md.
-def test_runs_from_one_second_keep_the_order_they_were_written_in(
-    tmp_path: Path,
-) -> None:
-    # One drive writes STAMP.md, STAMP-2.md, … ; a directory listing orders -10 before -2 and
-    # may order them any way at all.
-    env = _harness(tmp_path, "", TWO_SCENARIOS)
-    for n in range(1, 11):
-        _evidence(
-            tmp_path,
-            "20260101T000000Z" if n == 1 else f"20260101T000000Z-{n}",
-            "- **Scenario:** one\n- **Outcome:** "
-            + ("failed" if n == 10 else "verified")
-            + "\n",
-        )
-    _evidence(
-        tmp_path,
-        "20260101T000000Z-11",
-        "- **Scenario:** two\n- **Outcome:** verified\n",
-    )
-    listed = run_verify("list", env=env)
-    assert "failed (2026-01-01)" in listed.stdout, listed.stdout + listed.stderr
-
-
-# Holds the decision in docs/adr/20261014-one-verification-harness-per-project.md.
-def test_a_recipe_shows_the_worst_of_its_scenarios_latest_runs(tmp_path: Path) -> None:
-    env = _harness(tmp_path, "", TWO_SCENARIOS)
-    _evidence(
-        tmp_path, "20260101T000000Z", "- **Scenario:** one\n- **Outcome:** failed\n"
-    )
-    _evidence(
-        tmp_path, "20260102T000000Z", "- **Scenario:** two\n- **Outcome:** verified\n"
-    )
-    assert "failed (2026-01-01)" in run_verify("list", env=env).stdout
-    _evidence(
-        tmp_path, "20260103T000000Z", "- **Scenario:** one\n- **Outcome:** verified\n"
-    )
-    # Every scenario passed; the date is the weakest proof's.
-    assert "verified (2026-01-02)" in run_verify("list", env=env).stdout
-
-
-# Holds the decision in docs/adr/20261014-one-verification-harness-per-project.md.
-@pytest.mark.parametrize(
-    ("history", "expected"),
-    [
-        ("", "unverified"),
-        ("- **Outcome:** verified\n", "verified (2026-01-01)"),
-        ("- **Outcome:** failed\n", "failed (2026-01-01)"),
-        ("# no outcome line\n", "unjudged (2026-01-01)"),
-    ],
-)
-def test_status_follows_evidence(tmp_path: Path, history: str, expected: str) -> None:
-    result = run_verify("list", env=_harness(tmp_path, history))
-    assert result.returncode == 0, result.stderr
-    assert expected in result.stdout, result.stdout
-
-
 def _git(repo: Path, *args: str, when: str = "2026-01-02T00:00:00Z") -> None:
     # Commit times have one-second resolution; pinning them keeps two commits in one test
     # from sharing a second.
@@ -331,219 +274,19 @@ def _git(repo: Path, *args: str, when: str = "2026-01-02T00:00:00Z") -> None:
     )
 
 
-# Holds the decision in docs/adr/20261014-one-verification-harness-per-project.md.
-def test_status_goes_stale_when_covered_files_change_after_the_evidence(
-    tmp_path: Path,
-) -> None:
-    env = _covered_repo(
-        tmp_path, ONCE, {"20260101T000000Z": "- **Outcome:** verified\n"}
-    )
-    fresh = run_verify("list", env=env)
-    assert "verified (2026-01-01)" in fresh.stdout, fresh.stdout + fresh.stderr
-
-    (tmp_path / "src.txt").write_text("two\n", encoding="utf-8")
-    edited = run_verify("list", env=env)
-    assert "stale (" in edited.stdout, edited.stdout
-
-    # Evidence newer than an uncommitted edit is fresh: the edit counts from its own time.
-    os.utime(tmp_path / "src.txt", (1767225600, 1767225600))  # 2026-01-01T00:00:00Z
-    _evidence(tmp_path, "20260101T000001Z", "- **Outcome:** verified\n")
-    rerun = run_verify("list", env=env)
-    assert "verified (2026-01-01)" in rerun.stdout, rerun.stdout
-
-    _git(tmp_path, "commit", "-qam", "a later change", when="2026-01-03T00:00:00Z")
-    committed = run_verify("list", env=env)
-    assert "stale (" in committed.stdout, committed.stdout
-
-
-def _covering_src(
-    tmp_path: Path, scenarios: str = ONCE, evidence: dict[str, str] | None = None
-) -> dict[str, str]:
-    # A recipe covering src.txt, with the evidence given (stamp: text).
-    env = _harness(tmp_path, "", scenarios)
-    for stamp, text in (evidence or {}).items():
-        _evidence(tmp_path, stamp, text)
-    recipe = tmp_path / "verification" / "recipes" / "thing.md"
-    recipe.write_text(
-        recipe.read_text(encoding="utf-8").replace(
-            "kind: feature\n", "kind: feature\ncovers: src.txt\n"
-        ),
-        encoding="utf-8",
-    )
-    (tmp_path / "src.txt").write_text("one\n", encoding="utf-8")
-    return env
-
-
-def _covered_repo(
-    tmp_path: Path, scenarios: str, evidence: dict[str, str]
-) -> dict[str, str]:
-    # The same, committed on 2026-01-02 in a new repository.
-    env = _covering_src(tmp_path, scenarios, evidence)
-    _git(tmp_path, "init", "-q")
-    _git(tmp_path, "add", "-A")
-    _git(tmp_path, "commit", "-qm", "the change and its evidence")
-    return env
-
-
-def _later_change(tmp_path: Path, when: str) -> None:
-    (tmp_path / "src.txt").write_text("two\n", encoding="utf-8")
-    _git(tmp_path, "commit", "-qam", "a later change", when=when)
-
-
-def test_a_stale_recipe_with_an_unrun_scenario_says_both_plainly(
-    tmp_path: Path,
-) -> None:
-    env = _covered_repo(
-        tmp_path,
-        TWO_SCENARIOS,
-        {"20260101T000000Z": "- **Scenario:** one\n- **Outcome:** verified\n"},
-    )
-    _later_change(tmp_path, "2026-01-03T00:00:00Z")
-    shown = run_verify("help", "thing", env=env)
-    assert (
-        "stale (2026-01-03): covered files changed after the verified run of 2026-01-01; "
-        "no run yet for two" in shown.stdout
-    ), (shown.stdout + shown.stderr)
-
-
-def test_a_stale_message_names_the_newest_run_the_change_outdated(
-    tmp_path: Path,
-) -> None:
-    # The change outdated the runs of 12-30 (failed) and 01-01; the run of 01-05 came after
-    # it. The newest outdated run is named, not the worst or the oldest.
-    env = _covered_repo(
-        tmp_path,
-        TWO_SCENARIOS + "\n### three\nRun: `true`\n",
-        {
-            "20251230T000000Z": "- **Scenario:** three\n- **Outcome:** failed\n",
-            "20260101T000000Z": "- **Scenario:** one\n- **Outcome:** verified\n",
-        },
-    )
-    _later_change(tmp_path, "2026-01-04T00:00:00Z")
-    _evidence(
-        tmp_path, "20260105T000000Z", "- **Scenario:** two\n- **Outcome:** verified\n"
-    )
-    _git(tmp_path, "add", "-A")
-    _git(tmp_path, "commit", "-qm", "a run", when="2026-01-05T00:00:00Z")
-    shown = run_verify("help", "thing", env=env)
-    first = shown.stdout.splitlines()[0]
-    assert first.endswith(
-        "stale (2026-01-04): covered files changed after the verified run of 2026-01-01"
-    ), (shown.stdout + shown.stderr)
-
-
-def test_a_failure_on_the_current_files_shows_before_stale(tmp_path: Path) -> None:
-    env = _covered_repo(
-        tmp_path,
-        TWO_SCENARIOS,
-        {"20260101T000000Z": "- **Scenario:** one\n- **Outcome:** verified\n"},
-    )
-    _later_change(tmp_path, "2026-01-04T00:00:00Z")
-    _evidence(
-        tmp_path, "20260105T000000Z", "- **Scenario:** two\n- **Outcome:** failed\n"
-    )
-    _git(tmp_path, "add", "-A")
-    _git(tmp_path, "commit", "-qm", "a failed run", when="2026-01-05T00:00:00Z")
-    listed = run_verify("list", env=env)
-    assert "failed (2026-01-05)" in listed.stdout, listed.stdout + listed.stderr
-
-
-def test_a_fingerprinted_run_outdated_by_a_later_commit_says_changed_after(
-    tmp_path: Path,
-) -> None:
-    env = _covered_repo(tmp_path, "### once\nRun: `true`\n", {})
-    run = run_verify("drive", "thing", env={**env, "VERIFY_STAMP": "20260102T000000Z"})
-    assert run.returncode == 0, run.stdout + run.stderr
-    assert "- **Covers:** sha256:" in next(
-        (tmp_path / "verification" / "evidence" / "thing").glob("*.md")
-    ).read_text(encoding="utf-8")
-    _git(tmp_path, "add", "-A")
-    _git(tmp_path, "commit", "-qm", "its evidence", when="2026-01-02T00:00:01Z")
-    assert "verified (2026-01-02)" in run_verify("list", env=env).stdout
-    _later_change(tmp_path, "2026-01-06T00:00:00Z")
-    shown = run_verify("help", "thing", env=env)
-    first = shown.stdout.splitlines()[0]
-    assert first.endswith(
-        "stale (2026-01-06): covered files changed after the verified run of 2026-01-02"
-    ), (shown.stdout + shown.stderr)
-
-
-def test_a_run_of_an_edit_since_undone_differs_rather_than_predates(
-    tmp_path: Path,
-) -> None:
-    # The run checked a working-tree edit (its Covers line) that was then undone: the last
-    # commit to src.txt predates the run, so the files only differ from what it checked.
-    env = _covered_repo(tmp_path, TWO_SCENARIOS, {})
-    _evidence(
-        tmp_path,
-        "20260109T000000Z",
-        "- **Scenario:** one\n- **Outcome:** failed\n"
-        "- **Covers:** sha256:0000000000000000\n",
-    )
-    _git(tmp_path, "add", "-A")
-    _git(tmp_path, "commit", "-qm", "its evidence", when="2026-01-09T00:00:00Z")
-    shown = run_verify("help", "thing", env=env)
-    assert (
-        "stale (2026-01-09): covered files differ from what the failed run of 2026-01-09 "
-        "checked; no run yet for two" in shown.stdout
-    ), (shown.stdout + shown.stderr)
-
-
-def test_a_failed_recipe_names_its_unrun_scenarios(tmp_path: Path) -> None:
-    env = _harness(tmp_path, "", TWO_SCENARIOS)
-    _evidence(
-        tmp_path, "20260101T000000Z", "- **Scenario:** one\n- **Outcome:** failed\n"
-    )
-    shown = run_verify("help", "thing", env=env)
-    assert shown.stdout.splitlines()[0].endswith(
-        "failed (2026-01-01): no run yet for two"
-    ), (shown.stdout + shown.stderr)
-    assert "failed (2026-01-01)" in run_verify("list", env=env).stdout
-
-
-def test_a_failure_since_a_drift_line_shows_before_it(tmp_path: Path) -> None:
-    env = _harness(tmp_path, "", TWO_SCENARIOS)
-    _evidence(
-        tmp_path, "20260101T000000Z", "- **Scenario:** one\n- **Outcome:** verified\n"
-    )
-    recipe = tmp_path / "verification" / "recipes" / "thing.md"
-    recipe.write_text(
-        recipe.read_text(encoding="utf-8") + "\nDrift (2026-01-03): a flag changed.\n",
-        encoding="utf-8",
-    )
-    assert "stale (2026-01-03)" in run_verify("list", env=env).stdout
-    _evidence(
-        tmp_path, "20260105T000000Z", "- **Scenario:** two\n- **Outcome:** failed\n"
-    )
-    assert "failed (2026-01-05)" in run_verify("list", env=env).stdout
-
-
-# Holds the decision in docs/adr/20261014-one-verification-harness-per-project.md.
-def test_a_drift_line_marks_the_recipe_stale(tmp_path: Path) -> None:
-    env = _harness(tmp_path, "- **Outcome:** verified\n")
-    recipe = tmp_path / "verification" / "recipes" / "thing.md"
-    recipe.write_text(
-        recipe.read_text(encoding="utf-8")
-        + "\nDrift (2099-01-01): the command takes a flag now.\n",
-        encoding="utf-8",
-    )
-    shown = run_verify("help", "thing", env=env)
-    assert "stale (2099-01-01): the command takes a flag now." in shown.stdout
-    listed = run_verify("list", env=env)
-    assert "stale (2099-01-01)" in listed.stdout and "flag" not in listed.stdout
-
-
-# Holds the decision in docs/adr/20261014-one-verification-harness-per-project.md.
+# Holds the decision in
+# docs/adr/20261018-the-harness-commits-no-evidence-and-time-lines-live-in-recipes.md: a run says
+# what it found, in its output and in the summary it keeps here; nothing reads a status back.
 @pytest.mark.parametrize(
     ("scenario", "outcome", "code"),
     [
-        ("Run: `true`\n", "verified", 0),
+        ("Run: `true`\n", "passed", 0),
         ("Run: `exit 1`\n", "failed", 1),
         ("Run: `exit 3`\n", "unreachable", 1),
-        ("Run: `true`\nCheck: read\n", "unjudged", 0),
+        ("Run: `true`\nCheck: read\n", "passed; its output needs reading", 0),
     ],
 )
-def test_a_drive_keeps_evidence_that_reads_back_as_its_outcome(
+def test_a_drive_says_what_it_found_and_keeps_it_here(
     tmp_path: Path, scenario: str, outcome: str, code: int
 ) -> None:
     env = {
@@ -552,11 +295,13 @@ def test_a_drive_keeps_evidence_that_reads_back_as_its_outcome(
     }
     result = run_verify("drive", "thing", env=env)
     assert result.returncode == code, result.stdout + result.stderr
+    assert f"\n{outcome.split(';')[0]} in " in result.stdout, result.stdout
+    assert outcome.partition("; ")[2] in result.stdout, result.stdout
     kept = (
         tmp_path / "verification" / "evidence" / "thing" / "20260101T000000Z.md"
     ).read_text(encoding="utf-8")
-    assert f"- **Outcome:** {outcome}\n" in kept and "- **Scenario:** once\n" in kept
-    assert f"{outcome} (2026-01-01)" in run_verify("list", env=env).stdout
+    assert f"- **Outcome:** {outcome}" in kept and "- **Scenario:** once\n" in kept
+    assert run_verify("list", env=env).stdout == "thing  feature\n"
 
 
 def test_kept_output_carries_no_local_paths(tmp_path: Path) -> None:
@@ -568,14 +313,6 @@ def test_kept_output_carries_no_local_paths(tmp_path: Path) -> None:
     text = kept.read_text(encoding="utf-8").split("## Output", 1)[1]
     assert "/Users" not in text and "~/x" not in text and "/tmp/y" not in text, text
     assert text.count("[local path]") == 3
-
-
-def test_a_scenario_that_never_ran_leaves_the_recipe_unverified(tmp_path: Path) -> None:
-    env = _harness(tmp_path, "", "### one\nRun: `true`\n\n### two\nRun: `false`\n")
-    assert run_verify("drive", "thing", "one", env=env).returncode == 0
-    assert "unverified (" in run_verify("list", env=env).stdout
-    shown = run_verify("help", "thing", env=env).stdout
-    assert "no run yet for two" in shown, shown
 
 
 def test_runs_in_one_second_get_their_own_evidence(tmp_path: Path) -> None:
@@ -595,25 +332,6 @@ def test_runs_in_one_second_get_their_own_evidence(tmp_path: Path) -> None:
     assert made == ["20260101T000000Z-2.md"], made
 
 
-@pytest.mark.parametrize("has_outcome", [True, False])
-def test_judge_records_one_verdict(tmp_path: Path, has_outcome: bool) -> None:
-    env = _harness(tmp_path, "")
-    lines = "- **Scenario:** once\n" + (
-        "- **Outcome:** unjudged\n" if has_outcome else ""
-    )
-    path = _evidence(
-        tmp_path, "20260101T000000Z", f"# thing / once\n\n{lines}\n## Output\n\nok\n"
-    )
-    result = run_verify(
-        "judge", "thing", "20260101T000000Z", "verified", "read", "it", env=env
-    )
-    assert result.returncode == 0, result.stderr
-    text = path.read_text(encoding="utf-8")
-    assert text.count("- **Outcome:**") == 1 and "- **Outcome:** verified" in text
-    assert text.endswith("## Verdict\n\nverified: read it\n")
-    assert "verified (2026-01-01)" in run_verify("list", env=env).stdout
-
-
 @pytest.mark.parametrize(
     ("recipe", "evidence", "problem"),
     [
@@ -628,9 +346,21 @@ def test_judge_records_one_verdict(tmp_path: Path, has_outcome: bool) -> None:
             "names src/nope.sh",
         ),
         (
-            "---\nkind: feature\n---\n# T\n\n## Scenarios\n\n### a\nRun: `true`\n",
-            "- **Scenario:** ghost\n",
-            "'ghost' is not in",
+            "---\nkind: feature\n---\n# T\n\n## Scenarios\n\n### a\nRun: `true`\nLine: soon\n",
+            "",
+            "`Line: soon` is not",
+        ),
+        (
+            "---\nkind: feature\n---\n# T\n\n## Scenarios\n\n### a\nRun: `true`\n"
+            "Line: 1.0 s on m\nLine: 2.0 s on m\n",
+            "",
+            "two lines on m",
+        ),
+        (
+            "---\nkind: feature\n---\n# T\n\n## Scenarios\n\n### a\nRun: `true`\n"
+            "Workload: varies\nLine: 1.0 s on m\n",
+            "",
+            "takes no `Line:`",
         ),
         ("---\ncovers: src\n---\n# T\n", "", "no `kind:`"),
     ],
@@ -649,70 +379,10 @@ def test_check_reports_what_would_send_a_run_to_nothing(
     assert result.returncode == 1 and problem in result.stdout, result.stdout
 
 
-def test_detail_beside_the_summaries_is_kept_and_a_misnamed_summary_reported(
-    tmp_path: Path,
-) -> None:
-    env = _harness(tmp_path, "- **Outcome:** verified\n")
-    folder = tmp_path / "verification" / "evidence" / "thing"
-    (folder / "transcript.md").write_text("what the session said\n", encoding="utf-8")
-    assert "verified (2026-01-01)" in run_verify("list", env=env).stdout
-    assert run_verify("check", env=env).returncode == 0
-    (folder / "browser-run.md").write_text("- **Outcome:** failed\n", encoding="utf-8")
-    assert "verified (2026-01-01)" in run_verify("list", env=env).stdout
-    result = run_verify("check", env=env)
-    assert (
-        result.returncode == 1
-        and "browser-run.md: reads as a run summary" in result.stdout
-    )
-
-
 def test_check_leaves_a_directory_a_run_creates_alone(tmp_path: Path) -> None:
     env = _harness(tmp_path, "", "### a\nRun: `mkdir -p out && touch out/new.txt`\n")
     result = run_verify("check", env=env)
     assert result.returncode == 0, result.stdout
-
-
-# Holds the decision in docs/adr/20261014-one-verification-harness-per-project.md.
-def test_evidence_after_a_drift_line_clears_it(tmp_path: Path) -> None:
-    env = _harness(tmp_path, "- **Outcome:** verified\n")
-    recipe = tmp_path / "verification" / "recipes" / "thing.md"
-    recipe.write_text(
-        recipe.read_text(encoding="utf-8")
-        + "\nDrift (2025-11-30): older.\nDrift (2025-12-31): newer.\n",
-        encoding="utf-8",
-    )
-    assert "verified (2026-01-01)" in run_verify("list", env=env).stdout
-    _evidence(tmp_path, "20251201T000000Z", "- **Outcome:** verified\n")
-    (tmp_path / "verification" / "evidence" / "thing" / "20260101T000000Z.md").unlink()
-    shown = run_verify("help", "thing", env=env).stdout
-    assert "stale (2025-12-31): newer." in shown, shown
-
-
-# Holds the decision in docs/adr/20261014-one-verification-harness-per-project.md.
-def test_an_edit_after_the_run_stays_stale_however_it_is_committed(
-    tmp_path: Path,
-) -> None:
-    env = _covering_src(tmp_path)
-    _git(tmp_path, "init", "-q")
-    assert run_verify("drive", "thing", env=env).returncode == 0
-    _git(tmp_path, "add", "-A")
-    _git(tmp_path, "commit", "-qm", "change and its evidence")
-    assert "verified (" in run_verify("list", env=env).stdout
-
-    assert run_verify("drive", "thing", env=env).returncode == 0
-    (tmp_path / "src.txt").write_text("two\n", encoding="utf-8")
-    _git(
-        tmp_path, "add", "-A"
-    )  # the edit and the evidence of the run before it, together
-    _git(
-        tmp_path,
-        "commit",
-        "-qm",
-        "edit committed with older evidence",
-        when="2099-01-01T00:00:00Z",
-    )
-    listed = run_verify("list", env=env).stdout
-    assert "stale (" in listed, listed
 
 
 def test_an_interrupted_run_keeps_no_evidence(tmp_path: Path) -> None:
@@ -818,7 +488,7 @@ def test_a_reader_that_goes_away_still_leaves_whole_evidence(tmp_path: Path) -> 
     assert piped.stdout.startswith("running"), piped.stderr
     (kept,) = (tmp_path / "verification" / "evidence" / "thing").iterdir()
     text = kept.read_text(encoding="utf-8")
-    assert "- **Outcome:** verified\n" in text and "\n20000\n" in text
+    assert "- **Outcome:** passed\n" in text and "\n20000\n" in text
 
 
 @pytest.mark.parametrize(
@@ -842,76 +512,9 @@ def test_an_ask_first_recipe_runs_when_agreed_or_allowed(
     result = run_verify("drive", "thing", *args, env=env)
     assert result.returncode == code, result.stdout + result.stderr
     if code == 0:
-        assert "verified (" in run_verify("list", env=env).stdout
+        assert "passed in" in result.stdout, result.stdout
     else:
         assert "must be `ask` or `run`" in result.stderr
-
-
-def test_ignored_files_do_not_make_evidence_stale(tmp_path: Path) -> None:
-    env = _harness(tmp_path, "", "### once\nRun: `true`\n")
-    recipe = tmp_path / "verification" / "recipes" / "thing.md"
-    recipe.write_text(
-        recipe.read_text(encoding="utf-8").replace(
-            "kind: feature\n", "kind: feature\ncovers: src\n"
-        ),
-        encoding="utf-8",
-    )
-    (tmp_path / "src").mkdir()
-    (tmp_path / "src" / "a.txt").write_text("a\n", encoding="utf-8")
-    (tmp_path / ".gitignore").write_text("*.log\n", encoding="utf-8")
-    (tmp_path / "src" / "link").symlink_to("a.txt")
-    _git(tmp_path, "init", "-q")
-    assert run_verify("drive", "thing", env=env).returncode == 0
-    (tmp_path / "src" / "x.log").write_text("noise\n", encoding="utf-8")
-    assert "verified (" in run_verify("list", env=env).stdout
-    (tmp_path / "src" / "new.txt").write_text("new\n", encoding="utf-8")
-    assert "stale (" in run_verify("list", env=env).stdout
-
-
-def test_outside_a_repository_an_edit_still_makes_evidence_stale(
-    tmp_path: Path,
-) -> None:
-    env = _covering_src(tmp_path)
-    assert run_verify("drive", "thing", env=env).returncode == 0
-    assert "verified (" in run_verify("list", env=env).stdout
-    (tmp_path / "src.txt").write_text("two\n", encoding="utf-8")
-    assert "stale (" in run_verify("list", env=env).stdout
-
-
-@pytest.mark.parametrize(
-    ("evidence", "shows"),
-    [
-        (
-            [
-                ("20260101T000000Z", "one", "unjudged"),
-                ("20260101T000001Z", "two", "unreachable"),
-            ],
-            "unreachable (2026-01-01)",
-        ),
-        (
-            [
-                ("20260101T000000Z", "", "verified"),
-                ("20260102T000000Z", "one", "failed"),
-            ],
-            "failed (2026-01-02)",
-        ),
-        (
-            [
-                ("20260101T000000Z", "", "verified"),
-                ("20260102T000000Z", "ghost", "failed"),
-            ],
-            "verified (2026-01-01)",
-        ),
-    ],
-)
-def test_a_recipe_shows_the_worst_of_its_scenarios(
-    tmp_path: Path, evidence: list[tuple[str, str, str]], shows: str
-) -> None:
-    env = _harness(tmp_path, "", "### one\nRun: `true`\n\n### two\nRun: `true`\n")
-    for stamp, scenario, outcome in evidence:
-        line = f"- **Scenario:** {scenario}\n" if scenario else ""
-        _evidence(tmp_path, stamp, f"# x\n\n{line}- **Outcome:** {outcome}\n")
-    assert shows in run_verify("list", env=env).stdout
 
 
 @pytest.mark.parametrize(
@@ -919,7 +522,9 @@ def test_a_recipe_shows_the_worst_of_its_scenarios(
     [
         ("list", "a", "b"),
         ("drive", "thing", "--bogus"),
-        ("judge", "thing", "x", "maybe"),
+        ("line", "thing"),
+        ("raise", "thing", "once"),
+        ("freeze", "thing", "once", "--yes", "T-1"),
     ],
 )
 def test_usage_errors_exit_2(tmp_path: Path, args: tuple[str, ...]) -> None:
@@ -935,15 +540,7 @@ def test_output_that_is_not_utf8_is_still_kept(tmp_path: Path) -> None:
     )
     assert result.returncode == 0, result.stderr
     assert b"a\xffb" in result.stdout
-    assert "verified (" in run_verify("list", env=env).stdout
-
-
-def test_an_empty_evidence_file_is_reported_and_proves_nothing(tmp_path: Path) -> None:
-    env = _harness(tmp_path, "")
-    _evidence(tmp_path, "20260101T000000Z", "")
-    assert "unverified" in run_verify("list", env=env).stdout
-    checked = run_verify("check", env=env)
-    assert checked.returncode == 1 and "empty" in checked.stdout, checked.stdout
+    assert "- **Outcome:** passed\n" in _only_summary(tmp_path)
 
 
 # A home with nothing in it, so a dry run reads no settings of yours. Node stays reachable for
@@ -1000,38 +597,6 @@ def _covering(tmp_path: Path, run: str, covers: str) -> dict[str, str]:
         encoding="utf-8",
     )
     return env
-
-
-@pytest.mark.parametrize("in_repo", [True, False])
-def test_links_under_covers_count_by_their_target(
-    tmp_path: Path, in_repo: bool
-) -> None:
-    env = _covering(tmp_path, "true", "src")
-    (tmp_path / "src" / "dir").mkdir(parents=True)
-    (tmp_path / "src" / "to-dir").symlink_to("dir")
-    (tmp_path / "src" / "dangling").symlink_to("nowhere")
-    if in_repo:
-        _git(tmp_path, "init", "-q")
-    drove = run_verify("drive", "thing", env=env)
-    assert drove.returncode == 0, drove.stdout + drove.stderr
-    assert "verified (" in run_verify("list", env=env).stdout
-    (tmp_path / "src" / "dangling").unlink()
-    (tmp_path / "src" / "dangling").symlink_to("elsewhere")
-    assert "stale (" in run_verify("list", env=env).stdout
-
-
-def test_a_link_to_a_directory_counts_by_its_target_not_its_contents(
-    tmp_path: Path,
-) -> None:
-    env = _covering(tmp_path, "true", "src")
-    for name in ("one", "two"):
-        (tmp_path / "src" / name).mkdir(parents=True)
-        (tmp_path / "src" / name / "same.txt").write_text("x\n", encoding="utf-8")
-    (tmp_path / "src" / "to-dir").symlink_to("one")
-    assert run_verify("drive", "thing", env=env).returncode == 0
-    (tmp_path / "src" / "to-dir").unlink()
-    (tmp_path / "src" / "to-dir").symlink_to("two")  # same contents, new target
-    assert "stale (" in run_verify("list", env=env).stdout
 
 
 def test_a_command_never_outlives_a_killed_tool(tmp_path: Path) -> None:
@@ -1162,30 +727,6 @@ def test_a_killed_tool_stops_its_command_before_anyone_reaps_it(
     drive.wait(timeout=10)
 
 
-def test_help_shows_whole_recipe_evidence_under_each_scenario(tmp_path: Path) -> None:
-    env = _harness(
-        tmp_path,
-        "- **Outcome:** verified\n",
-        "### one\nRun: `true`\n\n### two\nRun: `true`\n",
-    )
-    shown = run_verify("help", "thing", env=env).stdout
-    assert "one: verified, verification/evidence/thing/20260101T000000Z.md" in shown
-    assert "two: verified, verification/evidence/thing/20260101T000000Z.md" in shown
-
-
-def test_a_drift_line_kept_as_a_list_item_still_marks_the_recipe_stale(
-    tmp_path: Path,
-) -> None:
-    env = _harness(tmp_path, "- **Outcome:** verified\n")
-    recipe = tmp_path / "verification" / "recipes" / "thing.md"
-    recipe.write_text(
-        recipe.read_text(encoding="utf-8")
-        + "\n## Traps\n\n- Drift (2099-01-01): the export now writes JSON\n",
-        encoding="utf-8",
-    )
-    assert "stale (2099-01-01)" in run_verify("list", env=env).stdout
-
-
 @pytest.mark.parametrize(("sent", "code"), [("INT", 130), ("QUIT", 131)])
 def test_a_command_that_signals_its_own_group_ends_the_run_as_failed(
     tmp_path: Path, sent: str, code: int
@@ -1203,28 +744,6 @@ def test_a_command_that_signals_its_own_group_ends_the_run_as_failed(
     (evidence,) = (tmp_path / "verification" / "evidence" / "thing").iterdir()
     text = evidence.read_text(encoding="utf-8")
     assert f"- **Exit code:** {code}" in text and "- **Outcome:** failed" in text
-
-
-# Holds the decision in docs/adr/20261014-one-verification-harness-per-project.md.
-def test_a_drift_line_holds_until_every_scenario_has_run_since(tmp_path: Path) -> None:
-    env = _harness(tmp_path, "- **Outcome:** verified\n", TWO_SCENARIOS)
-    recipe = tmp_path / "verification" / "recipes" / "thing.md"
-    recipe.write_text(
-        recipe.read_text(encoding="utf-8") + "\nDrift (2026-03-01): changed.\n",
-        encoding="utf-8",
-    )
-    _evidence(
-        tmp_path,
-        "20260401T000000Z",
-        "- **Scenario:** one\n- **Outcome:** verified\n",
-    )
-    assert "stale (2026-03-01)" in run_verify("list", env=env).stdout
-    _evidence(
-        tmp_path,
-        "20260402T000000Z",
-        "- **Scenario:** two\n- **Outcome:** verified\n",
-    )
-    assert "verified (2026-04-01)" in run_verify("list", env=env).stdout
 
 
 def test_a_killed_tool_lets_its_command_stop_cleanly_first(tmp_path: Path) -> None:
@@ -1458,17 +977,6 @@ def _delay(env: dict[str, str], seconds: float) -> None:
     env["VERIFY_DURATION"] = f"{seconds}"
 
 
-def _line(tmp_path: Path, line: str, duration: float) -> None:
-    """Plant the scenario's latest evidence carrying a line, as an earlier run left it."""
-    _evidence(
-        tmp_path,
-        "20260101T000000Z",
-        f"# thing / once\n\n- **Scenario:** once\n- **Outcome:** verified\n"
-        f"- **Machine:** {MACHINE}\n- **Duration:** {duration:.1f} s\n"
-        f"- **Line:** {MACHINE} {line}\n- **Proves:** it runs.\n\n## Output\n\n(none)\n",
-    )
-
-
 # --- the stop grace --------------------------------------------------------------------
 
 
@@ -1540,24 +1048,6 @@ def test_evidence_records_duration_and_machine(tmp_path: Path) -> None:
     assert f" s on {MACHINE}" in shown, shown
 
 
-# Holds the decision in docs/adr/20261015-check-run-time-is-held-by-an-alarm-against-creep.md.
-def test_a_real_run_is_timed_by_the_clock_and_crosses_its_line(tmp_path: Path) -> None:
-    # The one line test that plants no duration: the tool's own clock times a real sleep, and
-    # that measured time is what crosses the line.
-    env = _harness(tmp_path, "", "### once\nRun: `sleep 1.2`\n")
-    env["VERIFY_MACHINE"] = MACHINE
-    env.pop("VERIFY_DURATION", None)
-    _line(tmp_path, "0.0 s; first run", 0.0)
-    result = run_verify("drive", "thing", env=env)
-    assert (
-        result.returncode == 0 and "over its line once" in result.stdout
-    ), result.stdout
-    kept = _only_summary(tmp_path)
-    took = re.search(r"^- \*\*Duration:\*\* (\d+\.\d) s$", kept, re.M)
-    assert took and float(took.group(1)) >= 1.0, kept
-    assert f"{MACHINE} 0.0 s; first run; over 1\n" in kept, kept
-
-
 def test_without_an_override_the_machine_names_platform_and_cores(
     tmp_path: Path,
 ) -> None:
@@ -1570,18 +1060,11 @@ def test_without_an_override_the_machine_names_platform_and_cores(
     ), machine
 
 
-def test_evidence_from_before_durations_keeps_its_status(tmp_path: Path) -> None:
-    env = _harness(tmp_path, "- **Scenario:** once\n- **Outcome:** verified\n")
-    assert "verified (2026-01-01)" in run_verify("list", env=env).stdout
-    assert "once: verified" in run_verify("help", "thing", env=env).stdout
-
-
 def test_a_scenario_keeps_one_summary_however_often_it_runs(tmp_path: Path) -> None:
     env = _harness(tmp_path, "")
     for _ in range(4):
         assert run_verify("drive", "thing", env=env).returncode == 0
     assert len(_summaries(tmp_path)) == 1
-    assert "verified (" in run_verify("list", env=env).stdout
 
 
 def test_a_run_never_takes_a_name_that_sorts_before_the_one_it_replaces(
@@ -1595,14 +1078,14 @@ def test_a_run_never_takes_a_name_that_sorts_before_the_one_it_replaces(
     assert [p.name for p in _summaries(tmp_path)] == ["20260101T000000Z-3.md"]
 
 
-def test_summaries_from_merged_branches_fold_into_one_on_the_next_run(
+def test_older_summaries_of_a_scenario_fold_into_one_on_its_next_run(
     tmp_path: Path,
 ) -> None:
     env = _harness(tmp_path, "", "### once\nRun: `true`\n\n### other\nRun: `true`\n")
-    for stamp in ("20260101T000000Z", "20260102T000000Z"):  # one from each branch
-        _evidence(tmp_path, stamp, "- **Scenario:** once\n- **Outcome:** verified\n")
+    for stamp in ("20260101T000000Z", "20260102T000000Z"):  # left by a killed copy, say
+        _evidence(tmp_path, stamp, "- **Scenario:** once\n- **Outcome:** passed\n")
     _evidence(
-        tmp_path, "20260103T000000Z", "- **Scenario:** other\n- **Outcome:** verified\n"
+        tmp_path, "20260103T000000Z", "- **Scenario:** other\n- **Outcome:** passed\n"
     )
     detail = tmp_path / "verification" / "evidence" / "thing" / "transcript.md"
     detail.write_text("kept beside the summaries\n", encoding="utf-8")
@@ -1615,279 +1098,412 @@ def test_summaries_from_merged_branches_fold_into_one_on_the_next_run(
     assert detail.exists(), "detail kept beside the summaries was removed"
 
 
-# Holds the decision in docs/adr/20261015-check-run-time-is-held-by-an-alarm-against-creep.md.
-def test_a_freeze_from_either_merged_branch_survives_the_fold(tmp_path: Path) -> None:
+# --- lines -----------------------------------------------------------------------------
+#
+# Each test here holds the decision in
+# docs/adr/20261018-the-harness-commits-no-evidence-and-time-lines-live-in-recipes.md: a timed
+# scenario's line lives in its recipe, one per kind of machine; a crossing counts only once a
+# confirming run crosses too; and only `line`, `raise` and `freeze` move a line, each writing it
+# into the recipe.
+
+RECIPE_PATH = ("verification", "recipes", "thing.md")
+
+
+def _recipe(tmp_path: Path) -> Path:
+    return tmp_path.joinpath(*RECIPE_PATH)
+
+
+def _with_line(tmp_path: Path, line: str) -> None:
+    """State a line under the recipe's last scenario, as a change to the check wrote it."""
+    recipe = _recipe(tmp_path)
+    recipe.write_text(recipe.read_text(encoding="utf-8") + line + "\n", "utf-8")
+
+
+def _lines(tmp_path: Path) -> list[str]:
+    return re.findall(r"^Line: .*$", _recipe(tmp_path).read_text("utf-8"), re.M)
+
+
+# Holds the decision in docs/adr/20261018-the-harness-commits-no-evidence-and-time-lines-live-in-recipes.md, which amends
+# docs/adr/20261015-check-run-time-is-held-by-an-alarm-against-creep.md.
+def test_a_line_is_read_from_the_recipe_for_its_kind_of_machine(tmp_path: Path) -> None:
     env = _timed(tmp_path)
-    # The older summary froze an overshoot; the newer one, from the other branch, did not.
-    for stamp, line in (
-        ("20260101T000000Z", "0.0 s; first run; frozen at 3.0 s by T-1"),
-        ("20260102T000000Z", "0.0 s; first run"),
-    ):
-        _evidence(
-            tmp_path,
-            stamp,
-            f"- **Scenario:** once\n- **Outcome:** verified\n- **Machine:** {MACHINE}\n"
-            f"- **Duration:** 0.0 s\n- **Line:** {MACHINE} {line}\n",
-        )
-    _delay(env, 1.3)  # over the bare line, under the frozen level
+    _with_line(tmp_path, "Line: 0.0 s on another-machine")
+    _delay(env, 1.2)
+    # On a kind of machine the recipe has no line for, the run reports and compares nothing.
+    other = run_verify("drive", "thing", env=env)
+    assert other.returncode == 0, other.stdout + other.stderr
+    assert (
+        "its line is for another-machine, so this run compares nothing" in other.stdout
+    )
+    _with_line(tmp_path, f"Line: 0.0 s on {MACHINE}")
+    same = run_verify("drive", "thing", env=env)
+    assert same.returncode == 5, same.stdout + same.stderr
+    assert f"against its 0.0 s line (over past 1.0 s) on {MACHINE}" in same.stdout
+    shown = run_verify("help", "thing", env=env).stdout
+    assert (
+        f"line 0.0 s on {MACHINE}" in shown and "line 0.0 s on another-machine" in shown
+    )
+
+
+def test_a_scenario_with_no_line_says_how_its_first_is_set(tmp_path: Path) -> None:
+    env = _timed(tmp_path)
+    before = _recipe(tmp_path).read_bytes()
     result = run_verify("drive", "thing", env=env)
-    assert result.returncode == 0 and "over" not in result.stdout, result.stdout
-    assert "frozen at 3.0 s by T-1" in _only_summary(tmp_path)
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert (
+        "with no line yet" in result.stdout
+        and "verify line thing once" in result.stdout
+    )
+    assert (
+        _recipe(tmp_path).read_bytes() == before
+    ), "a run wrote a line nobody asked for"
 
 
-def test_a_run_needing_a_verdict_moves_its_line_only_once_judged_verified(
+# Holds the decision in docs/adr/20261018-the-harness-commits-no-evidence-and-time-lines-live-in-recipes.md, which amends
+# docs/adr/20261015-check-run-time-is-held-by-an-alarm-against-creep.md.
+def test_one_run_over_the_line_is_noise_until_a_confirming_run_crosses_too(
     tmp_path: Path,
 ) -> None:
-    env = _timed(tmp_path, "### once\nRun: `true`\nCheck: read\n")
-    _line(tmp_path, "0.0 s; first run", 0.0)
-    _delay(env, 1.3)
-    result = run_verify("drive", "thing", env=env)
-    assert result.returncode == 0 and "over" not in result.stdout, result.stdout
-    (first,) = _summaries(tmp_path)
-    carried = f"- **Line:** {MACHINE} 0.0 s; first run\n"
-    assert carried in first.read_text(encoding="utf-8")
-    # Judged failed, the run measured nothing: the line stays as it was.
-    assert run_verify("judge", "thing", first.stem, "failed", env=env).returncode == 0
-    assert carried in first.read_text(encoding="utf-8")
-    assert run_verify("drive", "thing", env=env).returncode == 0
-    (second,) = _summaries(tmp_path)
-    judged = run_verify("judge", "thing", second.stem, "verified", env=env)
-    assert "over its line once" in judged.stdout, judged.stdout
-    assert f"{MACHINE} 0.0 s; first run; over 1\n" in second.read_text(encoding="utf-8")
-
-
-def test_a_run_that_measured_nothing_never_reports_a_crossing(tmp_path: Path) -> None:
-    # A confirmed crossing is carried on by an unjudged or failed run, which measured nothing,
-    # so neither exits as over its line.
-    env = _timed(tmp_path, "### once\nRun: `true`\nCheck: read\n")
-    _line(tmp_path, "0.0 s; first run; over 2", 1.3)
-    drove = run_verify("drive", "thing", env=env)
-    assert drove.returncode == 0, drove.stdout + drove.stderr
-    (kept,) = _summaries(tmp_path)
-    judged = run_verify("judge", "thing", kept.stem, "failed", "wrong output", env=env)
-    assert judged.returncode == 0, judged.stdout + judged.stderr
-
-
-def test_a_line_moves_only_from_a_verified_run(tmp_path: Path) -> None:
-    env = _timed(
-        tmp_path,
-        '### once\nRun: `true; exit "$(cat code)"`\n\n'
-        "### varies\nRun: `true`\nWorkload: varies\n",
+    # Timed by the clock, not planted: the first run sleeps past the line, the confirming run
+    # that `drive` starts at once does not, so the crossing is noise and the drive passes.
+    env = _harness(
+        tmp_path, "", "### once\nRun: `if [ -f slow ]; then rm slow; sleep 1.5; fi`\n"
     )
-    (tmp_path / "code").write_text("1\n", encoding="utf-8")
-    _line(tmp_path, "0.0 s; first run; over 1", 1.3)
-    _delay(env, 1.3)
-    assert run_verify("drive", "thing", "once", env=env).returncode == 1
-    for how, said in (("raise", "new tests"), ("freeze", "T-9")):
-        refused = run_verify(how, "thing", "once", said, env=env)
+    env["VERIFY_MACHINE"] = MACHINE
+    _with_line(tmp_path, f"Line: 0.0 s on {MACHINE}")
+    (tmp_path / "slow").write_text("", encoding="utf-8")
+    noise = run_verify("drive", "thing", env=env)
+    assert noise.returncode == 0, noise.stdout + noise.stderr
+    assert (
+        "over its line once" in noise.stdout and "the first was noise" in noise.stdout
+    )
+    assert noise.stdout.count("running [once]") == 2, noise.stdout
+
+
+# Holds the decision in docs/adr/20261018-the-harness-commits-no-evidence-and-time-lines-live-in-recipes.md, which amends
+# docs/adr/20261015-check-run-time-is-held-by-an-alarm-against-creep.md.
+def test_a_crossing_a_confirming_run_repeats_exits_over_and_names_the_ways_on(
+    tmp_path: Path,
+) -> None:
+    env = _timed(tmp_path)
+    _with_line(tmp_path, f"Line: 0.0 s on {MACHINE}")
+    before = _recipe(tmp_path).read_bytes()
+    _delay(env, 1.2)
+    over = run_verify("drive", "thing", env=env)
+    assert over.returncode == 5, over.stdout + over.stderr
+    assert "on two runs in a row" in over.stdout, over.stdout
+    assert "verify raise thing once REASON" in over.stdout
+    assert "verify freeze thing once TICKET" in over.stdout
+    assert _recipe(tmp_path).read_bytes() == before, "a crossing moved the line"
+
+
+def test_a_failed_run_is_never_compared_with_its_line(tmp_path: Path) -> None:
+    env = _timed(tmp_path, "### once\nRun: `true; exit 1`\n")
+    _with_line(tmp_path, f"Line: 0.0 s on {MACHINE}")
+    _delay(env, 1.2)
+    result = run_verify("drive", "thing", env=env)
+    assert result.returncode == 1 and "over" not in result.stdout, result.stdout
+    for how, said in (("line", ()), ("raise", ("earned",)), ("freeze", ("T-9",))):
+        refused = run_verify(how, "thing", "once", *said, env=env)
         assert refused.returncode == 1, refused.stdout
         assert "measured nothing" in refused.stderr, refused.stderr
-    varies = run_verify("raise", "thing", "varies", "new tests", env=env)
-    assert "Workload: varies" in varies.stderr and "no line" in varies.stderr
+        assert "verify drive thing once" in refused.stderr, refused.stderr
 
 
-def test_a_new_run_of_a_judged_scenario_needs_judging_again(tmp_path: Path) -> None:
-    env = _harness(tmp_path, "", "### once\nRun: `true`\nCheck: read\n")
-    assert run_verify("drive", "thing", env=env).returncode == 0
-    (first,) = _summaries(tmp_path)
-    assert run_verify("judge", "thing", first.stem, "verified", env=env).returncode == 0
-    assert "verified (" in run_verify("list", env=env).stdout
-    assert run_verify("drive", "thing", env=env).returncode == 0
-    assert "unjudged (" in run_verify("list", env=env).stdout
-    assert not first.exists()
-
-
-# --- lines -----------------------------------------------------------------------------
-
-
-# Holds the decision in docs/adr/20261015-check-run-time-is-held-by-an-alarm-against-creep.md.
-def test_the_first_run_on_a_kind_of_machine_sets_its_line_there(tmp_path: Path) -> None:
+# Holds the decision in docs/adr/20261018-the-harness-commits-no-evidence-and-time-lines-live-in-recipes.md, which amends
+# docs/adr/20261015-check-run-time-is-held-by-an-alarm-against-creep.md.
+def test_line_writes_the_first_line_from_the_latest_run_here(tmp_path: Path) -> None:
     env = _timed(tmp_path)
+    unrun = run_verify("line", "thing", "once", env=env)
+    assert unrun.returncode == 1 and "drive it first" in unrun.stderr, unrun.stderr
+    _delay(env, 2.3)
     assert run_verify("drive", "thing", env=env).returncode == 0
-    assert f"- **Line:** {MACHINE} 0.0 s; first run\n" in _only_summary(tmp_path)
-    other = {**env, "VERIFY_MACHINE": "another-machine"}
-    _delay(other, 1.2)  # over the first machine's line, but never compared with it
-    result = run_verify("drive", "thing", env=other)
-    assert result.returncode == 0 and "over" not in result.stdout, result.stdout
-    kept = _only_summary(tmp_path)
-    assert f"- **Line:** {MACHINE} 0.0 s; first run\n" in kept, kept
-    assert re.search(r"^- \*\*Line:\*\* another-machine 1\.2 s; first run$", kept, re.M)
+    written = run_verify("line", "thing", "once", env=env)
+    assert written.returncode == 0, written.stdout + written.stderr
+    assert (
+        "line set at 2.3 s" in written.stdout
+        and "Commit verification/recipes/thing.md" in written.stdout
+    )
+    assert _lines(tmp_path) == [f"Line: 2.3 s on {MACHINE}"]
+    # Written under its own scenario, where the next run reads it.
+    assert run_verify("check", env=env).returncode == 0
 
 
-def test_a_scenario_whose_work_varies_gets_no_line(tmp_path: Path) -> None:
-    env = _timed(tmp_path, "### once\nRun: `true`\nWorkload: varies\n")
-    assert run_verify("drive", "thing", env=env).returncode == 0
-    assert "- **Line:**" not in _only_summary(tmp_path)
-
-
-# Holds the decision in docs/adr/20261015-check-run-time-is-held-by-an-alarm-against-creep.md.
-def test_one_run_over_the_line_is_noise_until_a_second_confirms_it(
+def test_line_lowers_a_line_a_faster_run_beat_by_more_than_the_headroom(
     tmp_path: Path,
 ) -> None:
     env = _timed(tmp_path)
-    _line(tmp_path, "0.0 s; first run", 0.0)
-    _delay(env, 1.2)
-    once = run_verify("drive", "thing", env=env)
-    assert once.returncode == 0 and "over its line once" in once.stdout, once.stdout
-    assert "verified (" in run_verify("list", env=env).stdout
-    twice = run_verify("drive", "thing", env=env)
-    assert twice.returncode == 5, twice.stdout + twice.stderr
-    listed = run_verify("list", env=env).stdout
-    assert "over its line (" in listed, listed
-    shown = run_verify("help", "thing", env=env).stdout
-    assert "took 1." in shown and "2 run(s) over" in shown, shown
-    # Back under the line: the crossing clears.
-    _delay(env, 0)
+    _with_line(tmp_path, f"Line: 5.0 s on {MACHINE}")
+    drove = run_verify("drive", "thing", env=env)
+    assert (
+        "A change that made it faster keeps the gain: verify line thing once"
+        in drove.stdout
+    )
+    assert _lines(tmp_path) == [f"Line: 5.0 s on {MACHINE}"], "a run lowered the line"
+    lowered = run_verify("line", "thing", "once", env=env)
+    assert lowered.returncode == 0 and "lowered from 5.0 s to 0.0 s" in lowered.stdout
+    assert _lines(tmp_path) == [f"Line: 0.0 s on {MACHINE}"]
+
+
+def test_line_never_moves_a_line_up_or_keeps_a_gain_inside_the_headroom(
+    tmp_path: Path,
+) -> None:
+    env = _timed(tmp_path)
+    _with_line(tmp_path, f"Line: 0.6 s on {MACHINE}")  # 0.0 s is within 1 s of 0.6 s
     assert run_verify("drive", "thing", env=env).returncode == 0
-    assert "verified (" in run_verify("list", env=env).stdout
+    kept = run_verify("line", "thing", "once", env=env)
+    assert kept.returncode == 1 and "no gain to keep" in kept.stderr, kept.stderr
+    _delay(env, 3.0)
+    run_verify("drive", "thing", env=env)
+    up = run_verify("line", "thing", "once", env=env)
+    assert (
+        up.returncode == 1 and "moves up only with its reason" in up.stderr
+    ), up.stderr
+    assert _lines(tmp_path) == [f"Line: 0.6 s on {MACHINE}"]
 
 
-def test_a_run_back_under_the_line_resets_a_single_crossing(tmp_path: Path) -> None:
+# Holds the decision in docs/adr/20261018-the-harness-commits-no-evidence-and-time-lines-live-in-recipes.md, which amends
+# docs/adr/20261015-check-run-time-is-held-by-an-alarm-against-creep.md.
+def test_a_raise_needs_its_reason_and_writes_both_into_the_recipe(
+    tmp_path: Path,
+) -> None:
     env = _timed(tmp_path)
-    _line(tmp_path, "0.0 s; first run; over 1", 1.3)
-    assert run_verify("drive", "thing", env=env).returncode == 0
-    assert "over 1" not in _only_summary(tmp_path)
-
-
-def test_a_run_faster_by_more_than_the_headroom_lowers_the_line(tmp_path: Path) -> None:
-    env = _timed(tmp_path)
-    _line(tmp_path, "5.0 s; first run", 5.0)
-    result = run_verify("drive", "thing", env=env)
-    assert "line lowered from 5.0 s" in result.stdout, result.stdout
-    assert f"- **Line:** {MACHINE} 0.0 s; lowered\n" in _only_summary(tmp_path)
-
-
-def test_a_run_within_the_headroom_keeps_the_line(tmp_path: Path) -> None:
-    env = _timed(tmp_path)
-    _line(tmp_path, "0.6 s; first run", 0.6)  # 0.0 s is within 1 s of 0.6 s
-    assert run_verify("drive", "thing", env=env).returncode == 0
-    assert f"- **Line:** {MACHINE} 0.6 s; first run\n" in _only_summary(tmp_path)
-
-
-def test_the_headroom_is_a_setting(tmp_path: Path) -> None:
-    env = _timed(tmp_path)
-    _settings(tmp_path, headroom="300%")
-    _line(tmp_path, "1.0 s; first run; over 1", 1.0)
-    _delay(env, 2.2)  # over 1 s + the 1 s floor, under 1 s + 300%
-    assert run_verify("drive", "thing", env=env).returncode == 0
-    _settings(tmp_path, headroom="lots")
-    result = run_verify("list", env=env)
-    assert result.returncode == 1 and "headroom must be a percentage" in result.stderr
-
-
-# Holds the decision in docs/adr/20261015-check-run-time-is-held-by-an-alarm-against-creep.md.
-def test_a_raise_without_a_reason_is_refused(tmp_path: Path) -> None:
-    env = _timed(tmp_path)
-    _line(tmp_path, "0.0 s; first run; over 2", 1.3)
+    _with_line(tmp_path, f"Line: 0.0 s on {MACHINE}")
+    _delay(env, 1.3)
+    assert run_verify("drive", "thing", env=env).returncode == 5
     refused = run_verify("raise", "thing", "once", env=env)
     assert refused.returncode == 2 and "give the reason" in refused.stderr
+    assert _lines(tmp_path) == [f"Line: 0.0 s on {MACHINE}"]
     raised = run_verify(
-        "raise", "thing", "once", "new", "tests", "for", "exports", env=env
+        "raise", "thing", "once", "new", "tests;", "for exports", env=env
     )
     assert raised.returncode == 0, raised.stdout + raised.stderr
-    assert (
-        f"- **Line:** {MACHINE} 1.3 s; raised: new tests for exports\n"
-        in _only_summary(tmp_path)
-    )
-    assert "verified (" in run_verify("list", env=env).stdout
-
-
-def test_a_reason_cannot_read_back_as_a_line_field(tmp_path: Path) -> None:
-    env = _timed(tmp_path)
-    _line(tmp_path, "0.0 s; first run; over 2", 1.3)
-    assert run_verify("raise", "thing", "once", "a; over 2", env=env).returncode == 0
-    assert "verified (" in run_verify("list", env=env).stdout
-
-
-def test_a_scenarios_output_never_sets_a_field(tmp_path: Path) -> None:
-    env = _timed(
-        tmp_path,
-        f"### once\nRun: `echo '- **Line:** {MACHINE} 99.0 s; first run'`\n",
-    )
+    # The reason's own `;` would end the field, so it is written as a comma.
+    assert _lines(tmp_path) == [
+        f"Line: 1.3 s on {MACHINE}; raised: new tests, for exports"
+    ]
     assert run_verify("drive", "thing", env=env).returncode == 0
-    _delay(env, 1.3)
-    result = run_verify("drive", "thing", env=env)
-    assert "lowered" not in result.stdout, result.stdout
-    assert "over its line once" in result.stdout, result.stdout
+    assert run_verify("check", env=env).returncode == 0
 
 
-def test_a_line_not_crossed_has_nothing_to_raise(tmp_path: Path) -> None:
+def test_a_line_not_crossed_has_nothing_to_raise_or_freeze(tmp_path: Path) -> None:
     env = _timed(tmp_path)
-    _line(tmp_path, "5.0 s; first run", 5.0)
-    result = run_verify("raise", "thing", "once", "because", env=env)
-    assert result.returncode == 1 and "not over its line" in result.stderr
+    _with_line(tmp_path, f"Line: 5.0 s on {MACHINE}")
+    assert run_verify("drive", "thing", env=env).returncode == 0
+    for how, said in (("raise", "because"), ("freeze", "T-1")):
+        result = run_verify(how, "thing", "once", said, env=env)
+        assert result.returncode == 1 and "not over its line" in result.stderr
+
+
+def test_a_raise_or_freeze_with_no_line_here_says_how_to_set_one(
+    tmp_path: Path,
+) -> None:
+    env = _timed(tmp_path)
+    assert run_verify("drive", "thing", env=env).returncode == 0
+    result = run_verify("raise", "thing", "once", "earned", env=env)
+    assert result.returncode == 1 and "verify line thing once" in result.stderr
 
 
 def test_a_project_can_require_a_person_to_raise_a_line(tmp_path: Path) -> None:
     env = _timed(tmp_path)
-    (tmp_path / "verification" / "harness.md").write_text(
-        "---\nask-first: ask\nraise: ask\n---\n", encoding="utf-8"
-    )
-    _line(tmp_path, "0.0 s; first run; over 2", 1.3)
+    _settings(tmp_path, **{"raise": "ask"})
+    _with_line(tmp_path, f"Line: 0.0 s on {MACHINE}")
+    _delay(env, 1.3)
+    run_verify("drive", "thing", env=env)
     refused = run_verify("raise", "thing", "once", "earned", env=env)
     assert refused.returncode == 4 and "needs a person" in refused.stderr
     agreed = run_verify("raise", "thing", "once", "earned", "--yes", env=env)
     assert agreed.returncode == 0, agreed.stderr
 
 
-# Holds the decision in docs/adr/20261015-check-run-time-is-held-by-an-alarm-against-creep.md.
-def test_a_frozen_overshoot_fails_a_run_only_past_the_frozen_level(
+# Holds the decision in docs/adr/20261018-the-harness-commits-no-evidence-and-time-lines-live-in-recipes.md, which amends
+# docs/adr/20261015-check-run-time-is-held-by-an-alarm-against-creep.md.
+def test_a_freeze_holds_an_overshoot_at_a_level_naming_its_debt_ticket(
     tmp_path: Path,
 ) -> None:
     env = _timed(tmp_path)
-    _line(tmp_path, "0.0 s; first run; over 2", 1.3)
+    _with_line(tmp_path, f"Line: 0.0 s on {MACHINE}")
+    _delay(env, 1.3)
+    assert run_verify("drive", "thing", env=env).returncode == 5
     assert run_verify("freeze", "thing", "once", env=env).returncode == 2
     frozen = run_verify("freeze", "thing", "once", "TICKET-7", env=env)
     assert frozen.returncode == 0, frozen.stdout + frozen.stderr
-    assert "frozen at 1.3 s by TICKET-7" in _only_summary(tmp_path)
-    assert "verified (" in run_verify("list", env=env).stdout
+    assert _lines(tmp_path) == [
+        f"Line: 0.0 s on {MACHINE}; frozen at 1.3 s by TICKET-7"
+    ]
     # Up to the frozen level (with headroom) other runs are not held up.
-    _delay(env, 1.2)
+    _delay(env, 2.2)
     held = run_verify("drive", "thing", env=env)
     assert held.returncode == 0 and "over" not in held.stdout, held.stdout
-    assert "frozen at 1.3 s by TICKET-7" in _only_summary(tmp_path)
     # Past it is new creep, paid by whoever causes it.
     _delay(env, 2.5)
     past = run_verify("drive", "thing", env=env)
-    assert "over its line once" in past.stdout, past.stdout
+    assert past.returncode == 5 and "the 1.3 s Ticket TICKET-7 froze" in past.stdout
 
 
-def test_a_run_back_under_the_original_line_pays_a_frozen_overshoot_down(
+def test_a_run_back_under_the_line_names_the_paid_down_freeze_and_line_clears_it(
     tmp_path: Path,
 ) -> None:
     env = _timed(tmp_path)
-    _line(tmp_path, "0.0 s; first run; frozen at 3.0 s by TICKET-7", 3.0)
-    result = run_verify("drive", "thing", env=env)
-    assert "is paid down" in result.stdout, result.stdout
-    assert f"- **Line:** {MACHINE} 0.0 s; paid down\n" in _only_summary(tmp_path)
+    _with_line(tmp_path, f"Line: 0.0 s on {MACHINE}; frozen at 3.0 s by TICKET-7")
+    drove = run_verify("drive", "thing", env=env)
+    assert drove.returncode == 0 and "is paid down" in drove.stdout, drove.stdout
+    assert (
+        "frozen at 3.0 s" in _lines(tmp_path)[0]
+    ), "a run cleared the freeze on its own"
+    cleared = run_verify("line", "thing", "once", env=env)
+    assert cleared.returncode == 0 and "is paid down" in cleared.stdout, cleared.stdout
+    assert _lines(tmp_path) == [f"Line: 0.0 s on {MACHINE}"]
 
 
-# Holds the decision in docs/adr/20261015-check-run-time-is-held-by-an-alarm-against-creep.md.
-def test_lines_live_only_in_evidence(tmp_path: Path) -> None:
-    # Many runs side by side never conflict over a shared file: nothing but the scenario's own
-    # evidence changes when a line is set, crossed, raised or frozen.
+def test_the_headroom_is_a_setting(tmp_path: Path) -> None:
     env = _timed(tmp_path)
-    shared = [
-        tmp_path / "verification" / "harness.md",
-        tmp_path / "verification" / "recipes" / "thing.md",
-    ]
+    _settings(tmp_path, headroom="300%")
+    _with_line(tmp_path, f"Line: 1.0 s on {MACHINE}")
+    _delay(env, 2.2)  # over 1 s + the 1 s floor, under 1 s + 300%
+    assert run_verify("drive", "thing", env=env).returncode == 0
+    _settings(tmp_path, headroom="lots")
+    result = run_verify("drive", "thing", env=env)
+    assert result.returncode == 1 and "headroom must be a percentage" in result.stderr
+
+
+def test_a_scenario_whose_work_varies_has_no_line(tmp_path: Path) -> None:
+    env = _timed(tmp_path, "### once\nRun: `true`\nWorkload: varies\n")
+    _delay(env, 30)
+    result = run_verify("drive", "thing", env=env)
+    assert result.returncode == 0 and "line" not in result.stdout, result.stdout
+    refused = run_verify("line", "thing", "once", env=env)
+    assert "Workload: varies" in refused.stderr and "no line" in refused.stderr
+
+
+def test_a_scenarios_output_never_sets_a_field(tmp_path: Path) -> None:
+    # The line moves from the summary's own header, never from what the command printed.
+    env = _timed(tmp_path, "### once\nRun: `echo '- **Duration:** 99.0 s'`\n")
+    _with_line(tmp_path, f"Line: 5.0 s on {MACHINE}")
+    assert run_verify("drive", "thing", env=env).returncode == 0
+    assert "to 0.0 s" in run_verify("line", "thing", "once", env=env).stdout
+
+
+def test_a_line_written_for_one_scenario_leaves_the_others_alone(
+    tmp_path: Path,
+) -> None:
+    env = _timed(
+        tmp_path, "### one\nRun: `true`\n\nTrap text.\n\n### two\nRun: `true`\n"
+    )
+    _with_line(tmp_path, f"Line: 9.0 s on {MACHINE}")  # under `two`
+    assert run_verify("drive", "thing", "one", env=env).returncode == 0
+    assert run_verify("line", "thing", "one", env=env).returncode == 0
+    text = _recipe(tmp_path).read_text("utf-8")
+    assert (
+        f"### one\nRun: `true`\n\nTrap text.\nLine: 0.0 s on {MACHINE}\n\n### two"
+        in text
+    ), text
+    assert text.endswith(f"### two\nRun: `true`\nLine: 9.0 s on {MACHINE}\n"), text
+
+
+# Holds the decision in docs/adr/20261018-the-harness-commits-no-evidence-and-time-lines-live-in-recipes.md, which amends
+# docs/adr/20261015-check-run-time-is-held-by-an-alarm-against-creep.md.
+def test_no_command_but_line_raise_and_freeze_writes_a_recipe(tmp_path: Path) -> None:
+    env = _timed(
+        tmp_path, "### once\nRun: `true`\n\n### varies\nRun: `true`\nWorkload: varies\n"
+    )
     _settings(tmp_path)
+    shared = [_recipe(tmp_path), tmp_path / "verification" / "harness.md"]
     before = [p.read_bytes() for p in shared]
-    _line(tmp_path, "0.0 s; first run; over 1", 1.3)
-    _delay(env, 1.2)
-    assert run_verify("drive", "thing", env=env).returncode == 5
-    assert run_verify("raise", "thing", "once", "earned", env=env).returncode == 0
+    for delay in (0, 5, 0):
+        _delay(env, delay)
+        run_verify("drive", "thing", env=env)
+        for args in (("list",), ("help", "thing"), ("check",), ("doctor",)):
+            run_verify(*args, env=env)
     assert [p.read_bytes() for p in shared] == before
 
 
-def test_a_failed_run_leaves_the_line_as_it_was(tmp_path: Path) -> None:
-    env = _timed(tmp_path, "### once\nRun: `true; exit 1`\n")
-    _line(tmp_path, "0.0 s; first run; over 1", 1.3)
-    _delay(env, 1.2)
-    assert run_verify("drive", "thing", env=env).returncode == 1
-    assert f"- **Line:** {MACHINE} 0.0 s; first run; over 1\n" in _only_summary(
-        tmp_path
+# --- evidence stays on the machine that ran ---------------------------------------------
+
+
+# Holds the decision in
+# docs/adr/20261018-the-harness-commits-no-evidence-and-time-lines-live-in-recipes.md: what a
+# run writes goes under the evidence directory, which git ignores, so nothing asks to commit it.
+def test_a_drive_writes_only_under_an_evidence_directory_git_ignores(
+    tmp_path: Path,
+) -> None:
+    (tmp_path / "scripts").mkdir()
+    for name in TOOL_FILES:
+        shutil.copy2(SHIPPED_HARNESS / name, tmp_path / "scripts" / name)
+    recipes = tmp_path / "verification" / "recipes"
+    recipes.mkdir(parents=True)
+    (recipes / "thing.md").write_text(
+        "---\nkind: feature\n---\n# Thing\n\n## Scenarios\n\n### once\nRun: `exit 1`\n",
+        encoding="utf-8",
     )
+    _git(tmp_path, "init", "-q")
+    _git(tmp_path, "add", "-A")
+    _git(tmp_path, "commit", "-qm", "a project with the harness")
+    tool = tmp_path / "scripts" / "verify"
+    shown = subprocess.run(
+        [str(tool), "--help"], capture_output=True, text=True, env=outer_env()
+    )
+    assert "\nevidence: verification/evidence " in shown.stdout, shown.stdout
+    drove = subprocess.run(
+        [str(tool), "drive", "thing"], capture_output=True, text=True, env=outer_env()
+    )
+    assert drove.returncode == 1, drove.stdout + drove.stderr
+    (kept,) = (tmp_path / "verification" / "evidence" / "thing").glob("*.md")
+    status = subprocess.run(
+        ["git", "-C", str(tmp_path), "status", "--porcelain", "--untracked-files=all"],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    assert (
+        status.stdout == ""
+    ), f"a run left something for git to commit:\n{status.stdout}"
+    ignored = subprocess.run(
+        ["git", "-C", str(tmp_path), "check-ignore", "-q", str(kept)],
+        capture_output=True,
+    )
+    assert ignored.returncode == 0, "the run's summary is not ignored"
+
+
+V6_GUIDE = SHIPPED_HARNESS.parent / "upgrades" / "v6-to-current.md"
+
+
+# Holds the decision in
+# docs/adr/20261018-the-harness-commits-no-evidence-and-time-lines-live-in-recipes.md: the v7
+# upgrade reads each line from the evidence before it removes the evidence, and finds the
+# evidence directory through the project's own tool.
+def test_the_upgrade_moves_lines_into_recipes_before_it_removes_evidence() -> None:
+    text = V6_GUIDE.read_text(encoding="utf-8")
+    items = dict(re.findall(r"^(\d+)\. \*\*([^*]+)\*\*", text, re.M))
+    lines = next(
+        (n for n, title in items.items() if "lines into recipes" in title), None
+    )
+    removed = next(
+        (n for n, title in items.items() if "evidence removed" in title), None
+    )
+    assert lines and removed, f"{V6_GUIDE.name} must offer both items; found {items}"
+    assert int(lines) < int(removed), "the lines must move before the evidence goes"
+    assert (
+        f"Item {lines} goes first" in text
+    ), "the guide must say its line item goes first"
+    assert (
+        "never by\nassuming" in text or "never by assuming" in text
+    ), "the guide must find the evidence directory through the project's own tool"
+
+
+# Holds the decision in
+# docs/adr/20261018-the-harness-commits-no-evidence-and-time-lines-live-in-recipes.md: a recipe
+# has no status, so nothing reads one back from evidence and no command records a verdict.
+def test_no_command_reports_or_records_a_status(tmp_path: Path) -> None:
+    env = _harness(tmp_path, "- **Scenario:** once\n- **Outcome:** failed\n")
+    listed = run_verify("list", env=env)
+    assert listed.stdout == "thing  feature\n", listed.stdout
+    shown = run_verify("help", "thing", env=env).stdout
+    for word in ("verified", "unverified", "stale", "unjudged"):
+        assert word not in shown and word not in listed.stdout, (word, shown)
+    judged = run_verify("judge", "thing", "20260101T000000Z", "passed", env=env)
+    assert judged.returncode == 2 and "unknown command 'judge'" in judged.stderr
+    assert "judge" not in run_verify("--help", env=env).stdout
 
 
 # --- control and run identity ----------------------------------------------------------
@@ -2011,18 +1627,6 @@ def test_a_drive_in_progress_leaves_the_harness_check_clean(tmp_path: Path) -> N
     assert "check: ok" in _only_summary(tmp_path)
     folder = tmp_path / "verification" / "evidence" / "thing"
     assert not list(folder.glob(".*.reserved")), "the run left its reservation behind"
-
-
-def test_check_reports_a_reservation_a_killed_run_left(tmp_path: Path) -> None:
-    env = _harness(tmp_path, "")
-    folder = tmp_path / "verification" / "evidence" / "thing"
-    folder.mkdir(parents=True)
-    (folder / ".20260101T000000Z.reserved").write_text("999999999\n", encoding="utf-8")
-    (folder / ".20260102T000000Z.reserved").write_text(f"{os.getpid()}\n", "utf-8")
-    result = run_verify("check", env=env)
-    assert result.returncode == 1, result.stdout
-    assert ".20260101T000000Z.reserved: left by a run that was killed" in result.stdout
-    assert "20260102T000000Z" not in result.stdout, "a live run's marker was reported"
 
 
 def test_a_drive_reaches_a_started_instance_by_its_run_id(tmp_path: Path) -> None:
@@ -2330,7 +1934,7 @@ def test_a_real_instance_is_started_driven_diagnosed_and_stopped(
     for text in failed:
         assert "request /missing" in text.split("## Logs", 1)[1], text
     assert any(
-        "- **Scenario:** serves" in t and "- **Outcome:** verified" in t
+        "- **Scenario:** serves" in t and "- **Outcome:** passed" in t
         for t in summaries.values()
     )
     assert not _left_running(tmp_path)
@@ -2467,7 +2071,10 @@ def test_affected_through_a_linked_project_root_sees_its_changes(
     assert "1 path(s) changed" in result.stdout, result.stdout
 
 
-def test_a_recipe_covering_the_whole_project_is_touched_by_any_change(
+# Holds the decision in
+# docs/adr/20261018-the-harness-commits-no-evidence-and-time-lines-live-in-recipes.md: a recipe
+# covering the whole tree runs for every change, and a path only it covers is still uncovered.
+def test_a_whole_tree_recipe_is_selected_yet_covers_no_path_in_particular(
     tmp_path: Path,
 ) -> None:
     env = _affected_project(tmp_path)
@@ -2477,30 +2084,15 @@ def test_a_recipe_covering_the_whole_project_is_touched_by_any_change(
         encoding="utf-8",
     )
     (tmp_path / "other.txt").write_text("edited\n", encoding="utf-8")
+    (tmp_path / "src/api/a.py").write_text("edited\n", encoding="utf-8")
     result = run_verify("affected", "HEAD", env=env)
-    assert "  all  suite" in result.stdout, result.stdout
-    assert "no recipe covers" not in result.stdout
-
-
-@pytest.mark.parametrize("in_repo", [True, False])
-def test_a_recipe_covering_the_whole_project_stays_verified_by_its_own_evidence(
-    tmp_path: Path, in_repo: bool
-) -> None:
-    # Its evidence sits under what it covers; recording a run must not make it stale. In a
-    # repository the covered files come from git, which lists the new evidence too.
-    env = _covering(tmp_path, "true", ".")
-    recipe = tmp_path / "verification" / "recipes" / "thing.md"
-    recipe.write_text(
-        recipe.read_text(encoding="utf-8") + "\n### twice\nRun: `true`\n", "utf-8"
-    )
-    if in_repo:
-        _git(tmp_path, "init", "-q")
-        _git(tmp_path, "add", "-A")
-        _git(tmp_path, "commit", "-q", "-m", "base")
-    assert run_verify("drive", "thing", "once", env=env).returncode == 0
-    assert run_verify("drive", "thing", "twice", env=env).returncode == 0
-    listed = run_verify("list", env=env).stdout
-    assert "verified (" in listed, listed
+    assert result.returncode == 0, result.stderr
+    touched = result.stdout.split("Recipes these changes touch:")[1].split("Changed")[0]
+    assert re.findall(r"^  (\S+)", touched, re.M) == ["all", "api"], result.stdout
+    assert "  all  suite  (the whole tree)" in touched, result.stdout
+    uncovered = result.stdout.split("Changed paths no recipe covers:")[1]
+    assert re.findall(r"^  (\S+)", uncovered, re.M) == ["other.txt"], result.stdout
+    assert "all covers the whole tree" in uncovered, result.stdout
 
 
 def test_affected_in_a_project_inside_a_larger_repository(tmp_path: Path) -> None:

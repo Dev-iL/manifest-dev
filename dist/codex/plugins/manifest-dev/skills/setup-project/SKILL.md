@@ -41,11 +41,11 @@ Where the project records a version, a difference in a copy the project owns can
 
 On a project that already carries surfaces, the run is an update, and it aims for the best setup the references describe, not only for what changed since the recorded version. Someone running this skill is asking whether their setup is sound, so a recorded version — even the newest — never ends the run on its own. The best setup is the one this project needs now, not every piece the references describe: each offer names the need it serves today — a surface the project's work relies on, a check that already exists, a term in use — and an item with no such need is not a gap, however the references read. Surfaces grow with the work that needs them. It covers:
 
-- **What changed since the recorded version** — marked as new, and offered as the upgrade guide for that version says. A guide goes straight to the newest version, so a project never passes through a shape a later version replaced. With no recorded version, nothing is offered by version: the comparison against what the steps emit today finds the gaps, and no shape a later version replaced is offered. Which guide loads:
+- **What changed since the recorded version** — marked as new, and offered as the upgrade guides from that version on say. The guide for a version offers what the next version gives a project recording it, so a project recording vN follows its own guide and then every later one in turn. Read every guide on that path, with the `changes/` files it spans, before offering anything, and offer what they add up to, so a project goes straight to the newest shape and never passes through one a later version replaced: an item a later version replaces is not offered, an item two guides name is offered once in its newest form, and an item that an earlier item on the path already settles — a tool the move just copied, an opt-out that drops every harness item — is not offered again. Items keep the guides' order, except where a guide says one goes first. With no recorded version, nothing is offered by version: the comparison against what the steps emit today finds the gaps, and no shape a later version replaced is offered. Which guides load:
 
   | Recorded version | Loads |
   |---|---|
-  | vN, older than the newest `CHANGES.md` lists | `references/upgrades/vN-to-current.md` |
+  | vN, older than the newest `CHANGES.md` lists | `references/upgrades/vN-to-current.md`, then each later `vM-to-current.md` in that folder |
   | the newest | no guide |
   | none | no version guide; `references/upgrades/MOVE_TO_HARNESS.md` when the project has a feature map, a reader-task list or a verification-surface README to move |
 
