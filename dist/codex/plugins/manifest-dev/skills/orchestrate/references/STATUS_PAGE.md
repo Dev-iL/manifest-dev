@@ -6,6 +6,9 @@ work the orchestrator runs, with one destination and one front item: the effort'
 the Ticket store, where its standing settings live. A check-in is each time the orchestrator reads the
 store again and acts on what changed.
 
+One page shows one effort. An orchestrator working several efforts keeps one page for each, every
+page holding only its own effort's Tickets and linked from that effort's front item.
+
 The page is a view rebuilt from the store at each check-in. It is never a record of its own: every
 fact on it is read from the Tickets and the front item, and nothing the orchestrator decides is read
 back from the page.
@@ -107,7 +110,7 @@ wait on it.
 | `title` | string | The Ticket's title. | The Ticket. |
 | `url` | string, optional | The Ticket's address. Only an `http://` or `https://` address becomes a link. | The Ticket. |
 | `status` | string, one of the statuses below | Where the Ticket stands. | See the statuses below. |
-| `phase` | string, optional | For a `running` or `escalated` Ticket, the step its run is at: `understand`, `define`, `build`, `verify`, `ready` (a ready pull request) or `land` (at its landing turn). | The progress in the Ticket's attempt record: the one marked comment where the run keeps its Manifest, its progress and its run facts. |
+| `phase` | string, optional | For a `running` or `escalated` Ticket, the step its run is at: `understand`, `define`, `build`, `verify`, `ready` (a ready pull request) or `land` (at its landing turn). | The progress in the Ticket's attempt record: the one marked record where the run keeps its Manifest, its progress and its run facts; `land` is the orchestrator's own, while it takes that Ticket's landing turn. |
 | `at` | time, optional | For `running`, when this run started; for `landed`, when it landed. | The attempt record, or the pull request's merge time. |
 | `pr` | object, optional | The Ticket's pull request: `id` (string, such as `#205`) and `url` (string, optional). | The attempt record or the venue's link between the Ticket and its pull request. |
 | `note` | string, optional | One sentence the person would want, such as why the Ticket is left alone, or that the base moved. | This check-in's reading of the Ticket. |
@@ -124,7 +127,7 @@ An id in `dependsOn`, `after` or `from` that is not on the page draws no edge.
 
 | Status | Shown as | When |
 |---|---|---|
-| `running` | its phase, with the time it has run | A live run holds the Ticket: its attempt record names the run and its session, written by the automation identity, and the host reports that session alive. |
+| `running` | its phase, with the time it has run | A live run holds the Ticket: its attempt record names the run and its session, written by the automation identity, and the run is live as `../../ticket-up/references/AUTOMATED_EXECUTION.md` → *The attempt record* defines it. |
 | `landed` | Landed, with the time | Its pull request merged and the Ticket closed. |
 | `held` | Your look | It stopped at a ready pull request that waits for the person: it has no Auto, or its landing needs the person. |
 | `escalated` | Your answer | It carries an escalation mark: the record on the Ticket that says a person is needed. |

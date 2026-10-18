@@ -181,9 +181,8 @@ continues from it. The handoff record contains:
 - the run's material decisions, the user's calls first, each with the alternative not taken and what decided it.
 
 Leave the Ticket open and retain its Auto grant when it is still present, and release the claim —
-in that order, mark first. Releasing a claim is itself an event dispatchers act on, so a dispatcher
-that re-reads the Ticket before the mark has landed sees ordinary ready work and starts the attempt
-this one just ended. A later escalation replaces that handoff record and its mark rather than
+in that order, mark first. Released before the mark lands, the claim leaves an escalated Ticket
+looking like ordinary ready work, and the next check-in starts the attempt this one just ended. A later escalation replaces that handoff record and its mark rather than
 adding a second. After resolving the blocker, that person records the continuation context and
 clears the mark, which makes the Ticket eligible for unattended execution again. Escalation ends
 this attempt, not the work. Never close the source or

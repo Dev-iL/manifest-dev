@@ -280,7 +280,7 @@ The harness-neutral execution move that receives one exact Ticket, claims or rec
 _Avoid_: Auto picker, ticket trigger.
 
 **Escalation Mark**:
-The durable record an escalated attempt leaves on a Ticket saying a person is needed — the thing that holds unattended dispatch off, so the claim does not have to and the Ticket stays takeable; cleared by the person's explicit answer — `orchestrate` records the continuation and clears it — and rendered by each venue's own reference.
+The durable record an escalated attempt leaves on a Ticket saying a person is needed — the thing that holds unattended dispatch off, so the claim does not have to and the Ticket stays takeable; cleared once the person answers — by the person, or by `orchestrate` recording their explicit answer as the continuation — and rendered by each venue's own reference.
 _Avoid_: Blocked status, escalated state.
 
 **Orchestrate**:

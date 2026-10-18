@@ -55,7 +55,7 @@ made define ask through the host's question capability by default, batching its 
 added the proof gate to its pull-request task file, so the next baseline replaces them. The
 headless harness offers no question capability, so the cases measure define's plain-text path. A single 2026-10-14 drive of `d01` (not a measurement) found define keeping the
 requested layer cut as a user's call; define's slicing rule now says a requested cut is never one,
-and a re-drive came back re-cut (`verification/evidence/define/`).
+and a re-drive came back re-cut (that drive's evidence is not kept in the repository).
 
 ## First measurement of `d11`–`d17` — 2026-10-12
 

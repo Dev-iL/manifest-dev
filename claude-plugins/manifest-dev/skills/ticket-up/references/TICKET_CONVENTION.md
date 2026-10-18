@@ -25,14 +25,14 @@ The kind is declared on the ticket, so the picker knows which tool to bring.
 
 ## The Auto grant
 
-A ticket of either kind may carry **Auto** — an opt-in grant, declared when the ticket is written,
+A ticket of either kind may carry **Auto** — an opt-in grant, given by its grantor as *Who grants* below says,
 that unattended automation may take it end to end: do the work, judge it done, and complete any
 required landing, with nobody watching. For repository work, end to end includes merging through
 the repository's normal protections before the Ticket closes.
 
 - **Granting.** Grant only when neither doing the work nor judging it done needs any human's knowledge, taste, or authority — no done-judgment resting on someone's unstated criteria, no approval, no access an unattended worker won't have, no irreversible act that requires separate human authority beyond the Auto grant, no decision deferred to mid-flight input. Ordinary landing through the repository's declared protections is within Auto; a repository policy that requires human approval is not. That bar is necessary but never sufficient: whoever grants still chooses, and withheld trust alone is reason enough to withhold. When in doubt, don't grant.
 - **Who grants.** A person grants: the ticket's author, or someone reviewing it, at the `ticket-up` boundary. `orchestrate --autonomous` also grants, to a ticket an agent wrote, wherever the bar above holds. The run that found the work never grants it. Every grant names its grantor on the ticket, so a person can tell an `orchestrate` grant from their own and withdraw it.
-- **Absence means a person finishes it.** A ticket without the grant may still be worked by automation, but never completed or landed by it. Unattended work takes it up only when its author has write access to the repository and no person is assigned to it; the run asks for the person's judgment through the escalation mark wherever it needs it, and stops at a ready pull request — or, for a question ticket, with its answer drafted — for a person to land or accept. A ticket whose author lacks write access is never worked unattended, until a person with write access grants it Auto or approves a plan that includes it. Items in a shared venue that were never tickets stay untouched. Nothing is ever marked "not auto"; silence already says it. A person may also hand an ungranted ticket to an agent and watch — that is the person working the ticket.
+- **Absence means a person finishes it.** A ticket without the grant may still be worked by automation, but never completed or landed by it. Unattended work takes it up only when its author has write access to the repository and no person is assigned to it; the run asks for the person's judgment through the escalation mark wherever it needs it, and stops at a ready pull request — or, for a question ticket, with its answer drafted — for a person to land or accept. A ticket whose author lacks write access is never worked unattended, until a person with write access grants it Auto or approves a plan that includes it. Items in a shared venue that were never tickets stay untouched. Nothing is ever marked "not auto" to keep automation off; silence already says it. A person may also hand an ungranted ticket to an agent and watch — that is the person working the ticket.
 - **Surprises don't revoke.** A granted ticket's worker can still hit an unexpected blocker; it stops and surfaces rather than deciding what only a person can. That is the exception path working, not evidence the grant was wrong — only a step known at write time to need a person keeps the grant off.
 
 Auto is durable authority, not mutable queue state. Claiming, retrying, completing, or escalating
@@ -65,7 +65,7 @@ A shaped ticket carries, in plain language:
 - **Suggested approach** *(optional)* — a starting direction, marked as advice the picker may discard.
 - **Definition of done** — checks a stranger can judge for themselves, in prose.
 - **Depends on** — ticket IDs this one needs finished first. Structural needs only.
-- **Auto** *(when granted)* — the grant above, declared by the author; a ticket that doesn't carry it is ungranted, and nothing marks the negative.
+- **Auto** *(when granted)* — the grant above, naming its grantor; a ticket that doesn't carry it is ungranted. A recorded withhold or withdrawal fences nothing: it only tells `orchestrate --autonomous` the ticket was already judged.
 - **Type** *(when one fits)* — one of the types above, naming what kind of work this is; omitted when none of them describes it.
 - **Status / Claimed by** — see lifecycle.
 

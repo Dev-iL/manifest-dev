@@ -111,6 +111,8 @@ def test_the_one_landing_procedure_refreshes_checks_the_base_and_closes_after_me
     assert "observes the merged state" in landing
     assert "A Ticket closes only after its landing is observed" in landing
     assert "With Auto, its run closes it once the answer is recorded" in landing
+    assert "through the venue's normal protected mechanism" in landing
+    assert "It never force-pushes a shared branch, bypasses protection" in landing
 
 
 # Holds the decision in docs/adr/20261018-orchestrate-lands-and-run-ticket-stops-at-a-ready-pull-request.md.
@@ -223,6 +225,9 @@ def test_a_ticket_without_auto_runs_to_a_ready_pull_request_and_never_lands() ->
     assert "A Ticket without Auto is never landed here." in orchestrate
     assert "they never land here" in autonomous
     assert "never lands it, whatever its prompt says" in run_ticket
+    assert (
+        "Without Auto, mark the answer drafted in the run facts and stop" in run_ticket
+    )
     assert "A Ticket without Auto is never landed by automation" in landing
     for venue in ("GITHUB_STORE.md", "FILE_STORE.md"):
         assert "| Author's write access |" in ticket_ref(SOURCE_SKILLS, venue), venue
@@ -319,6 +324,7 @@ def test_orchestrate_selects_recovers_first_and_leaves_paused_work_alone() -> No
     assert "*Left alone*, each with its reason: a person is assigned" in text
     assert "Venue items that are not Tickets are never touched." in text
     assert "When nothing is running, to land, to recover or ready, say so" in text
+    assert "**Rank** recovery first, then ready work" in text
 
 
 # Holds the decision in docs/adr/20261018-an-orchestrating-skill-runs-the-queue-and-replaces-the-sweep.md.
@@ -392,7 +398,8 @@ def test_orchestrate_tickets_up_debt_and_grants_only_where_it_may() -> None:
     run_ticket = flat(skill_text(SOURCE_SKILLS, "run-ticket"))
     github = ticket_ref(SOURCE_SKILLS, "GITHUB_STORE.md")
 
-    assert "**Gather the debt** of each Ticket that landed" in text
+    assert "**Gather the debt** — what a run found and did not fix" in text
+    assert "of each Ticket that landed" in text
     assert "skip what an open Ticket already covers" in text
     assert "through `ticket-up`, each linked to its source" in text
     assert "When debt in one area has come from three or more runs" in text

@@ -52,8 +52,8 @@ second one, rebuilds the same picture.
 4. **Take an orchestrator ID**, such as the start time and a short random suffix. Every run ID it
    writes starts with it, which is how it tells its own runs from another orchestrator's.
 5. **Read every Ticket in scope whole**, its records included, and sort it. Count a record only
-   when the automation identity wrote it. A run is **live** while the host reports its session
-   alive and its timeout has not passed
+   when the automation identity wrote it. A run is **live** until it writes an outcome, while the
+   host reports its session alive and its timeout has not passed
    (`../ticket-up/references/AUTOMATED_EXECUTION.md` → *The attempt record*). A run that is not
    yours belongs to another orchestrator until its timeout has passed, live or not; leave its
    Ticket alone until then.
@@ -73,7 +73,7 @@ second one, rebuilds the same picture.
    Venue items that are not Tickets are never touched. When nothing is running, to land, to
    recover or ready, say so, name what is left alone and why, and stop.
 6. **Rank** recovery first, then ready work, by the convention's delay-loss rule; across efforts,
-   weigh each destination against the North Star's winning field where the project has one.
+   weigh each destination against the winning field of the project's North Star (`NORTH_STAR.md` at the repository root) where it has one.
 7. **Plan around collisions.** Read each candidate and the code it likely touches. Tickets likely
    to touch the same code run one after another, the second starting after the first lands. That
    includes a cross-cutting pair: one change alters how every instance of something must look
@@ -105,8 +105,8 @@ For each free slot, take the next Ticket in the plan:
    session, and check in when it returns. A file store always runs this way.
 
 A launch fails when the host cannot start its session — that failure counts at once — or when
-the session ends or passes its timeout before the run reaches a ready pull request, an escalation
-or a close. Stop a run's session where
+the session ends or passes its timeout before the run reaches a ready pull request, a drafted
+answer, an escalation or a close. Stop a run's session where
 the host allows once its timeout passes. Launch a failed Ticket again. When the third launch in a
 row fails, the Ticket goes to a person: write the escalation record with the run IDs and sessions
 and the fact that no attempt reached an outcome, apply the escalation mark, and release the
@@ -131,7 +131,7 @@ whatever way the host allows. At each check-in:
    base in and re-run its gates; it keeps the turn meanwhile, and a launch that fails counts like
    any other. A Ticket without Auto is never landed here. When a person has merged its pull
    request, that merge is its landing: record the landing reference and close the Ticket.
-4. **Gather the debt** of each Ticket that landed and whose completion record has no line saying
+4. **Gather the debt** — what a run found and did not fix, which its completion record lists — of each Ticket that landed and whose completion record has no line saying
    its debt was gathered. Check each item against the current code, group what still stands by
    area, skip what an open Ticket already covers, and write the rest as Tickets through
    `ticket-up`, each linked to its source. Then add the gathered line. Every Ticket an agent wrote
@@ -143,9 +143,10 @@ whatever way the host allows. At each check-in:
    the person, with the count. Its direction is the person's
    call, so the proposal never carries Auto from this skill; on the person's yes, write it through
    `ticket-up`.
-6. **Rebuild the status page** from the store and publish it as `references/STATUS_PAGE.md`
-   describes. Save its link on the front item of each effort in scope, as a `Status page:` line,
-   so later plans update the same page. The page is a view: never read state back from it.
+6. **Rebuild the status pages** from the store, one page per effort in scope, each showing only
+   that effort's Tickets, and publish them as `references/STATUS_PAGE.md` describes. Save each
+   page's link on its own effort's front item, as a `Status page:` line, so later plans on that
+   effort update the same page. The page is a view: never read state back from it.
 7. **Fill free slots** as the mode's reference says. A Ticket waiting on the person holds no slot.
 
 Keep **one list of what waits on the person**, ordered by what waiting costs: held pull requests

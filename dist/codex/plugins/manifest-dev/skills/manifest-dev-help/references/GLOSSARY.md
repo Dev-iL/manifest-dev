@@ -486,10 +486,10 @@ Run Ticket keeps a record on the Ticket: the branch, the progress and the Manife
 can continue the work.
 
 ### Escalation Mark
-<!-- context: 7bc96e9693c0 -->
+<!-- context: d0bcb771f760 -->
 An Escalation Mark is the record on a Ticket that says that a person must act. Unattended automation
-does not take a Ticket with this mark. A person can still take it. When the person answers,
-`/orchestrate` records the answer and removes the mark.
+does not take a Ticket with this mark. A person can still take it. When the person answers, they
+remove the mark, or `/orchestrate` records the answer and removes it.
 
 ### Orchestrate
 <!-- context: 84eaa3e4c71b -->

@@ -11,7 +11,7 @@ Takes one exact Ticket, recovers any earlier attempt from the Manifest and progr
 ## How a user reaches it
 
 - `/run-ticket <ticket reference>`.
-- Phrases its description matches: "run this ticket end to end", a hosted trigger or agent runner supplying an issue.
+- Phrases its description matches: "run this ticket end to end", orchestrate, an agent runner or a person supplying an issue.
 - `orchestrate`, which starts it in its own session for each Ticket it runs.
 - It reconciles an earlier attempt's record, branch and pull request; it uses check-pr before marking the work ready; separate findings go to ticket-up as follow-ups.
 
