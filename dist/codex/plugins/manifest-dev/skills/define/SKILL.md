@@ -240,7 +240,7 @@ figure-out's own probe files are a separate set this skill never reads, and any
 | Bug | Defects, errors, regressions, "broken" | `BUG.md` |
 | Refactor | Restructuring, cleanup, pattern changes | `REFACTOR.md` |
 | UI | Anything a person sees and judges rather than calls — screens, decks, rendered documents, emails, games | `UI.md` |
-| PR lifecycle | Shipping a change through CI, review, approvals | `PR_LIFECYCLE.md` |
+| PR lifecycle | Shipping a change through a GitHub pull request — its proof, CI, review, approvals | `PR_LIFECYCLE.md` |
 | Prompting | LLM prompts, skills, agents, system instructions | `PROMPTING.md` |
 | Prose floor | Any prose deliverable — the rules holding in both registers (base) | `PROSE_FLOOR.md` |
 | Writing | Human-voice register: prose, articles, copy, social, creative | `WRITING.md` |

@@ -65,9 +65,12 @@ request's description or comments with `--attach`, through the same upload the w
 - A change with no runnable surface shows its proof as command output only.
 
 ## Enforced by
-not yet — a test over define's pull-request task file would fail if the gate loses the
-one-minute top of the description, the never-production rule, images attached with `--attach`, or
-the stated fallback where the upload is unavailable.
+partly — `tests/test_pr_lifecycle_proof_gate.py` fails if the proof gate templated in
+`claude-plugins/manifest-dev/skills/define/tasks/PR_LIFECYCLE.md` loses the one-minute top of the
+description, the never-production rule, images attached with `--attach`, or the stated fallback
+where the upload is unavailable, or if a rule dropping the `check-pr` lifecycle gate would drop it
+too; that define composes it into every Manifest shipping through a GitHub pull request, and
+whether a description meets it, stay judgment.
 
 ## Source
 - Session: figure-out on running unattended Ticket work with many agents at once (2026-10-18).
