@@ -51,7 +51,9 @@ stored on the Ticket.
 - Retry tuning remains an operational responsibility outside manifest-dev.
 
 ## Enforced by
-partly — `tests/test_ticket_automation_prompts.py` — `test_trigger_adapter_contract_stays_thin_and_recoverable` checks finite retries and a marked handoff; assigning a person is judgment.
+none — retired with the event-trigger guidance: `test_trigger_adapter_contract_stays_thin_and_recoverable`
+was removed. The handoff after three failed launches now lives in `orchestrate`, held by
+`test_orchestrate_names_its_failure_and_host_paths` in `tests/test_ticket_automation_prompts.py`.
 
 ## Source
 - Session: unattended Ticket automation design (2026-08-12)

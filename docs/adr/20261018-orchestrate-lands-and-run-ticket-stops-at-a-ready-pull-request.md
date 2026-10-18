@@ -59,11 +59,12 @@ re-check. A run sees only its own Ticket; the orchestrator sees all of its runs.
 - A hand run no longer lands by itself.
 
 ## Enforced by
-not yet — `tests/test_ticket_automation_prompts.py` would retarget
-`test_run_ticket_recovers_and_lands_before_done` to fail if `run-ticket` stops at anything but a
-ready pull request with its record marked ready to land, and would fail if `orchestrate`'s landing
-loses the refresh before merge, the unchanged-base check, or closing only after the merge is
-observed.
+`tests/test_ticket_automation_prompts.py` — `test_run_ticket_stops_at_a_ready_pull_request_and_lands_only_when_told` fails if
+`run-ticket` stops at anything but a ready pull request with its completion record marked ready to
+land, or lands without being told to; `test_the_one_landing_procedure_refreshes_checks_the_base_and_closes_after_merge`
+fails if the landing procedure loses the refresh before merge, the unchanged-base check, the pinned
+head, or closing only after the merge is observed; `test_landing_and_the_attempt_record_each_have_one_owner`
+fails if the landing procedure gains a second home beside the shared automation reference.
 
 ## Source
 - Session: figure-out on running unattended Ticket work with many agents at once (2026-10-18).

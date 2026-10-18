@@ -126,11 +126,18 @@ position: the sweep gives too little control and is too slow.
 - How well an agent judges overlap at plan time has not been tested.
 
 ## Enforced by
-not yet — `tests/test_ticket_automation_prompts.py` would fail if `orchestrate` loses
-propose-and-wait as its default, Auto-only autonomous runs, the re-read of one Ticket before each
-launch, merge, close or mark change, the ordering of cross-cutting pairs, or the rules for where
-the person's answers count; `tests/test_entry_points.py` would declare `orchestrate` in place of
-`sweep-tickets`.
+`tests/test_ticket_automation_prompts.py` — `test_orchestrate_proposes_and_waits_by_default`, `test_orchestrate_selects_recovers_first_and_leaves_paused_work_alone`,
+`test_orchestrate_rereads_one_ticket_before_each_launch_merge_close_or_mark_change`,
+`test_orchestrate_orders_cross_cutting_pairs_and_checks_them_at_landing`,
+`test_orchestrate_counts_answers_by_where_they_come_from`, `test_orchestrate_names_its_failure_and_host_paths`,
+`test_orchestrate_stays_an_optional_extra` and `test_the_sweep_and_the_event_trigger_guidance_are_gone`
+fail if `orchestrate` loses propose-and-wait as its default, the autonomous fill-and-stop, recovery
+first, the re-read of one Ticket before each launch, merge, close or mark change, the ordering of
+cross-cutting pairs, the rules for where the person's answers count, its failure and host paths,
+or its place as an optional extra, or if the sweep or the event-trigger guidance returns. Also
+`tests/test_entry_points.py` — `test_user_invocable_skills_are_the_declared_set` declares
+`orchestrate` in place of `sweep-tickets`, and `tests/test_dist_skill_references.py` —
+`test_codex_does_not_ship_reviewer_agents_or_removed_skills` fails if `sweep-tickets` ships again.
 
 ## Source
 - Session: figure-out on running unattended Ticket work with many agents at once (2026-10-18).

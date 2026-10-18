@@ -65,7 +65,9 @@ CODE_REVIEW_DIMENSIONS = {
     "type-safety",
 }
 RETIRED_REVIEWER_AGENTS = {f"{d}-reviewer" for d in CODE_REVIEW_DIMENSIONS}
-REMOVED_SKILLS = ("verify",)
+# sweep-tickets was replaced by orchestrate; see
+# docs/adr/20261018-an-orchestrating-skill-runs-the-queue-and-replaces-the-sweep.md.
+REMOVED_SKILLS = ("verify", "sweep-tickets")
 
 # The superseded manifest schema gave a gate a `verify:` block (carrying
 # `instructions`/`prompt`/`model`) and an optional integer `phase`. Both are
