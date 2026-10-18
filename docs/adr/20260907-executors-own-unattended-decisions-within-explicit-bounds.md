@@ -1,7 +1,7 @@
 # ADR: Executors own unattended decisions within explicit bounds
 
 ## Status
-Accepted
+Accepted; amended by 20261018-do-names-the-evidence-that-puts-a-gate-out-of-reach: evidence, never a count of tries, now says when credible alternatives have run out for a gate that always has one more thing to try
 
 ## Area
 define / do

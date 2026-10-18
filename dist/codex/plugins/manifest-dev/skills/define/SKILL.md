@@ -163,6 +163,13 @@ That gives a floor that isn't ceremony:
   the change itself, such as a runbook or design doc — so reread every gate body
   for them before handoff, letting the user veto a value instead of meeting it
   mid-run as a requirement.
+- A target whose reachability the session did not establish binds a floor and
+  advises an aim: the gate holds the floor — a sourced specific like any other,
+  or a behavior such as faster than a measured baseline — and the hoped-for
+  value goes to Process Guidance as the aim, so the run reaches for it without
+  being trapped by it. A number the user stated stays binding: attended, ask
+  whether it is a firm requirement or an aim; unattended, keep it binding and
+  record in an `ASM-*` that its reachability was not established.
 - Every gate declares "Judgment gate." or "Deterministic gate." — never
   inferred; an executor handed an undeclared kind is broken by it. A gate mixing
   a command with a judgment is a judgment gate.
@@ -322,8 +329,24 @@ amendments log — git is history.
 
 ## Finishing
 
+A new Manifest gets one review in a fresh context before the digest, attended or
+unattended; an amendment gets none. The context that wrote the gates reads them
+as it meant them, which is how an invented number, a dropped point or two gates
+that cannot both hold survive the reread above. Hand a fresh context the paths of
+`references/REVIEW.md` — its brief — this file, `references/SCHEMA.md`, the task
+files this session loaded, the Manifest, and the session record: the figure-out
+log when one exists, and the transcript where the host keeps one the fresh
+context can read, else the conversation passed verbatim. Where no isolated
+context is available, review against that brief yourself and say in the digest
+that the review was self-graded. Settle every finding in one pass — fix it or
+reject it; a fix that changes what the user agreed is a user's call, asked when
+attended and recorded as an `(auto)` `ASM-*` when unattended. No second review
+follows.
+
 Give a plain-language digest — the pain, the plan, what gets built, the
-guardrails, how it is verified. No codes, no schema vocabulary; it reads like
+guardrails, how it is verified, and every number a gate holds the work to (each
+threshold, bound, count or target, in plain words) so the user can veto one
+before execution. No codes, no schema vocabulary; it reads like
 talking to a colleague. The pain matters most, being the one thing only the user
 can confirm and the surface where an invented Problem gets caught. Wait for a yes
 unless the caller is unattended or this is an amendment. Then emit the handoff
