@@ -29,6 +29,12 @@ Proves: no `do-*.md` log is written for that Manifest.
 Check: read
 Workload: varies
 
+### out-of-reach
+Run: `scripts/drive-skill.sh do verification/prompts/do-out-of-reach.md --max-turns 120`
+Proves: the start-up check cannot finish within 2 milliseconds while it stays a script run by `python3`, since starting the interpreter alone takes longer. The run builds `greet.py` and passes its gate, raises a blocker for the start-up check that names the best time reached, the limiter (interpreter start-up), the attempts made and the requirement change that would unblock it, and ends in `/escalate`; `manifest.md` still reads "under 2 milliseconds".
+Check: read
+Workload: varies
+
 ## Gotchas
 
 - It changes files, commits, and may push or open pull requests as its Manifest allows. Never drive it on this checkout.

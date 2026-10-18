@@ -11,7 +11,7 @@ cases and why. A prompt change marks the cases it covers stale rather than runni
 
 ```bash
 scripts/evals/run_eval.sh define evals/results/define/aggregate-result.json \
-  --tag define --ablation with-without --judge-model sonnet --scaffold -j 8 --max-cost-usd 60
+  --tag define --ablation with-without --judge-model sonnet --scaffold -j 8 --max-cost-usd 65
 ```
 
 `--max-cost-usd` is the plan's estimate below, a hard stop as `../README.md` describes.
@@ -36,7 +36,7 @@ The graders have since been rewritten to classify before judging, which that che
 before acting on a FAIL from a grader that reads the whole Manifest, read the Manifest it failed.
 Numbers judged by different models do not compare.
 
-## Cases added 2026-10-13 to 2026-10-15 — unmeasured
+## Cases added 2026-10-13 to 2026-10-18 — unmeasured
 
 | Case | Discipline under test |
 |---|---|
@@ -45,6 +45,7 @@ Numbers judged by different models do not compare.
 | `d21-user-rule-over-default` | A rule the project states overrides a conflicting task-file Default, and the adjustment is recorded |
 | `d23-unfit-recipe-repaired-first` | A change touching a feature whose recipe cannot be relied on — started by hand on a fixed port, its last failure unexplained — cuts repairing that recipe as the first Deliverable, and gates that the touched recipe is updated and run. It carries `d18-map-gate`'s grader: same prompt and project, so `d18` was retired into it on 2026-10-15 |
 | `d24-own-check-repaired-first` | With no harness, a touched test of the project's own that passes whatever the output is gets repaired in pytest form by the first Deliverable, and no harness is built. The project-own twin of `d23`, and the define half of figure-out's `55` |
+| `d25-vague-target` | A speed want with no number and no profile ("make the preview fast", about 25 fps today) binds a floor such as faster than the measured baseline, never an invented frame rate; a higher number may appear only as an aim or a recorded assumption. Its own grader is `floor-not-invented-target` |
 | `d22-projectless-manifest-builds-no-harness` | A one-off script outside any project gets a Manifest whose gates check its output, with no harness, recipe, decision record or setup. A guard: the no-plugin arm is expected to pass it, so a Δ of zero is no reason to remove it |
 
 These have never been run; the first both-arm run decides which stay. **Every number below is stale
@@ -52,7 +53,11 @@ as of 2026-10-18**: the 2026-10-13 change edited define's spine and its task fil
 2026-10-14 change moved its verification wording to one harness, the 2026-10-15 change made
 that harness optional and the project's own checks a run's to repair, and the 2026-10-18 change
 made define ask through the host's question capability by default, batching its key calls, and
-added the proof gate to its pull-request task file, so the next baseline replaces them. The
+added the proof gate to its pull-request task file. A second 2026-10-18 change made define hand
+each new Manifest to a fresh context for review before its digest, list every bound number in the
+digest, and encode a target whose reachability the session did not establish as a binding floor
+plus an advisory aim — which reaches every case that writes a spec, `d05` and `d10` most. The
+next baseline replaces them. The
 headless harness offers no question capability, so the cases measure define's plain-text path. A single 2026-10-14 drive of `d01` (not a measurement) found define keeping the
 requested layer cut as a user's call; define's slicing rule now says a requested cut is never one,
 and a re-drive came back re-cut (that drive's evidence is not kept in the repository).
@@ -341,7 +346,7 @@ the no-plugin arm has no schema to follow.
 
 ## Classification
 
-Every case's standing as of 2026-10-15, under the selection rules in `../README.md`: measured
+Every case's standing as of 2026-10-18, under the selection rules in `../README.md`: measured
 uplift or a declared guard keeps a case, an unmeasured case stays until its first run decides, and
 a duplicate, an out-of-scope skill, or an undeclared floor in both arms retires it.
 `tests/test_eval_cases.py` fails when a case has no row here.
@@ -366,6 +371,7 @@ a duplicate, an out-of-scope skill, or an undeclared floor in both arms retires 
 | `d22` | keep | Declared guard: the no-plugin arm is expected to pass; run once for status |
 | `d23` | first run decides | New on 2026-10-15: define's rule that an unfit touched recipe is repaired first, plus the touched-recipe gate `d18` held |
 | `d24` | first run decides | New on 2026-10-15: the same rule for a check of the project's own, with no harness |
+| `d25` | first run decides | New on 2026-10-18: a vague speed want encoded as a floor plus an aim, the case for define's floor-plus-aim rule. The review runs in a fresh context only where the suite allows one; the `define` recipe's `fresh-review` drive covers that |
 
 Retired on 2026-10-15: `d18-map-gate`, folded into `d23`, which has the same prompt and project
 and now carries its grader.
@@ -384,8 +390,9 @@ bounds.
 | 4 | `d20` | 2 | Headroom likely |
 | 5 | `d21` | 2 | |
 | 6 | `d22` | 2 | Guard; status only |
+| 7 | `d25` | 2 | Covers the floor-plus-aim rule; the base model likely binds an invented frame rate |
 
-All of it is 12 runs, under $20. A full baseline also re-measures the 12 kept cases, another 24
+All of it is 14 runs, under $25. A full baseline also re-measures the 12 kept cases, another 24
 runs, under $40, since every recorded number is stale. **A smaller budget** runs `d23` and `d24`
 first: 4 runs, under $10. Read the results as `../README.md` → *Reading a result at this depth*
 says: direction comes from the whole suite; a case whose own graders pass in both arms is re-run

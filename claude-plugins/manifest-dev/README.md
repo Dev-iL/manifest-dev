@@ -26,11 +26,11 @@ Four skills cover one piece of work, and each is useful on its own:
 | Skill | What it does |
 |-------|--------------|
 | `/figure-out` | Works out what you mean. It reads your code, finds the question that decides the work, and asks you only what the code can't answer, with its recommended answer first. It holds a position under pushback and changes it on evidence. Useful on its own, whether or not anything gets built after. |
-| `/define` | Writes down what done means, as a Manifest: the pieces of work (Deliverables), a check each one must pass (Acceptance Criteria), and rules that hold across all of them (Global Invariants). Calls `/figure-out` first if the work isn't understood yet. |
+| `/define` | Writes down what done means, as a Manifest: the pieces of work (Deliverables), a check each one must pass (Acceptance Criteria), and rules that hold across all of them (Global Invariants). Calls `/figure-out` first if the work isn't understood yet. Before you see it, a fresh context checks it against the session and the rules it was written under, and the summary lists every number the work will be held to. |
 | `/do` | Builds until every check passes. A failed check sends that piece back to be fixed; done means every check passed on fresh evidence. |
 | `/auto` | Runs all three in one go, without stopping for approval between them. |
 
-`/do` assumes you are away for the whole run, even after you send it a steering message. It decides without asking and reports the decisions it made for you and why. It raises a blocker as soon as it finds one, and carries on with work that doesn't depend on the answer. Before broader work starts, it may grow the planned change when that serves your outcome; your exclusions and binding requirements stay fixed.
+`/do` assumes you are away for the whole run, even after you send it a steering message. It decides without asking and reports the decisions it made for you and why. It raises a blocker as soon as it finds one — including a target its measurements show is out of reach, whose bar only you can change — and carries on with work that doesn't depend on the answer. Before broader work starts, it may grow the planned change when that serves your outcome; your exclusions and binding requirements stay fixed.
 
 Before it builds, `/do` points the host's goal-setting or continuation capability at the Manifest, so an interrupted run resumes against the same file. Where the host has neither, it prints the same completion contract for you to apply.
 
