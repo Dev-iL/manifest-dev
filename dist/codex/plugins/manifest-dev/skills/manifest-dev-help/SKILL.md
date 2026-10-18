@@ -58,9 +58,16 @@ fastest or the cheapest result.
 `/auto` does the three steps without a stop between them. Each skill also works alone. `/define`
 starts `/figure-out` first when you and the agent do not yet agree on the problem.
 
+When your tool can show a question as a list of options, `/figure-out` and `/define` ask you that
+way. The first option is the answer that they recommend. You can also answer in your own words.
+
 `/do` works as if you are away. It makes decisions without questions and reports them at the end. A
 message that you send during `/do` changes the Manifest, and the run continues. It stops only when
 each gate has evidence, or when a person must act.
+
+When the work goes into a pull request, its description shows the change working. The top tells
+what changed and why, how the run showed that it works, the decisions, and the Debt left. Screenshots
+show a change that you can see.
 
 ## The autonomy ladder
 
