@@ -1513,7 +1513,7 @@ button.row:active { background: var(--fill); }
     if (d.maxBatch != null && typeof d.maxBatch !== "number") return false;
     var ids = {};
     var ticketsOk = d.tickets.every(function (t) {
-      if (!t || typeof t.id !== "string" || ids[t.id] || t.id === "goal" || typeof t.title !== "string" || !Object.prototype.hasOwnProperty.call(TONE, t.status)) return false;
+      if (!t || typeof t.id !== "string" || ids[t.id] || t.id === "goal" || typeof t.title !== "string" || typeof t.status !== "string" || !Object.prototype.hasOwnProperty.call(TONE, t.status)) return false;
       ids[t.id] = 1;
       if (!optStr(t.url) || !optStr(t.at) || !optStr(t.note) || !optStr(t.grant)) return false;
       if ((t.phase != null && !oneOf(t.phase, PHASE_IDS)) || (t.kind != null && !oneOf(t.kind, KINDS)) || (t.auto != null && t.auto !== false)) return false;

@@ -65,8 +65,9 @@ if "eval" in args:
     deadline = time.monotonic() + 30
     while release and not os.path.exists(release) and time.monotonic() < deadline:
         time.sleep(0.05)
-    out = pathlib.Path(args[args.index("--json") + 1])
-    out.write_text(json.dumps({"cliVersion": "9.9.9"}), encoding="utf-8")
+    if os.environ.get("STANDIN_WRITES_RESULT", "1") == "1":
+        out = pathlib.Path(args[args.index("--json") + 1])
+        out.write_text(json.dumps({"cliVersion": "9.9.9"}), encoding="utf-8")
     sys.exit(code)
 record = os.environ.get("STANDIN_WRITES_RECORD")
 if record:
@@ -366,23 +367,22 @@ def test_an_eval_run_waited_on_exits_with_the_suites_status(
 def test_an_eval_result_path_is_relative_to_the_plugin_by_default(
     tmp_path: Path, toolbox: Path
 ) -> None:
-    env = setup(tmp_path, toolbox)
+    # Resolved against claude-plugins/manifest-dev, whose evals/ directory always exists, and
+    # the stand-in writes no result: the test leaves the checkout as it found it, so a test
+    # copying the plugin at the same moment never meets a file appearing or vanishing.
+    env = setup(tmp_path, toolbox, STANDIN_WRITES_RESULT="0")
     result = subprocess.run(
-        [str(RUN_EVAL), "--wait", "suite", "evals/results/x.json"],
-        env={**env, "STANDIN_RECORD": str(tmp_path / "calls.jsonl")},
+        [str(RUN_EVAL), "--wait", "suite", "evals/x.json"],
+        env=env,
         capture_output=True,
         text=True,
         timeout=60,
     )
-    written = PLUGIN / "evals" / "results" / "x.json"
-    try:
-        assert result.returncode == 0, result.stderr
-        (call,) = calls(tmp_path)
-        assert after(call["args"], "--json") == str(written)
-    finally:
-        written.unlink(missing_ok=True)
-        if not any(written.parent.iterdir()):
-            written.parent.rmdir()
+    assert result.returncode == 0, result.stderr
+    (call,) = calls(tmp_path)
+    expected = PLUGIN / "evals" / "x.json"
+    assert after(call["args"], "--json") == str(expected)
+    assert not expected.exists()
 
 
 @pytest.mark.parametrize(
@@ -593,6 +593,18 @@ def test_a_session_that_errored_after_it_started_is_unreachable(
     (summary,) = (tmp_path / "store" / "figure-out").glob("*/summary.json")
     recorded = json.loads(summary.read_text(encoding="utf-8"))
     assert (recorded["ended"], recorded["claude_exit"]) == (ended, int(code))
+
+
+@pytest.mark.parametrize("code", ["1", "0"])
+def test_a_session_that_ended_with_no_result_is_unreachable(
+    tmp_path: Path, toolbox: Path, code: str
+) -> None:
+    # The CLI crashed after init: there is no result to read, whatever it exited with.
+    result = drive(
+        setup(tmp_path, toolbox, STANDIN_TRANSCRIPT=lines(GOOD[:1]), STANDIN_EXIT=code)
+    )
+    assert result.returncode == 3, result.stdout + result.stderr
+    assert f"ended with no result event (claude exit {code})" in result.stderr
 
 
 def failing_cp(tmp_path: Path) -> None:

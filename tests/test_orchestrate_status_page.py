@@ -170,6 +170,7 @@ def test_the_sample_snapshot_is_valid() -> None:
         (("mode",), "fast"),
         (("state",), "stopped"),
         (("tickets", 0, "status"), "done"),
+        (("tickets", 0, "status"), ["running"]),
         (("tickets", 0, "phase"), "review"),
         (("tickets", 0, "kind"), "chore"),
         (("tickets", 0, "auto"), True),
