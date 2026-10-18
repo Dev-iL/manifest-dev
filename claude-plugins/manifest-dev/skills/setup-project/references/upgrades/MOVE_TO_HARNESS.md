@@ -29,26 +29,16 @@ Keep everything the project wrote; change only its shape:
   test suite, build or gate runner, as scenarios calling the project's own commands, per
   `../VERIFICATION_HARNESS.md` → *Build on what exists*. An old surface listed only what users
   reach, so moving its entries alone would leave these checks outside the harness.
-- **Evidence keeps its files and gains a summary the tool reads.** The tool reads only
-  `evidence/<recipe>/` Markdown files whose names carry a stamp (`20260101T120000Z`) or a date
-  (`2026-01-01`), and from each takes two lines:
-  - `- **Scenario:** <name>`, only where one of the recipe's scenarios carried the old check, with
-    that scenario's exact name; leave it out otherwise, so the summary stands for the whole recipe;
-  - `- **Outcome:** <outcome>`: `verified` for an entry that was `verified (DATE)`, `failed` or
-    `unreachable` for one that was, and no line for any other status, which reads as `unjudged`.
-
-  A Markdown summary already named that way moves there keeping its name and gains those lines.
-  For an entry that had other evidence — screenshots, transcripts, files with other names — those
-  files stay where they are or move beside the summary keeping their names, and a new summary
-  `evidence/<recipe>/<DATE>.md` carries the two lines and says where they are. An entry with no
-  evidence at all starts `unverified`, unless the next step gives it a Drift line, and the
-  report names each one.
-- **Drift is kept as a `Drift` line**, the form the tool reads, so the entry shows `stale` until
-  a run repairs it and removes the line. An entry whose status was `stale (DATE): <what differs>`
-  gains `Drift (DATE): <what differs>` in its recipe. Where git shows a covered path changed after
-  an entry's evidence DATE, its recipe gains `Drift (<today>): <path> changed after the check of
-  DATE`: the summary's time comes from the move, not the run, so without the line it would read
-  current. Hand-kept `Status:` lines are then removed, since statuses now come from evidence.
+- **Statuses and committed evidence do not move.** The harness keeps no status and commits no
+  evidence: a run writes its output to the evidence directory on the machine that ran, which git
+  ignores (`../VERIFICATION_HARNESS.md` → *The parts*). Hand-kept `Status:` lines are removed, and
+  so is committed evidence of the old surface, with the other old pieces below. Transcripts,
+  screenshots or other files a recipe's scenario still points to stay where they are, and the
+  recipe says where. The report names each entry whose last status was `failed` or `unreachable`,
+  so that work is not lost with the line.
+- **Drift is kept as a `Drift` line.** An entry whose status was `stale (DATE): <what differs>`
+  gains `Drift (DATE): <what differs>` in its recipe, so the next run that reads the recipe meets
+  it; the run that repairs the recipe removes the line.
 - **Costly recipes get the `ask-first` mark** with the reason: any scenario that starts an agent
   session, uses a paid API or cloud resources, loads a shared environment, or has effects outside
   the repository. Run time alone is not a reason. Free drives stay unmarked.
@@ -59,6 +49,7 @@ Keep everything the project wrote; change only its shape:
   project whose verification lived at a non-default path may keep it there and set the path
   lines at the top of the tool.
 - **The old pieces go**: the feature-map directory, the reader-task list, a harness or feature-map
-  README and their repository checks are removed once their content is in recipes, and the tests
+  README, committed evidence and their repository checks are removed once their content is in
+  recipes, and the tests
   that checked them are replaced by one that runs `verify check`. An eval suite's README is not
   one of them.

@@ -65,10 +65,19 @@ which the North Star's ruling that verification speed binds depends.
 - Nobody can see a recipe's last result without running it.
 
 ## Enforced by
-not yet — `tests/test_verify.py` would replace `test_lines_live_only_in_evidence` and the status
-tests with tests that lines are read from recipes, that a raise without a reason is refused, and
-that the upgrade moves lines into recipes before it removes evidence; a test would fail if this
-repository tracks a file under the evidence directory.
+partly — `tests/test_verify.py`: `test_a_drive_writes_only_under_an_evidence_directory_git_ignores`
+(a drive in a fixture repository leaves nothing to commit),
+`test_no_command_reports_or_records_a_status` (`list` and `help` show no status; `judge` is gone),
+`test_a_whole_tree_recipe_is_selected_yet_covers_no_path_in_particular`,
+`test_a_line_is_read_from_the_recipe_for_its_kind_of_machine` (another kind of machine compares
+nothing), `test_one_run_over_the_line_is_noise_until_a_confirming_run_crosses_too`,
+`test_a_raise_needs_its_reason_and_writes_both_into_the_recipe`,
+`test_a_freeze_holds_an_overshoot_at_a_level_naming_its_debt_ticket`,
+`test_no_command_but_line_raise_and_freeze_writes_a_recipe`, and
+`test_the_upgrade_moves_lines_into_recipes_before_it_removes_evidence`. Not yet: a test that fails
+when this repository tracks a file under its evidence directory, added once that evidence is
+removed. Whether a raise's reason is true, and whether an upgrade found the project's own evidence
+directory, stay judgment.
 
 ## Source
 - Session: figure-out on running unattended Ticket work with many agents at once (2026-10-18).

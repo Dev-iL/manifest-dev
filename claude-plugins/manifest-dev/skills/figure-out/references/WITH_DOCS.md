@@ -34,7 +34,7 @@ Then resolve the active context file and load it if it exists:
 
 ## Drift marker on a verification recipe (inline, no offer)
 
-The verification harness is the project's one command for checking its result, and a recipe is one feature, skill, document walk, eval suite or set of checks run across the whole tree in it. When the read finds a recipe drifting from what it describes, and the work this read implies will not touch it, add one line to that recipe naming what differs — `Drift (YYYY-MM-DD): <what differs>` — and change nothing else in it or anywhere in the project; the harness then shows the recipe `stale`. The next run that touches the recipe repairs it and removes the line. A recipe the work does touch is the work's to repair, so the read states that repair instead of marking it.
+The verification harness is the project's one command for checking its result, and a recipe is one feature, skill, document walk, eval suite or set of checks run across the whole tree in it. When the read finds a recipe drifting from what it describes, and the work this read implies will not touch it, add one line to that recipe naming what differs — `Drift (YYYY-MM-DD): <what differs>` — and change nothing else in it or anywhere in the project, so the next run that reads the recipe meets it. The next run that touches the recipe repairs it and removes the line. A recipe the work does touch is the work's to repair, so the read states that repair instead of marking it.
 
 ## Glossary captures (per-turn, inline, no offer)
 

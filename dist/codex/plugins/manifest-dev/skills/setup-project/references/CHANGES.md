@@ -12,3 +12,4 @@ from that version on say; it records the newest version once the user has answer
 - v4 — `changes/v4.md`: one verification harness of recipes replaces the surface, map and reader tasks.
 - v5 — `changes/v5.md`: the harness is optional, controls what it checks, holds run time against creep, and reads as a default shape.
 - v6 — `changes/v6.md`: every check a harness project keeps is a recipe, the checks run across the whole tree included, and the evidence a change rests on comes through the harness.
+- v7 — `changes/v7.md`: the harness commits no evidence and keeps no status, and each timed scenario's line lives in its recipe.
