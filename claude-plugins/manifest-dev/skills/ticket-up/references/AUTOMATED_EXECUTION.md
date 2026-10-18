@@ -49,10 +49,11 @@ there is not its own. A Manifest too long for the venue's comment limit continue
 comment carrying `<!-- manifest-dev-run-ticket-manifest -->`, and in a third with the same marker
 should it need one. The Manifest is not committed to the repository unless the user asks for it.
 
-A run is live from its launch until it writes an outcome — ready to land, a drafted answer, an
-escalation, or the close — while the host reports its session alive and its timeout has not passed; a session the
-host keeps open after its run wrote an outcome holds nothing. Where the host cannot report on a
-session, the outcome and the timeout alone decide. The store config may set the timeout;
+A run's **outcome** is the record it leaves when it stops: ready to land, a drafted answer, an
+escalation, or the close. A run is live from its launch until it writes an outcome, while the host
+reports its session alive and its timeout has not passed; a session the host keeps open after its
+run wrote an outcome holds nothing. Where the host cannot report on a session, the outcome and the
+timeout alone decide. The store config may set the timeout;
 without one it is four hours from the run's start.
 
 ## The completion record
@@ -123,5 +124,4 @@ boundary.
   before each write are; git rejects a stale run's push, and that run then stops.
 - Auto is durable authority, not a launch pulse. Removing and reapplying it to retry erases the
   difference between authority and delivery.
-- A run that ends without a ready pull request, a drafted answer, an escalation or a close is a
-  failed launch, not a Ticket outcome. Only the escalation record says a person is needed.
+- A run that ends without an outcome is a failed launch, not a Ticket outcome. Only the escalation record says a person is needed.

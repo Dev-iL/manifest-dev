@@ -502,7 +502,11 @@ def test_orchestrate_excludes_escalated_tickets_where_it_decides() -> None:
 
     # The ready set tests for the mark, not the recovery branch.
     assert "every dependency closed, no escalation mark" in text
-    assert "neither ready to land nor escalated" in text
+    # Recovery takes only a run that wrote no outcome, and an escalation is one.
+    assert "its last run wrote no outcome" in text
+    assert "an escalation" in flat(
+        section(automation_text(SOURCE_SKILLS), "The attempt record")
+    )
     # And the launch re-read tests for it again, where it decides to start.
     assert "it carries the escalation mark" in text
 
@@ -599,3 +603,33 @@ def test_ticket_execution_skills_ship_on_every_distribution() -> None:
         github = ticket_ref(skills_root, "GITHUB_STORE.md")
         assert "| Escalation mark | An `escalated` label on the ticket" in github
         assert (skills_root / "ticket-up" / "references" / "FILE_STORE.md").is_file()
+
+
+# A run's outcomes were once listed in five places, and one copy lost the drafted answer, so a
+# Question Ticket without Auto was relaunched at every check-in. They are defined once now.
+def test_a_runs_outcomes_are_defined_once_and_a_drafted_answer_waits_on_the_person() -> (
+    None
+):
+    outcomes = "ready to land, a drafted answer, an escalation, or the close"
+    definition = flat(section(automation_text(SOURCE_SKILLS), "The attempt record"))
+    assert (
+        f"A run's **outcome** is the record it leaves when it stops: {outcomes}."
+        in (definition)
+    )
+    for path in SOURCE_SKILLS.rglob("*.md"):
+        text = flat(path.read_text(encoding="utf-8"))
+        if path.name != "AUTOMATED_EXECUTION.md":
+            assert "a drafted answer, an escalation" not in text, path
+
+    orchestrate = flat(orchestrate_text(SOURCE_SKILLS))
+    assert "*Answered*: its record holds a drafted answer and no run is live." in (
+        orchestrate
+    )
+    assert "its last run wrote no outcome (*The attempt record* lists them)" in (
+        orchestrate
+    )
+    run_ticket = flat(skill_text(SOURCE_SKILLS, "run-ticket"))
+    assert (
+        "A record holding a drafted answer waits for a person to accept it; stop."
+        in (run_ticket)
+    )

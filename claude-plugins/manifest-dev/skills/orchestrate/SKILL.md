@@ -60,8 +60,10 @@ second one, rebuilds the same picture.
    - *Running*: its run facts name a live run.
    - *To land*: its record is marked ready to land and no run is live. With Auto it waits for a
      landing turn; without Auto it waits on the person.
-   - *To recover*: the automation identity holds its claim, no run is live, and it is neither
-     ready to land nor escalated. Its last run ended without an outcome: a failed launch.
+   - *Answered*: its record holds a drafted answer and no run is live. It waits on the person to
+     accept it.
+   - *To recover*: the automation identity holds its claim, no run is live, and its last run
+     wrote no outcome (*The attempt record* lists them): a failed launch.
    - *Ready*: open, unclaimed, every dependency closed, no escalation mark, matching any type
      filter, and either granted Auto or, without it, allowed under the convention's *The Auto
      grant*.
@@ -71,9 +73,11 @@ second one, rebuilds the same picture.
      planned joins the plan behind them.
 
    Venue items that are not Tickets are never touched. When nothing is running, to land, to
-   recover or ready, say so, name what is left alone and why, and stop.
+   recover or ready, say so, name what waits on the person and what is left alone and why, and
+   stop.
 6. **Rank** recovery first, then ready work, by the convention's delay-loss rule; across efforts,
-   weigh each destination against the winning field of the project's North Star (`NORTH_STAR.md` at the repository root) where it has one.
+   weigh each destination against the winning field of the project's North Star where it has one
+   (`NORTH_STAR.md`, or wherever the project context file says it lives).
 7. **Plan around collisions.** Read each candidate and the code it likely touches. Tickets likely
    to touch the same code run one after another, the second starting after the first lands. That
    includes a cross-cutting pair: one change alters how every instance of something must look
@@ -105,8 +109,7 @@ For each free slot, take the next Ticket in the plan:
    session, and check in when it returns. A file store always runs this way.
 
 A launch fails when the host cannot start its session — that failure counts at once — or when
-the session ends or passes its timeout before the run reaches a ready pull request, a drafted
-answer, an escalation or a close. Stop a run's session where
+the session ends or passes its timeout before the run writes an outcome. Stop a run's session where
 the host allows once its timeout passes. Launch a failed Ticket again. When the third launch in a
 row fails, the Ticket goes to a person: write the escalation record with the run IDs and sessions
 and the fact that no attempt reached an outcome, apply the escalation mark, and release the

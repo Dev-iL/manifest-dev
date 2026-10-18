@@ -41,8 +41,8 @@ position: the sweep gives too little control and is too slow.
   evidence and land only after the person looks. Approving a plan is not an Auto grant.
 - Orchestrators never coordinate with each other. Each knows only itself; the store and git are
   all they share. The first live run on a Ticket wins: its attempt record names the run and its
-  session, and a run is live while the host reports its session alive, or until the per-run
-  timeout. Before each launch, merge, close or mark change, the orchestrator re-reads that one
+  session, and a run is live from its launch until it writes an outcome, while the host reports
+  its session alive and its per-run timeout has not passed. Before each launch, merge, close or mark change, the orchestrator re-reads that one
   Ticket and stops when the run facts on it are not its own. Git rejects a stale run's push, and
   that run then stops.
 - Collisions are handled at three points. At plan time, Tickets likely to touch the same code run

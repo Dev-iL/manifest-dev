@@ -129,7 +129,7 @@ An id in `dependsOn`, `after` or `from` that is not on the page draws no edge.
 |---|---|---|
 | `running` | its phase, with the time it has run | A live run holds the Ticket: its attempt record names the run and its session, written by the automation identity, and the run is live as `../../ticket-up/references/AUTOMATED_EXECUTION.md` → *The attempt record* defines it. |
 | `landed` | Landed, with the time | Its pull request merged and the Ticket closed. |
-| `held` | Your look | It stopped at a ready pull request that waits for the person: it has no Auto, or its landing needs the person. |
+| `held` | Your look | It stopped at a ready pull request or a drafted answer that waits for the person: it has no Auto, or its landing needs the person. |
 | `escalated` | Your answer | It carries an escalation mark: the record on the Ticket that says a person is needed. |
 | `failed` | Launch failed | Its session failed to start three times, and it went to a person. |
 | `grant` | Grant Auto? | An agent wrote it, and in default mode it waits for the person to grant Auto. |

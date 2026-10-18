@@ -70,6 +70,7 @@ Reconcile the farthest durable state first:
   it names, take landing step 4 in `../ticket-up/references/AUTOMATED_EXECUTION.md` → *Landing*:
   merge the base in, check cross-cuts both ways, re-run every gate, and mark it ready again.
   Otherwise there is nothing to redo; go to *Finish at a ready pull request*.
+- A record holding a drafted answer waits for a person to accept it; stop.
 - An escalation record whose mark a person has cleared carries their continuation context; resume
   with it.
 - An open pull request or pushed branch is resumed in place.
@@ -188,7 +189,8 @@ clears the mark, which makes the Ticket eligible for unattended execution again.
 this attempt, not the work. Never close the source or
 create a replacement Ticket for its unfinished obligation.
 
-A runner that disappears before writing a ready record or an escalation is a failed launch, not
+A runner that disappears before writing an outcome
+(`../ticket-up/references/AUTOMATED_EXECUTION.md` → *The attempt record*) is a failed launch, not
 an outcome: its launcher counts it and starts the Ticket again. `run-ticket` does not invent a
 Ticket outcome for a process that is no longer running.
 
