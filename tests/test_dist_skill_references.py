@@ -281,8 +281,10 @@ def test_goal_setting_backstop_is_universal_across_source_and_dist() -> None:
         assert "completion contract" in text, path
         assert "/goal" not in text, path
 
+    # The root README introduces the workflow and leaves the backstop to the plugin README; it
+    # may still never describe it as a literal /goal rule.
+    assert "/goal" not in (ROOT / "README.md").read_text(encoding="utf-8")
     source_docs = [
-        ROOT / "README.md",
         ROOT / "claude-plugins/README.md",
         ROOT / "claude-plugins/manifest-dev/README.md",
         ROOT / "claude-plugins/manifest-dev/.claude-plugin/plugin.json",
