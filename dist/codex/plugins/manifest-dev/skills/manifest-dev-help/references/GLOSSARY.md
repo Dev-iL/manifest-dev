@@ -303,15 +303,16 @@ the `/setup-project` setup the project has. When the number is older than the ne
 ## Verification
 
 ### Verification Harness
-<!-- context: 66b62e2201b2 -->
+<!-- context: 2a0e6dfdb86f -->
 The Verification Harness is the one command in a project that agents and people use to find if the
 work still does its job. Its `--help` says all about it. It reads one Recipe for each feature,
 skill, document walk or eval suite. It also reads one Recipe for the checks that run on all of the
 project, such as lint, types and tests. Thus each check that the project keeps is in one place.
 
 While you work, you can run a check command directly. The Evidence that a change works comes from
-the harness. It calculates each status from Evidence in the repository, not
-from a list that a person keeps. It can also start, observe, reset and stop what it examines.
+the harness. The harness writes its Evidence on your computer, in a directory that git ignores, so
+the repository keeps no Evidence. To find what a change must run, it reads the change. It can also
+start, observe, reset and stop what it examines.
 
 It exists because without it each session must find again how to test the project, and a test that
 nobody runs becomes stale.
@@ -331,11 +332,10 @@ recipe.
 
 The shape that `/setup-project` ships is a default, and you can change it to fit
 your project. Each harness must give one place to learn how to examine the project. Each harness
-must also give statuses from Evidence, an ask-first mark that follows cost, and the Fit to Trust
-jobs.
+must also give an ask-first mark that follows cost, and the Fit to Trust jobs.
 
 ### Recipe
-<!-- context: bb7b3ec98333 -->
+<!-- context: c40275c62de6 -->
 A Recipe is one Markdown file in the Verification Harness. It says what one part is, how a user
 reaches it, the Scenarios that exercise it, and its traps. Recipes exist so that each part of the
 project has one place that says how to examine it. A change then finds the recipes that it touches.
@@ -346,26 +346,31 @@ the project, such as lint and tests. Each of its Scenarios calls the command tha
 already has.
 
 ### Scenario
-<!-- context: 010d556fdb11 -->
+<!-- context: 39c884d2c5f3 -->
 A Scenario is one exercise in a Recipe: an exact command and what it proves. The Verification
-Harness runs it, keeps its Evidence and calculates its status. It exists so that each claim of a
+Harness runs it, writes its Evidence and tells you if it passed. It exists so that each claim of a
 Recipe has an exact command that anyone can run again.
 
 ### Evidence
-<!-- context: dc99ab79b2a8 -->
-Evidence is what a gate result or a Scenario status rests on. It can be the output of a command, a
-summary of a Scenario run in the repository, or a quoted part of a file. A summary claim is not
+<!-- context: 85ba87b53562 -->
+Evidence is what a gate result or the result of a Scenario rests on. It can be the output of a
+command, the summary that a Scenario run writes on your computer, or a quoted part of a file. A pull
+request shows its Evidence in its description. A summary claim is not
 evidence. In a North Star, "evidence" is also a state, with the same sense: something observed, not
 only said.
 
 ### Time Line
-<!-- context: 8e51ac0fc472 -->
+<!-- context: 789424b3ebff -->
 A Time Line is the run time that a Scenario with a fixed workload must stay under. The line stops a
 slow increase of test time that nobody sees.
 
-The first passed run sets the line, with some headroom. A faster run lowers it. Only a raise with a
-reason increases it. A freeze that names a debt Ticket keeps it at its value. A Scenario is over its
-line after it crosses the line on two runs in a row.
+The line is in the Recipe, for one kind of computer. A passed run sets it, with some headroom. Only
+the change that changes the check moves its line. It lowers the line when it makes the check faster.
+It raises the line only with a reason that it writes beside the line. A freeze that names a debt
+Ticket keeps the line at its value.
+
+A run on a different kind of computer shows its time and compares nothing. When a run crosses the
+line, the harness runs the Scenario again. The crossing counts only when the second run crosses too.
 
 ### Ask-first
 <!-- context: dcbbcddc356f -->
