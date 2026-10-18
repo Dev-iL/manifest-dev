@@ -1,7 +1,7 @@
 # ADR: The shipped verification harness is a default shape a project adapts
 
 ## Status
-Accepted
+Accepted — amended by 20261018-the-harness-commits-no-evidence-and-time-lines-live-in-recipes: statuses from evidence are no longer among what every harness owes
 
 ## Area
 define / do

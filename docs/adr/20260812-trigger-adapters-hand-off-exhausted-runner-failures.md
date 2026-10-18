@@ -1,7 +1,7 @@
 # ADR: Trigger adapters hand off exhausted runner failures
 
 ## Status
-Accepted
+Superseded by 20261018-an-orchestrating-skill-runs-the-queue-and-replaces-the-sweep
 
 ## Area
 Ticketing

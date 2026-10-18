@@ -1,7 +1,7 @@
 # ADR: Trigger adapters enforce single-flight per Ticket
 
 ## Status
-Accepted
+Superseded by 20261018-an-orchestrating-skill-runs-the-queue-and-replaces-the-sweep
 
 ## Area
 Ticketing

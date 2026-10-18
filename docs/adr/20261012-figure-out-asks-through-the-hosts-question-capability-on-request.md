@@ -1,7 +1,7 @@
 # ADR: figure-out asks through the host's question capability when the user asks for it
 
 ## Status
-Accepted
+Superseded by 20261018-figure-out-and-define-ask-through-the-question-capability-by-default
 
 ## Area
 figure-out

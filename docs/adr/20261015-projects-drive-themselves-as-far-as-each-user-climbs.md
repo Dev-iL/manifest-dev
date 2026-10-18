@@ -1,7 +1,7 @@
 # ADR: Projects drive themselves as far as each user climbs, and manifest-dev fits inside teams that do not use it
 
 ## Status
-Accepted
+Accepted — amended by 20261018-an-orchestrating-skill-runs-the-queue-and-replaces-the-sweep: manifest-dev ships an orchestrating skill, not a scheduler, in place of shipping no orchestrator
 
 ## Area
 North Star

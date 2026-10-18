@@ -1,7 +1,7 @@
 # ADR: A check's run time is held by an alarm against creep, set from measurement and moved only on purpose
 
 ## Status
-Accepted
+Accepted — amended by 20261018-the-harness-commits-no-evidence-and-time-lines-live-in-recipes: a line is a number in its recipe that only a run changing that check moves, so it no longer lowers itself
 
 ## Area
 define / do

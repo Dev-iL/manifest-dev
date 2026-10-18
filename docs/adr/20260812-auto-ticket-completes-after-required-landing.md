@@ -1,7 +1,7 @@
 # ADR: An Auto Ticket completes only after its required landing
 
 ## Status
-Accepted
+Accepted — amended by 20261018-orchestrate-lands-and-run-ticket-stops-at-a-ready-pull-request: orchestrate lands and closes the Ticket, and run-ticket stops at a ready pull request; a Ticket still closes only after its landing is observed
 
 ## Area
 Ticketing

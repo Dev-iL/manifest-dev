@@ -107,16 +107,18 @@ nothing has to be adopted whole to be useful. The levels form an autonomy ladder
 skill used on its own, one piece of work understood, defined and verified, a project that
 keeps its direction, vocabulary, decisions and checks, a shared queue of work, and
 unattended runs that take work from that queue — and each level works without the ones
-above it and without anyone else on the team adopting any of it. manifest-dev ships no
-orchestrator: unattended runs start from whatever scheduler or orchestrator the user already
-runs, and the skills are the protocol it drives.
+above it and without anyone else on the team adopting any of it. manifest-dev ships an
+orchestrating skill, not a scheduler: the user starts it by hand or from a scheduler they
+already run, and every skill it drives still works on its own.
 
 — ruled: 2026-08-21, arrival is not pursued; the standalone shape is kept because it is
   the honest entry to the method, not because it converts. Extended 2026-10-15 to the
-  autonomy ladder, each level working without the ones above it and without the team, and
-  the same day to stay the protocol any orchestrator drives rather than ship one. See
-  docs/adr/20260821-positioning-drops-the-conversion-funnel.md and
-  docs/adr/20261015-projects-drive-themselves-as-far-as-each-user-climbs.md. Only the owner moves this.
+  autonomy ladder, each level working without the ones above it and without the team.
+  Changed 2026-10-18 from shipping no orchestrator to shipping an orchestrating skill, after
+  the one-Ticket sweep gave too little control and ran too slowly for many agents at once. See
+  docs/adr/20260821-positioning-drops-the-conversion-funnel.md,
+  docs/adr/20261015-projects-drive-themselves-as-far-as-each-user-climbs.md and
+  docs/adr/20261018-an-orchestrating-skill-runs-the-queue-and-replaces-the-sweep.md. Only the owner moves this.
 
 ## Money — or what it feeds
 

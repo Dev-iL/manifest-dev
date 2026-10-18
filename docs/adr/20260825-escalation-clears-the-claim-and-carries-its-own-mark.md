@@ -1,7 +1,7 @@
 # ADR: Escalation clears the claim and carries its own mark
 
 ## Status
-Accepted
+Accepted — amended by 20261018-an-orchestrating-skill-runs-the-queue-and-replaces-the-sweep: orchestrate is the unattended dispatch path that excludes marked Tickets, and on the person's explicit answer in its conversation it may record the continuation and clear the mark
 
 ## Area
 Ticketing

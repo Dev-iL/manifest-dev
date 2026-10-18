@@ -1,7 +1,7 @@
 # ADR: The scheduled Ticket sweep is recovery-first and handles one Ticket
 
 ## Status
-Accepted
+Superseded by 20261018-an-orchestrating-skill-runs-the-queue-and-replaces-the-sweep
 
 ## Area
 Ticketing

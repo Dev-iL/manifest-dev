@@ -1,7 +1,7 @@
 # ADR: Ticket recovery uses coherent pushed checkpoints
 
 ## Status
-Accepted
+Accepted — amended by 20261018-the-tickets-attempt-record-carries-its-manifest-progress-and-run-facts: the attempt record also carries the run's Manifest, its progress and the run facts orchestrate reads, so a fresh attempt resumes the recorded Manifest
 
 ## Area
 Ticketing

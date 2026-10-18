@@ -1,0 +1,131 @@
+# ADR: An orchestrating skill runs the queue in parallel and replaces the sweep and event triggers
+
+## Status
+Accepted
+
+## Area
+Ticketing
+
+## Decided by
+The user
+
+## Context
+Unattended Ticket work started in two ways. A scheduled `sweep-tickets` run recovered or started
+one Ticket and stopped. An event-triggered automation, which the user built from guidance in
+`ticket-up`'s automated-execution reference, launched `run-ticket` when an issue changed. The sweep
+advances at most one Ticket per invocation, which is too slow once many agents can run at once.
+The event path is fast, but it leaves the user to build the adapter, its per-Ticket single-flight,
+its retries and its failure handoff on their own host. Neither path gives a person control over
+what runs: there is no plan to approve, no view of what is in flight, and no single place that
+knows which runs are live. In the owner's own use, running many Tickets by hand meant asking each
+session for its status, again and again.
+
+20261015-projects-drive-themselves-as-far-as-each-user-climbs ruled that manifest-dev ships no
+orchestrator, because one ties the project to one host and adds user-facing complexity, and
+because `/sweep-tickets` was already the one step a scheduler calls. The owner reversed that
+position: the sweep gives too little control and is too slow.
+
+## Decision
+- A new skill, `orchestrate`, takes an effort or, when none is named, the whole store. It runs
+  ready Tickets in parallel, each through `run-ticket` in its own session, up to `--max-batch` at
+  once (default 10; `none` removes the limit). It ranks candidates by the store's delay-loss rule.
+- It has two modes, and each mode decides whether it chains, so no flag does. By default it
+  proposes an execution plan and waits for the person's approval; when the plan ends, it proposes
+  the next one, and no answer means stop. With `--autonomous` it acts on its own, keeps filling
+  free slots while granted work remains in scope, then stops. Autonomous runs take only Auto
+  Tickets.
+- An approved plan may include ungranted Tickets. They stop at a ready pull request with its
+  evidence and land only after the person looks. Approving a plan is not an Auto grant.
+- Orchestrators never coordinate with each other. Each knows only itself; the store and git are
+  all they share. The first live run on a Ticket wins: its attempt record names the run and its
+  session, and a run is live while the host reports its session alive, or until the per-run
+  timeout. Before each launch, merge, close or mark change, the orchestrator re-reads that one
+  Ticket and stops when the run facts on it are not its own. Git rejects a stale run's push, and
+  that run then stops.
+- Collisions are handled at three points. At plan time, Tickets likely to touch the same code run
+  one after another, including a cross-cutting pair, where one change alters how every instance of
+  something must look and the other adds a new instance. When the base moves, in-flight runs merge
+  it in early, which keeps conflicts small, and re-run their gates only at their landing turn. At
+  landing, a run whose base moved reads what landed and checks the cross-cut both ways; it extends
+  its work when the extension fits its Ticket, and otherwise writes a follow-up for a person.
+- Planning splits by size. A quick ticket-up happens in the orchestrator's conversation. Deep
+  planning runs in its own session, which tells the orchestrator when its Tickets are written.
+- A person follows the run on a status page: a view rebuilt from the store at each check-in, never
+  a record of its own, linked from the effort's front item so later plans update the same page.
+  The orchestrator keeps one list of what waits on the person — held pull requests, escalations,
+  follow-ups awaiting an Auto grant, the next plan — ordered by what waiting costs.
+- The person's answers count by where they come from. The orchestrator writes an answer given in
+  its conversation back to the Ticket, and on the person's explicit answer it may record the
+  continuation and clear an escalation mark. On the venue, only a pull-request approval by someone
+  with write access counts. An Auto grant still goes through `ticket-up`.
+- A line on the effort's front item pauses the effort: an orchestrator starting on it starts
+  nothing new, and running sessions finish.
+- A failed launch is retried. After three failed launches, the Ticket goes to a person with the
+  run references. Each run has a timeout.
+- A file store gets no parallel runs: separate checkouts share no live surface on which claims
+  can separate runs.
+- On a host that cannot start other sessions, a batch of one runs the Ticket inside the
+  orchestrator's own session.
+- `sweep-tickets` and the event-trigger guidance are removed. A scheduler the user already runs
+  may start `orchestrate --autonomous`.
+- `orchestrate` is an optional extra under
+  20261013-new-capabilities-live-inside-the-four-workflow-entry-points: figure-out, define, do and
+  auto never depend on it, and every skill it drives still works on its own.
+- The North Star's *How they arrive* now reads: "manifest-dev ships an orchestrating skill, not a
+  scheduler: the user starts it by hand or from a scheduler they already run, and every skill it
+  drives still works on its own."
+
+## Alternatives Considered
+- **Keep the sweep and the event path**: one Ticket per sweep is too slow, and the event path
+  leaves the user to build adapter machinery with no plan, no view and no control.
+- **Batch the sweep**: rejected in 20260812-scheduled-ticket-sweep-is-recovery-first-and-one-ticket
+  because "the sweep becomes an orchestrator". That is now the decision, made openly, with the
+  plan, view and control a batch needs, rather than inside a scheduled step.
+- **Keep run state in the status page**: cheaper to read, but the page and the Tickets can then
+  disagree, and a crashed or second orchestrator acts on the wrong one. An independent
+  re-derivation of the design found this; per-run facts live on the Ticket, under
+  20261018-the-tickets-attempt-record-carries-its-manifest-progress-and-run-facts.
+- **A lock per scope that every orchestrator checks**: the owner wants each orchestrator aware
+  only of itself, and the first live run per Ticket separates them without a shared lock.
+- **Re-run gates in every in-flight run each time anything lands**: catches breakage sooner, but
+  the cost grows with the square of the batch.
+- **Ship a scheduler or hosting**: ties the project to one host, which is the part of the
+  2026-10-15 grounds that still holds.
+
+## Consequences
+
+### Positive
+- Many Tickets run at once under one plan the person approved, with one page that shows where
+  each stands.
+- Users no longer build trigger adapters: single-flight, retries and the failure handoff live in
+  one skill.
+- Several orchestrators can run on different efforts without knowing about each other.
+
+### Negative
+- One more skill a person invokes, and a larger one than the sweep.
+- Without required up-to-date branches or a merge queue, two orchestrators landing on one branch
+  leave a race of seconds between a run's last check and its merge. The plan names it once.
+- With no event path, new Tickets wait for the next orchestrator pass.
+- A cross-cutting pair that the Ticket text does not reveal lands incomplete until the landing
+  check sees it.
+- How well an agent judges overlap at plan time has not been tested.
+
+## Enforced by
+not yet — `tests/test_ticket_automation_prompts.py` would fail if `orchestrate` loses
+propose-and-wait as its default, Auto-only autonomous runs, the re-read of one Ticket before each
+launch, merge, close or mark change, the ordering of cross-cutting pairs, or the rules for where
+the person's answers count; `tests/test_entry_points.py` would declare `orchestrate` in place of
+`sweep-tickets`.
+
+## Source
+- Session: figure-out on running unattended Ticket work with many agents at once (2026-10-18).
+- Supersedes 20260812-scheduled-ticket-sweep-is-recovery-first-and-one-ticket,
+  20260812-trigger-adapters-enforce-per-ticket-single-flight,
+  20260812-trigger-adapters-hand-off-exhausted-runner-failures
+- Related: amends 20261015-projects-drive-themselves-as-far-as-each-user-climbs,
+  20260825-escalation-clears-the-claim-and-carries-its-own-mark,
+  20260812-human-assignment-pauses-auto-ticket-execution; see also
+  20261018-orchestrate-lands-and-run-ticket-stops-at-a-ready-pull-request,
+  20260814-ticket-selection-minimizes-delay-loss-across-available-executors,
+  20261013-new-capabilities-live-inside-the-four-workflow-entry-points,
+  20260703-figure-out-fog-discipline
