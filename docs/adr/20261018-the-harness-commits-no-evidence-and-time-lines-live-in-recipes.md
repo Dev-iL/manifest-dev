@@ -44,7 +44,7 @@ which the North Star's ruling that verification speed binds depends.
 - **Keep committed evidence**: gives statuses without a rerun, staleness by fingerprint, and lines
   that move on their own. Its cost lands on every pull request and repository, while `affected`,
   the pull request's proof and the recipe's number serve the jobs that justified it.
-- **Move the summaries to the evidence branch**: one home with the screenshots and clean diffs,
+- **Move the summaries onto the pull request beside its screenshots**: one home and clean diffs,
   but new machinery in the shipped tool to keep a ledger nobody reads.
 - **Keep a small evidence record only for lines**: keeps lines that lower themselves, but keeps
   part of the noise.
