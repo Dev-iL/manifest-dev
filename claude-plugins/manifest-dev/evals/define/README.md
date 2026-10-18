@@ -6,10 +6,12 @@ which would therefore make every case a vanity win.
 
 A run is many model sessions: the owner runs it, or an agent runs it after asking, naming the
 cases and why. A prompt change marks the cases it covers stale rather than running them, as
-`../README.md` → *Scope and statuses* says. Run it from the plugin directory:
+`../README.md` → *Scope and statuses* says. Run it from the repository root, through the script
+`../README.md` → *Running a suite* describes:
 
 ```bash
-claude plugin eval . --tag define --ablation with-without --judge-model sonnet --allow-tools Write Bash --scaffold -j 8 --max-cost-usd 60
+scripts/evals/run_eval.sh define evals/results/define/aggregate-result.json \
+  --tag define --ablation with-without --judge-model sonnet --scaffold -j 8 --max-cost-usd 60
 ```
 
 `--max-cost-usd` is the plan's estimate below, a hard stop as `../README.md` describes.
