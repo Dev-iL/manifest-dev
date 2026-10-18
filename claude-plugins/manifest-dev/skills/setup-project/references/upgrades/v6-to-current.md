@@ -35,8 +35,11 @@ removed, since the evidence is where the lines are read from:
    place), and the directory is ignored: the updated tool writes its own ignore file there on its
    next run, and where the tool was not updated the project's `.gitignore` lists the directory.
    Confirm with `git check-ignore` on a file there before calling it done.
-4. **Context-file lines that tell runs to commit evidence** — each line of the project context
-   file that tells a run to commit its evidence, or to read a recipe's status, rewritten so runs
-   report what a drive found and leave its evidence uncommitted; the verification bullet keeps its
-   newest wording from `../NORTH_STAR_FORMAT.md` → *The project-surfaces section*, which v7 leaves
-   unchanged. Show each line before and after, wherever in the file it sits.
+4. **Lines that tell runs to commit evidence** — each line that tells a run or a contributor to
+   commit its evidence, or to read a recipe's status, rewritten so runs report what a drive found
+   and leave its evidence uncommitted: in the project context file, in the harness's settings file
+   and recipes, and in the contributor docs the context file or the harness points to, such as a
+   pre-submission checklist. Search those files for it rather than reading only the context file.
+   The verification bullet keeps its newest wording from `../NORTH_STAR_FORMAT.md` → *The
+   project-surfaces section*, which v7 leaves unchanged. Show each line before and after, wherever
+   in its file it sits.

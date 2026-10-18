@@ -74,9 +74,9 @@ nothing), `test_one_run_over_the_line_is_noise_until_a_confirming_run_crosses_to
 `test_a_raise_needs_its_reason_and_writes_both_into_the_recipe`,
 `test_a_freeze_holds_an_overshoot_at_a_level_naming_its_debt_ticket`,
 `test_no_command_but_line_raise_and_freeze_writes_a_recipe`, and
-`test_the_upgrade_moves_lines_into_recipes_before_it_removes_evidence`. Not yet: a test that fails
-when this repository tracks a file under its evidence directory, added once that evidence is
-removed. Whether a raise's reason is true, and whether an upgrade found the project's own evidence
+`test_the_upgrade_moves_lines_into_recipes_before_it_removes_evidence`, and
+`test_this_repository_tracks_no_evidence` (this repository's evidence directory, read from
+`verify --help`, holds no tracked file). Whether a raise's reason is true, and whether an upgrade found the project's own evidence
 directory, stay judgment.
 
 ## Source

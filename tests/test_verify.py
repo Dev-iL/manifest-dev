@@ -2116,3 +2116,24 @@ def test_affected_refuses_a_base_that_is_not_a_commit(tmp_path: Path) -> None:
     env = _affected_project(tmp_path)
     result = run_verify("affected", "no-such-branch", env=env)
     assert result.returncode == 2 and "is not a commit here" in result.stderr
+
+
+def test_this_repository_tracks_no_evidence() -> None:
+    """docs/adr/20261018-the-harness-commits-no-evidence-and-time-lines-live-in-recipes.md:
+    this repository's evidence directory, read from the tool's own `--help`, holds no tracked file.
+    """
+    help_text = run_verify("--help").stdout
+    found = re.search(r"^evidence:\s+(\S+)", help_text, re.MULTILINE)
+    assert found, "verify --help printed no `evidence:` line:\n" + help_text
+    evidence_dir = found.group(1)
+    tracked = subprocess.run(
+        ["git", "ls-files", "--", evidence_dir],
+        capture_output=True,
+        text=True,
+        cwd=REPO_ROOT,
+        check=True,
+    ).stdout.split()
+    assert not tracked, (
+        f"{evidence_dir} is git-ignored and commits nothing, yet git tracks: {tracked}. "
+        f"Run `git rm --cached` on them; evidence stays on the machine that ran it."
+    )
