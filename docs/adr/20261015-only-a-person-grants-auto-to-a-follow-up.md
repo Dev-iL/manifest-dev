@@ -50,9 +50,9 @@ themselves work.
   takes it.
 
 ## Enforced by
-`tests/test_ticket_automation_prompts.py` — `test_ticket_up_preserves_auto_authority_boundary`
-fails if ticket-up lets a source's Auto carry over to a follow-up, drops the person's grant at the
-boundary, drops the limit on manual `run-ticket` calls, or drops "Shaped never implies Auto".
+none — superseded: `test_ticket_up_preserves_auto_authority_boundary` in `tests/test_ticket_automation_prompts.py` now holds the
+superseding grant path, under
+20261018-orchestrate-tickets-up-debt-and-grants-auto-where-the-criterion-holds.
 
 ## Source
 - Session: the owner's ruling on the North Star's open questions about unattended work.

@@ -12,8 +12,8 @@ Writes self-sufficient Tickets into the project's Ticket store — from a Manife
 
 - `/ticket-up <manifest path | request | question>`.
 - Phrases its description matches: "create tickets", "ticket up the plan", "hand this to a teammate".
-- figure-out when questions stop depending on each other; `run-ticket` for follow-ups.
-- From a Manifest it splits by Deliverable only when asked for delegation; follow-ups from another Ticket are grouped, and carry Auto only when a person grants it at that step, whatever the source carries.
+- figure-out when questions stop depending on each other; `run-ticket` for follow-ups; `orchestrate` for the debt Tickets it writes and the Auto grants it makes.
+- From a Manifest it splits by Deliverable only when asked for delegation; follow-ups from another Ticket are grouped, and carry Auto only when a person, or `orchestrate --autonomous` under the grant criterion, grants it at that step, whatever the source carries; the run that found the work never does.
 - Venues: a file store, GitHub Issues, or another tracker named in the store config.
 
 ## Scenarios
@@ -26,7 +26,7 @@ Workload: varies
 
 ### follow-up
 Run: `scripts/drive-skill.sh ticket-up verification/prompts/ticket-up-follow-up.md`
-Proves: a follow-up an unattended run found, from a source that carries Auto, is written as a Ticket with no Auto, because no person granted it at this step. The Ticket names its source.
+Proves: a follow-up an unattended run found, from a source that carries Auto, is written as a Ticket with no Auto, because neither a person nor `orchestrate --autonomous` granted it at this step. The Ticket names its source.
 Check: read
 Workload: varies
 

@@ -63,10 +63,12 @@ write access label an issue as a Ticket, and the Ticket's author is known on eve
 - More pull requests wait on the person's look at once.
 
 ## Enforced by
-not yet — `tests/test_ticket_automation_prompts.py` would fail if `orchestrate` lands or closes a
-Ticket without Auto, works one whose author lacks write access or that a person is assigned to, or
-lets a Ticket without Auto end anywhere but a ready pull request or an escalation. It would also
-retarget `test_ticket_up_preserves_auto_authority_boundary` to the new meaning of absence.
+`tests/test_ticket_automation_prompts.py` — `test_a_ticket_without_auto_runs_to_a_ready_pull_request_and_never_lands` fails if the
+convention, `orchestrate`, `run-ticket` or the landing procedure lets automation land or complete a
+Ticket without Auto, drops the write-access or no-assignee condition, ends such a Ticket anywhere
+but a ready pull request or an escalation, or a venue reference stops saying how to check the
+author's write access; `test_ticket_up_preserves_auto_authority_boundary` is retargeted to the
+grant path that sits beside the new meaning of absence.
 
 ## Source
 - Session: define on running unattended Ticket work with many agents at once (2026-10-18).

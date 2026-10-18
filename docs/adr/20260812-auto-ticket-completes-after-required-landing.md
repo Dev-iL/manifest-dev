@@ -54,7 +54,11 @@ launch, and `run-ticket` refreshes Auto again before unattended landing.
 - Repositories that require human approval cannot grant Auto to Tickets needing that approval.
 
 ## Enforced by
-`tests/test_ticket_automation_prompts.py` — `test_run_ticket_recovers_and_lands_before_done` fails if run-ticket stops re-checking Auto just before an irreversible unattended landing, stops merging through the protected mechanism, or loses the rule that its completion record waits until the landing is observed.
+`tests/test_ticket_automation_prompts.py` — `test_the_one_landing_procedure_refreshes_checks_the_base_and_closes_after_merge` fails if
+the landing procedure stops re-checking Auto just before an irreversible unattended landing, stops
+merging through the protected mechanism, or closes the Ticket before its landing is observed;
+`test_run_ticket_stops_at_a_ready_pull_request_and_lands_only_when_told` holds the amendment that
+`run-ticket` stops at a ready pull request.
 
 ## Source
 - Session: unattended Ticket automation design (2026-08-12)

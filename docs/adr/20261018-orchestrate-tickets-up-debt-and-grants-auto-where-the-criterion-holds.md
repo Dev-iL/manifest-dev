@@ -69,10 +69,11 @@ Auto wherever the grant criterion holds.
   used to make.
 
 ## Enforced by
-not yet — `tests/test_ticket_automation_prompts.py` would fail if `orchestrate` stops gathering debt
-at check-in, grants Auto outside `--autonomous` or without the criterion, lets the run that found
-the work grant it, or drops the grantor from a grant. It would also retarget
-`test_ticket_up_preserves_auto_authority_boundary` to the new grant path.
+`tests/test_ticket_automation_prompts.py` — `test_orchestrate_tickets_up_debt_and_grants_only_where_it_may` fails if `orchestrate`
+stops gathering debt at check-in, grants Auto in default mode or without the criterion, re-grants a
+withdrawn grant, lets the run that found the work grant it, or drops the grantor from a grant;
+`test_ticket_up_preserves_auto_authority_boundary` is retargeted to the new grant path in
+`ticket-up` and the convention: two grantors, the grantor recorded, and never the finder.
 
 ## Source
 - Session: define on running unattended Ticket work with many agents at once (2026-10-18).

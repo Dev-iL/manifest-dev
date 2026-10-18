@@ -12,7 +12,7 @@ Reads the Ticket store, picks the one Ticket whose delay would cost the project 
 
 - `/next-ticket`.
 - Phrases its description matches: "what's next", "what should I work on".
-- No other skill calls it; `run-ticket` and `sweep-tickets` deliberately do not.
+- No other skill calls it; `run-ticket` and `orchestrate` deliberately do not.
 - It ranks open Tickets across efforts.
 
 ## Scenarios

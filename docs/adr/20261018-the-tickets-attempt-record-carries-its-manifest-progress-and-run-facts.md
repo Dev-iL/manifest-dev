@@ -56,9 +56,12 @@ disagree.
   Manifest spans two comments.
 
 ## Enforced by
-not yet — `tests/test_ticket_automation_prompts.py` would fail if `run-ticket`'s attempt record
-loses the Manifest, the progress record, or the rule that a fresh runner resumes the recorded
-Manifest, or if a run fact counts without the automation identity as its writer.
+`tests/test_ticket_automation_prompts.py` — `test_attempt_record_carries_the_manifest_progress_and_run_facts` fails if the attempt
+record loses the Manifest, the progress record, a run fact or the second marked comment, or if a
+fresh runner stops resuming the recorded Manifest; `test_a_run_fact_counts_only_when_the_automation_identity_wrote_it`
+fails if a record counts without the automation identity as its writer, or a fact gains a second
+writer; `test_landing_and_the_attempt_record_each_have_one_owner` fails if the record's format gains
+a second home.
 
 ## Source
 - Session: figure-out on running unattended Ticket work with many agents at once (2026-10-18).
