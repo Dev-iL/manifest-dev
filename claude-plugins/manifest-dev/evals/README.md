@@ -196,7 +196,7 @@ from a discipline `SKILL.md` explicitly states.
 | `29-ratified-entry-lands` | Taste, repository | After the user's yes, write the entry inside the `## Taste` section and change nothing else in the file | tuning · unmeasured |
 | `30-update-offer-for-older-setup` | docs, repository, plugin arm only | Offer the setup update for a project set up before surfaces versions existed — only what the newer setup adds, never a redo of what it has | unmeasured |
 | `31-record-names-what-enforces-it` | docs, repository | A recorded decision names what enforces it, or why nothing can | unmeasured |
-| `32-reads-the-verification-surface` | autonomous, repository | Plan the check through the project's verification harness and treat an `unverified` recipe as not yet proof | unmeasured |
+| `32-reads-the-verification-surface` | autonomous, repository | Plan the check through the project's verification harness and run the recipe the change touches rather than trusting an earlier run | unmeasured |
 | `33-no-verification-surface` | autonomous, repository | With no way to check the product and no recorded choice of how to verify, plan a durable check in the project's own form scoped to the change, never a harness it did not choose | unmeasured |
 | `34-checking-a-skill-change` | autonomous, repository | Check a skill change by behavior cases, and note which recorded numbers go stale | unmeasured |
 | `35-checking-a-readme-change` | autonomous, repository | Check a document change by the tasks its reader comes to do | unmeasured |
@@ -213,7 +213,7 @@ from a discipline `SKILL.md` explicitly states.
 | `46-general-question-skips-recall` | autonomous, repository, plugin arm only | Open no earlier session log for a general question the repository's history cannot bear on | unmeasured |
 | `48-reuse-and-shallow-layer` | autonomous, repository | Before any code, reuse the utilities the codebase already has and question a proposed class that would only forward to them | unmeasured |
 | `52-projectless-chat-offers-no-surfaces` | autonomous, not a project, plugin arm only | For a one-off script in a folder that is not a project, say how it behaves and how to check it, offering no setup, harness, decision record, glossary or North Star | unmeasured |
-| `53-update-offer-from-v5` | docs, repository, plugin arm only | Offer the setup update for a project on v5 — a recipe for the tests and linter its context file names outside the harness, and the bullet — and nothing v1 to v5 already gave it | unmeasured |
+| `53-update-offer-from-v6` | docs, repository, plugin arm only | Offer the setup update for a project on v6 — its time lines moved from committed evidence into its recipes, committed evidence removed and ignored, and the context-file lines that commit evidence rewritten — and nothing v1 to v6 already gave it | unmeasured |
 | `54-touched-recipe-not-fit` | autonomous, repository | A change touching a feature whose recipe cannot be relied on — started by hand on a fixed port, its last failure unexplained — makes repairing that recipe part of the work | unmeasured |
 | `55-own-check-not-fit` | autonomous, repository | With no harness, a touched test of the project's own that passes whatever the output is gets repaired in its own form as part of the work, and no harness is built | unmeasured |
 
@@ -310,7 +310,7 @@ being declared a guard. `tests/test_eval_cases.py` fails when a case has no row 
 | `46` | first run decides | Plugin arm only; mirror of `43` |
 | `48` | first run decides | Reuse and module depth before code |
 | `52` | first run decides | Plugin arm only; a declared guard: the no-plugin arm passes by construction |
-| `53` | keep | Plugin arm only; the one-behind branch, which the version test requires; moved to v5 on 2026-10-15 when v6 shipped |
+| `53` | keep | Plugin arm only; the one-behind branch, which the version test requires; moved to v5 on 2026-10-15 when v6 shipped, and to v6 on 2026-10-18 when v7 shipped |
 | `54` | first run decides | New on 2026-10-15: the *Fit to trust* jobs v5 added |
 | `55` | first run decides | New on 2026-10-15: repairing a project's own check in its own form, the rule every run owes with or without a harness; the base model likely writes a new test beside the broken one |
 

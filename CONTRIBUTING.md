@@ -161,7 +161,7 @@ Before submitting your PR:
 - [ ] License is compatible (MIT preferred)
 - [ ] Code follows existing style
 - [ ] Examples work as documented
-- [ ] `scripts/verify drive property-suite` passes (lint, format, typecheck, tests) and its evidence is committed
+- [ ] `scripts/verify drive property-suite` passes (lint, format, typecheck, tests), with its output shown in the pull request
 
 ## Plugin Quality Guidelines
 

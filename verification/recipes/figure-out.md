@@ -27,14 +27,14 @@ Check: read
 Workload: varies
 
 ### one-version-behind
-Run: `scripts/drive-skill.sh figure-out claude-plugins/manifest-dev/evals/53-update-offer-from-v5/prompt.md --scaffold claude-plugins/manifest-dev/evals/53-update-offer-from-v5`
-Proves: the reply offers the update and names only what v6 adds — a recipe for the project's `pytest` and `ruff` checks, the *Before merging* section's commands pointed at it, and the bullet — and nothing v1 to v5 gave.
+Run: `scripts/drive-skill.sh figure-out claude-plugins/manifest-dev/evals/53-update-offer-from-v6/prompt.md --scaffold claude-plugins/manifest-dev/evals/53-update-offer-from-v6`
+Proves: the reply offers the update and names only what v7 adds — each time line moved from committed evidence into its scenario's recipe, keeping the raise's reason and the freeze's Ticket, committed evidence removed and its directory ignored, and the two context-file lines that commit evidence rewritten — and nothing v1 to v6 gave.
 Check: read
 Workload: varies
 
 ### from-v1
 Run: `scripts/drive-skill.sh figure-out verification/prompts/figure-out-from-v1.md --scaffold verification/scaffolds/project-at-v1`
-Proves: the reply offers the update and names only what v2 to v6 add, including the move to one harness.
+Proves: the reply offers the update and names only what v2 to v7 add, including the move to one harness.
 Check: read
 Workload: varies
 

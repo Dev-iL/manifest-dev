@@ -50,7 +50,8 @@ doctor: scripts/drive-skill.sh preflight
   transcript, the scratch project and what the session wrote to `~/.manifest-dev` stay on the
   driving machine under
   `${MANIFEST_DEV_FEATURES_EVIDENCE:-~/.local/state/manifest-dev-features}/<recipe>/<stamp>/`.
-  Then `verify judge` records the verdict.
+  Whoever drove it reads that against the scenario's `Proves` line and shows the verdict in the
+  pull request's proof.
 - An entry point that could not be driven — no GitHub access, no Slack, no Ticket store — is
   never reported verified because another entry point worked; the evidence names its scenario.
 - A drive shows a skill runs, not that it beats the no-plugin baseline: the behavior suites

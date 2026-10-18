@@ -31,7 +31,7 @@ Proves: every property test passes, run across every CPU.
 
 ## Gotchas
 
-- It covers the whole tree, since the tests read every shipped Markdown file: any edit outside
-  `verification/evidence/` makes it stale, as it should.
+- It covers the whole tree, since the tests read every shipped Markdown file, so `affected`
+  selects it for every change.
 - The suite needs the virtual environment active and `npm --prefix scripts ci` done;
   `scripts/setup.sh` does both. A missing tool fails loudly rather than skipping its check.

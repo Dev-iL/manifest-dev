@@ -262,7 +262,7 @@ Prefer `cp` and `mv` bash commands over the Write tool when duplicating or movin
 
 ```bash
 scripts/check.sh --fix                # fix lint and format while iterating
-scripts/verify drive property-suite   # lint, types and tests through the harness; commit its evidence
+scripts/verify drive property-suite   # lint, types and tests through the harness; show its output in the PR
 ```
 
 Bump plugin version if plugin files changed.
