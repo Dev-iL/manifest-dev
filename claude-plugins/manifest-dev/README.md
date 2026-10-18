@@ -1,58 +1,69 @@
 # manifest-dev
 
-The workflow: understand the problem, write down what you'd accept, then build and verify against it. Plus the surfaces that keep a project's direction and its queue of work out of any one person's head.
+Hand your agent a task. Get back work you can trust. This plugin is the workflow: your agent works out what you mean, writes down what done means, and calls nothing finished until every check passes. Around it sit the parts that let a project keep its direction, hold its work as Tickets, and run that queue while you make the calls only you can make.
 
-[See it explained →](https://doodledood.github.io/manifest-dev/) Each part works on its own, and nobody else on your team has to use it; the repository README shows [how far to take it](../../README.md#how-far-to-take-it).
+[See it explained →](https://doodledood.github.io/manifest-dev/) Each part works on its own, and nobody else on your team has to use it.
 
-```bash
+```text
+/plugin marketplace add doodledood/manifest-dev
 /plugin install manifest-dev@manifest-dev
 ```
 
-## The three beats
+## What to run at each level
 
-Run them in order, though each works on its own:
+1. **One skill** — install the plugin, then `/figure-out` with a question.
+2. **One piece of work** — `/auto` with a task (or `/figure-out`, `/define`, `/do` one step at a time).
+3. **A project that remembers** — `/setup-project`, once.
+4. **A shared queue** — `/ticket-up` writes work as Tickets; `/next-ticket` picks the next one.
+5. **The queue runs** — `/orchestrate`, then approve its plan; or `/orchestrate --autonomous` from a scheduler you already run. Mark a Ticket Auto when it needs no one's judgment.
 
-| Skill | What it does |
-|-------|--------------|
-| `/figure-out` | Presses on a problem until you both understand it. Investigates on its own, asks when your contribution changes the answer, and carries acknowledgments forward into the next question. Holds a position under pushback and changes it on evidence. Useful on its own, whether or not anything gets built after. |
-| `/define` | Turns that understanding into a Manifest — the deliverables, the criteria each has to meet, and the rules holding across all of them. Calls `/figure-out` first if understanding isn't there yet. |
-| `/do` | Implements against the Manifest and verifies every criterion before reporting completion. |
+Everything below is what those moves do.
 
-`/do` finishes through `done`, which reports the completed work, or `escalate`, the terminal handoff when unresolved blockers need outside intervention and no useful independent work remains. Neither is invoked by hand.
-
-The workflow favors durable outcomes and makes ease of subsequent correct work part of acceptance. Existing quality reviews judge concrete burdens; sound structure needs no redesign. Defect repair review requires proportionate prevention or an evidenced reason for weaker protection.
-
-## Run it unattended
-
-`/do` assumes you are away for the entire execution, even after you send a steering message. It decides without asking follow-up questions and reports material choices and their rationale afterward. A failed approach calls for another approach; a blocker requires something the executor cannot responsibly supply. Blockers are reported promptly while useful independent work continues.
-
-`/do` may revise Appetite — the planned size of the change — before broader work starts when the benefit to your requested outcome justifies added complexity and maintenance. Explicit exclusions and binding requirements stay fixed. Unrelated improvements and changing the contract to excuse excess work are outside that delegation.
-
-`/auto` extends unattended work through planning: it chains figure-out, define and do without stopping for approval between them.
-
-Before implementation, `/do` arms a completion backstop: it sets a goal naming the Manifest's absolute path through the host's goal-setting or continuation capability, or prints the same contract for you to apply where the host has neither. `/auto` sets no goal during understanding and definition, so an interruption there needs a restart.
-
-## What the workflow maintains
-
-Nothing new to remember: the same commands move a codebase toward one the workflow can keep correct.
-
-- **Design before code** — figure-out sketches the shape of a change, compares a second one, and screens both for patterns the next agent would copy; define puts a behavior-preserving restructuring first when the area resists the change.
-- **Corrections become checks** — `/do` turns a caught mistake into a scoped type, lint, or test, and the decision record names it.
-- **Debt in `done` and in pull requests** — what a run leaves unfixed is listed at the end and in a "Debt left" section of each pull request; the next change on that path is offered the fix.
-- **A recommended, optional verification harness kept fresh by runs** — one command that can start, drive and check what runs change, with a recipe per feature, skill, document walk, eval suite and the checks run across the whole tree, and its results kept as evidence. `/setup-project` installs it by default, and a project that verifies its own way can opt out: runs then verify through the project's own tests and scripts and never add one. Where it is kept, runs extend it and repair it when it drifts; a check that costs money, quota or effects outside the repository asks first. The shipped shape is a default each project adapts.
-- **Recall and update offers** — sessions working on a repository, whether on a bug, a change, a design, or a decision, start from earlier work on it, and set-up projects are offered what changed since their recorded surfaces version.
-
-## The project and its queue
-
-These keep what the project is becoming and what is worth doing next:
+## One piece of work
 
 | Skill | What it does |
 |-------|--------------|
-| `/setup-project` | Sets a repository up with a North Star, a glossary, decision-record conventions, and a verification harness you can opt out of, plus the wiring that makes every session read them. Seeds them from the project's own history where there is any, and run again on a set-up project audits the whole setup and offers each gap for you to accept or decline, marking what changed since the surfaces version it records in your context file. `/figure-out` offers it when the version is behind or a surface is broken, so you rarely type it. |
-| `/ticket-up` | Writes work into your ticket store — from a finished Manifest, a direct request, an open question, or findings from other work. A follow-up carries Auto only when a person grants it here. |
-| `/next-ticket` | Reads the store, picks the one to work on now, claims it, and says why it leads. |
-| `/run-ticket` | Takes one specific ticket end to end and records the outcome back on it. |
-| `/sweep-tickets` | Resumes or starts a single ticket a person granted Auto, for the scheduler you already run. |
+| `/figure-out` | Works out what you mean. It reads your code, finds the question that decides the work, and asks you only what the code can't answer, with its recommended answer first. It holds a position under pushback and changes it on evidence. Useful on its own, whether or not anything gets built after. |
+| `/define` | Writes down what done means, as a Manifest: the pieces of work (Deliverables), a check each one must pass (Acceptance Criteria), and rules that hold across all of them (Global Invariants). Calls `/figure-out` first if the work isn't understood yet. |
+| `/do` | Builds until every check passes. A failed check sends that piece back to be fixed; done means every check passed on fresh evidence. |
+| `/auto` | Runs all three in one go, without stopping for approval between them. |
+
+`/do` assumes you are away for the whole run, even after you send it a steering message. It decides without asking, reports the calls it made for you and why, and raises a blocker as soon as it finds one while it carries on with work that doesn't depend on the answer. It may grow the planned change — its Appetite — before broader work starts, when that serves your outcome; your exclusions and binding requirements stay fixed. Before it builds, it sets the host's goal-setting or continuation capability on the Manifest, or prints the same completion contract for you to apply, so an interrupted run resumes against the same file.
+
+It finishes through `done`, which reports the work, or `escalate`, which hands unresolved blockers to you once no useful independent work remains. Neither is invoked by hand. When the work ships as a pull request, its top reads in about a minute: what changed and why, the change shown working, the calls made for you, and the debt left — what the run found and didn't fix.
+
+## A project that remembers
+
+| Skill | What it does |
+|-------|--------------|
+| `/setup-project` | Gives the project a North Star — what it is becoming, who it's for, what winning means and what it never does — plus a glossary, decision-record conventions, and one command that checks the project still works, with the wiring that makes every session read them. It seeds them from the project's history where there is any. Run again on a set-up project, it audits the whole setup and offers each gap. `/figure-out` offers it when the setup is behind, so you rarely type it. |
+
+The check command is recommended, not required: a project that verifies its own way opts out, and runs then use its own tests and scripts and never add one. Where it is kept, it has one recipe per feature, skill, document walk, eval suite, and the checks run across the whole tree; a check that costs money, quota or effects outside the repository asks first.
+
+The same commands keep the codebase easier to change, with nothing extra to run:
+
+- **Design before code** — `/figure-out` sketches the shape of a change, compares a second one, and screens both for patterns the next agent would copy; `/define` puts a behavior-preserving restructuring first when the area resists the change.
+- **Corrections become checks** — `/do` turns a caught mistake into a scoped type, lint or test, and the decision record names it.
+- **Debt stays visible** — what a run leaves unfixed is listed when it finishes and in the pull request; the next change on that path is offered the fix.
+- **Earlier work is not lost** — sessions on a repository start from what earlier ones ruled and found, and runs keep the glossary, decisions and checks current where their work touches them.
+
+## A shared queue
+
+| Skill | What it does |
+|-------|--------------|
+| `/ticket-up` | Writes work as Tickets — from a finished Manifest, a direct request, an open question, or findings from other work — into GitHub Issues, files in the repository, or a tracker you describe. A Ticket carries everything a person or an agent needs to do one piece of work and know it's done. It also turns a planned effort (one goal and its own Tickets) into that effort's Tickets. |
+| `/next-ticket` | Reads the store, picks the Ticket whose wait costs most, claims it, and says why it leads. |
+
+**Auto** marks a Ticket that needs no one's judgment to finish and land. A person grants it, or `/orchestrate --autonomous` does, only on a Ticket an agent wrote that meets that test.
+
+## The queue runs
+
+| Skill | What it does |
+|-------|--------------|
+| `/orchestrate` | Proposes a plan over an effort's ready Tickets and runs it once you approve: each Ticket in its own session, landed one at a time. Auto Tickets land on their own; the rest stop at a ready pull request for you to land. The debt they leave becomes new Tickets, and one status page shows what is running and what waits on you. With `--autonomous`, started by a scheduler you already run, it fills free slots while work remains and grants Auto where no one's judgment is needed. |
+| `/run-ticket` | Takes one Ticket end to end, up to a ready pull request, keeping its Manifest and progress on the Ticket so a fresh run can resume it. It lands only when told to. `/orchestrate` starts it for each Ticket; you can run it by hand too. |
+
+What waits for you: landing a Ticket without Auto, escalations, Tickets from people without write access, planning a new effort, and each plan in the default mode.
 
 ## Review and verification
 
