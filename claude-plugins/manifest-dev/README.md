@@ -34,7 +34,7 @@ Four skills cover one piece of work, and each is useful on its own:
 
 Before it builds, `/do` points the host's goal-setting or continuation capability at the Manifest, so an interrupted run resumes against the same file. Where the host has neither, it prints the same completion contract for you to apply.
 
-It finishes through `done`, which reports the work, or `escalate`, which hands unresolved blockers to you once no useful independent work remains. Neither is invoked by hand. When the work ships as a pull request, its top reads in about a minute: what changed and why, the change shown working, the calls made for you, and the debt left — what the run found and didn't fix.
+It finishes through `done`, which reports the work, or `escalate`, which hands unresolved blockers to you once no useful independent work remains. Neither is invoked by hand. When the work ships as a pull request, its top reads in about a minute: what changed and why, the change shown working, the decisions made for you, and the debt left — what the run found and didn't fix.
 
 ## A project that remembers
 
