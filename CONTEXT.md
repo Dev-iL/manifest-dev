@@ -229,7 +229,7 @@ The standing project-level strategy surface — a project's diagnosis and the as
 _Avoid_: Steering layer, strategy doc, business context.
 
 **Autonomy Ladder**:
-The levels at which manifest-dev is adopted, each useful without the ones above it and without anyone else on the team adopting it: one Skill on its own; one piece of work understood, defined and verified; Project Surfaces kept by every run; a shared Ticket Store; and unattended runs that take Auto Tickets from the store and ticket up what they find, with people stepping in only for a blocker, judgment, taste or authority.
+The levels at which manifest-dev is adopted, each useful without the ones above it and without anyone else on the team adopting it: one Skill on its own; one piece of work understood, defined and verified; Project Surfaces kept by every run; a shared Ticket Store; and the queue running under Orchestrate — Auto Tickets end to end and others up to a ready pull request, debt ticketed up as it is found — with people stepping in only for a blocker, judgment, taste or authority.
 _Avoid_: Maturity model, adoption funnel, tiers (those are the North Star, Ticket and Manifest).
 
 **Taste**:
@@ -252,7 +252,7 @@ A Ticket whose decision space is still open — however much prior context it ca
 _Avoid_: Spike.
 
 **Auto**:
-An opt-in grant, declared at write time on either kind of Ticket, permitting unattended automation to take it end to end; absent the grant, automation leaves the Ticket entirely alone.
+An opt-in grant on either kind of Ticket permitting unattended automation to take it end to end, landing included — given by a person at the `ticket-up` boundary, or by `orchestrate --autonomous` to a Ticket an agent wrote wherever the grant criterion holds, never by the run that found the work, and naming its grantor. Absent the grant, automation may work the Ticket up to a ready pull request or a drafted answer, when its author has write access and no person is assigned, but never completes or lands it.
 _Avoid_: Autonomous ticket, agent-ready.
 
 **Ticket Type**:
@@ -276,16 +276,16 @@ The single Ticket-authoring boundary: turns a finished Manifest, direct work req
 _Avoid_: Breakdown, sharding.
 
 **Run Ticket**:
-The harness-neutral execution move that receives one exact Ticket, claims or recovers it, invokes `auto`, completes any required protected landing, and records DONE or ESCALATED evidence on that same Ticket; dispatch and backlog selection stay outside it.
+The harness-neutral execution move that receives one exact Ticket, claims or recovers it, invokes `auto` — or resumes the Manifest its attempt record carries — and works it to a ready pull request, keeping the attempt record (its branch, run facts, progress and Manifest) on that same Ticket; it lands only when told to, through the one landing procedure, and records DONE or ESCALATED evidence; dispatch and backlog selection stay outside it.
 _Avoid_: Auto picker, ticket trigger.
 
 **Escalation Mark**:
-The durable record an escalated attempt leaves on a Ticket saying a person is needed — the thing that holds unattended dispatch off, so the claim does not have to and the Ticket stays takeable; cleared by the person's continuation step, and rendered by each venue's own reference.
+The durable record an escalated attempt leaves on a Ticket saying a person is needed — the thing that holds unattended dispatch off, so the claim does not have to and the Ticket stays takeable; cleared by the person's explicit answer — `orchestrate` records the continuation and clears it — and rendered by each venue's own reference.
 _Avoid_: Blocked status, escalated state.
 
-**Ticket Sweep**:
-The scheduled one-Ticket dispatch move that first resumes an interrupted Ticket claimed by the automation identity, otherwise selects one ready Auto Ticket, invokes Run Ticket with that exact Ticket, and stops.
-_Avoid_: Batch runner, label pulse, dependency controller.
+**Orchestrate**:
+The dispatch move that works one effort's ready Tickets, or the whole store's, several at a time: it sorts every Ticket from the store and git alone, keeping no state of its own; proposes a plan and waits for approval by default, or acts on its own under `--autonomous`; launches each Ticket through Run Ticket in its own session; lands finished work one Ticket at a time; tickets up the debt runs leave; and keeps a status page and one list of what waits on the person.
+_Avoid_: Ticket sweep, batch runner, scheduler.
 
 ## Relationships
 
@@ -298,17 +298,16 @@ _Avoid_: Batch runner, label pulse, dependency controller.
 - A separate **Question Ticket** exists only when its question needs independent assignment, priority, blocking, or closure; related questions sharing one lifecycle stay grouped.
 - `next-ticket` claims and presents the **Ticket** it names, which is what makes several sessions reading one **Ticket Store** get different ones — and it separates them only where the store's venue is a live surface every worker reads, never across separate checkouts of a file store. It never executes the pick.
 - **Run Ticket** receives one exact **Ticket** from a person or dispatcher and invokes `auto` for one attempt; it never selects from the store or enforces **Auto** eligibility at dispatch. For repository work it uses one durable branch and pull request across attempts, and DONE follows the required landing rather than a merely mergeable branch.
-- A **Ticket Sweep** handles at most one **Ticket** per invocation: recover an interrupted automation-owned Auto Ticket first, otherwise select one ready Auto Ticket, pass it to **Run Ticket**, and stop. Issue events are the fast path; the sweep is the correctness path.
-- Every unattended dispatch path — the **Ticket Sweep** and the issue-event adapter alike — excludes a Ticket carrying an **Escalation Mark**, each testing for it where it decides; a human picker applies no such filter, which is what lets escalated work compete for attention on the ordinary priority rule.
-- Trigger adapters serialize **Run Ticket** by canonical Ticket identity, bound infrastructure retries, and assign a person with run evidence after retry exhaustion; claims and labels do not duplicate host liveness state.
+- **Orchestrate** passes each **Ticket** it launches to **Run Ticket** in a session of its own, and takes each finished run's landing turn itself, one **Ticket** at a time; a run started by hand stops at its ready pull request the same way. A file store gets no parallel runs: **Orchestrate** runs its **Tickets** one at a time in its own session.
+- **Orchestrate** never launches a **Ticket** carrying an **Escalation Mark**; a human picker applies no such filter, which is what lets escalated work compete for attention on the ordinary priority rule. A third failed launch in a row hands the **Ticket** to a person through an **Escalation Mark**.
 - The **Auto** grant requires that neither doing a **Ticket** nor judging it done needs any human's knowledge, taste, or authority — necessary but never sufficient: the author still chooses to grant.
 - A **Ticket** remains the identity of its work across execution attempts: a successful attempt closes it, while an escalated attempt records its evidence and releases the same open **Ticket**'s claim under an **Escalation Mark**; a follow-up **Ticket** represents only separate work.
-- A follow-up **Ticket** receives **Auto** only when a person grants it at its `ticket-up` boundary after it meets the grant criterion; whatever its source carries, an agent never grants **Auto** to work it found.
-- Absence of **Auto** is one fence covering untrusted **Tickets**, **Tickets** with a designed-in human step, and venue items never written as **Tickets** at all.
-- **Auto** says whether automation may touch a **Ticket** at all and is the author's call; a **Ticket Type** says which granted work an operator runs today and is the query's — keeping rollout schedule out of the grant, whose silence already carries three meanings.
+- A follow-up **Ticket** receives **Auto** only through a grant at its own `ticket-up` boundary after it meets the grant criterion — a person's, or `orchestrate --autonomous`'s; whatever its source carries, the run that found the work never grants it.
+- Absence of **Auto** keeps completion and landing with a person: unattended work takes such a **Ticket** only up to a ready pull request, only when its author has write access and no person is assigned, and never touches venue items that were never written as **Tickets**.
+- **Auto** says whether automation may finish a **Ticket** and is the grantor's call; a **Ticket Type** says which work an operator runs today and is the query's — keeping rollout schedule out of the grant.
 - Every venue a **Ticket Store** runs on has a **Venue Reference**.
 - A **Ticket Store** holds one or more **Efforts**, each with its own front file and destination — so the priority rule's "impact" is measured within an **Effort**, and comparing across them takes the **North Star**'s winning definition, the measure the destinations alone don't supply.
-- Each level of the **Autonomy Ladder** works without the ones above it; at the top, **Run Ticket** and **Ticket Sweep** take **Auto** **Tickets** unattended, and a person steps in at an **Escalation Mark**, a **User's Call** or a **Taste** offer.
+- Each level of the **Autonomy Ladder** works without the ones above it; at the top, **Orchestrate** runs the queue through **Run Ticket**, and a person steps in at an **Escalation Mark**, a **User's Call** or a **Taste** offer.
 - **Project Surfaces** live in the project and are read by every session through the **Project Context File**; the **Glossary** and the **Decision Records** are two of them, and the **Verification Harness** runs one **Scenario** at a time, keeping **Evidence** that carries each **Time Line**.
 - A **North Star** informs every session by residency and never binds; the one binding route is `/define` routing an unsafe or irreversible Never to a **Global Invariant**.
 - A project-owned North Star conventions file (emitted by `setup-project` beside the doc) governs the **North Star**'s form wherever it exists, with the plugin's shipped default applying otherwise — the same precedence the **ADR Conventions** carry; cadence stays with figure-out.
