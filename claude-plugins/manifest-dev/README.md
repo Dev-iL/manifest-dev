@@ -30,7 +30,7 @@ Four skills cover one piece of work, and each is useful on its own:
 | `/do` | Builds until every check passes. A failed check sends that piece back to be fixed; done means every check passed on fresh evidence. |
 | `/auto` | Runs all three in one go, without stopping for approval between them. |
 
-`/do` assumes you are away for the whole run, even after you send it a steering message. It decides without asking and reports the calls it made for you and why. It raises a blocker as soon as it finds one, and carries on with work that doesn't depend on the answer. Before broader work starts, it may grow the planned change when that serves your outcome; your exclusions and binding requirements stay fixed.
+`/do` assumes you are away for the whole run, even after you send it a steering message. It decides without asking and reports the decisions it made for you and why. It raises a blocker as soon as it finds one, and carries on with work that doesn't depend on the answer. Before broader work starts, it may grow the planned change when that serves your outcome; your exclusions and binding requirements stay fixed.
 
 Before it builds, `/do` points the host's goal-setting or continuation capability at the Manifest, so an interrupted run resumes against the same file. Where the host has neither, it prints the same completion contract for you to apply.
 

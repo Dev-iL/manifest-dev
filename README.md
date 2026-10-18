@@ -39,11 +39,11 @@ Ask about the bug you keep putting off. When a term or a step is unclear, ask `/
 
 **Then you agree what done means.** `/define` writes a Manifest: the pieces of work (Deliverables), a check each one must pass (Acceptance Criteria), and rules that hold across all of them (Global Invariants).
 
-**It builds until every check passes.** `/do` builds against the Manifest. A failed check sends that piece back to be fixed, and done means every check passed on fresh evidence. `/do` assumes you are away: it decides without asking, reports the calls it made for you, and raises a blocker as soon as it finds one.
+**It builds until every check passes.** `/do` builds against the Manifest. A failed check sends that piece back to be fixed, and done means every check passed on fresh evidence. `/do` assumes you are away: it decides without asking, reports the decisions it made for you, and raises a blocker as soon as it finds one.
 
 `/auto` runs all three steps in one go.
 
-**What you review: a pull request that shows the change working.** When the work ships as a pull request, its top reads in about a minute. It says what changed and why, shows the change working with screenshots or command output, and lists the calls it made for you and the debt it left — what it found and didn't fix.
+**What you review: a pull request that shows the change working.** When the work ships as a pull request, its top reads in about a minute. It says what changed and why, shows the change working with screenshots or command output, and lists the decisions it made for you and the debt it left — what it found and didn't fix.
 
 ## A project that remembers
 

@@ -375,7 +375,7 @@ footer { display: flex; flex-wrap: wrap; gap: 6px 16px; padding: 40px 0 calc(48p
     <article class="card">
       <p class="eyebrow">What you review</p>
       <h2>A pull request that shows the change working.</h2>
-      <p>When the work ships as a pull request, its top reads in about a minute: what changed and why, screenshots or command output showing it work, the calls it made for you, and the debt it left (what it found and didn't fix).</p>
+      <p>When the work ships as a pull request, its top reads in about a minute: what changed and why, screenshots or command output showing it work, the decisions it made for you, and the debt it left (what it found and didn't fix).</p>
       <svg class="still" viewBox="0 0 360 210" role="img" aria-label="A pull request card: three pieces of work on the left, their evidence on the right under Shown working, and a line for decisions and debt at the bottom">
         <rect x="40" y="10" width="280" height="190" rx="16" fill="var(--card)" stroke="var(--line-2)" stroke-width="1.5"/>
         <text class="tk" x="60" y="40" style="font-size:15px">Pull request</text>
@@ -384,7 +384,7 @@ footer { display: flex; flex-wrap: wrap; gap: 6px 16px; padding: 40px 0 calc(48p
         <g fill="var(--bg-2)" stroke="var(--line-2)" stroke-width="1.5"><rect x="60" y="80" width="16" height="16" rx="4"/><rect x="60" y="110" width="16" height="16" rx="4"/><rect x="60" y="140" width="16" height="16" rx="4"/></g>
         <g fill="var(--line-2)"><rect x="86" y="85" width="100" height="6" rx="3"/><rect x="86" y="115" width="84" height="6" rx="3"/><rect x="86" y="145" width="92" height="6" rx="3"/></g>
         <g fill="var(--pass)"><rect x="216" y="83" width="18" height="10" rx="2"/><rect x="242" y="83" width="18" height="10" rx="2"/><rect x="216" y="113" width="18" height="10" rx="2"/><rect x="242" y="113" width="18" height="10" rx="2"/><rect x="216" y="143" width="18" height="10" rx="2"/><rect x="242" y="143" width="18" height="10" rx="2"/></g>
-        <text x="60" y="184">Calls made for you · Debt left</text>
+        <text x="60" y="184">Decisions made for you · Debt left</text>
       </svg>
     </article>
   </section>
@@ -400,7 +400,7 @@ footer { display: flex; flex-wrap: wrap; gap: 6px 16px; padding: 40px 0 calc(48p
         <rect x="150" y="182" width="60" height="20" rx="6" fill="var(--bg-2)" stroke="var(--line-2)"/>
         <text class="tk" x="180" y="18" text-anchor="middle">what it's becoming</text>
         <text class="tk" x="252" y="94">who it's for</text>
-        <text class="tk" x="108" y="94" text-anchor="end">what winning means</text>
+        <text class="tk" x="108" y="88" text-anchor="end">what winning</text><text class="tk" x="108" y="102" text-anchor="end">means</text>
         <text class="tk" x="196" y="140">what it never does</text>
       </svg>
     </article>
@@ -424,7 +424,7 @@ footer { display: flex; flex-wrap: wrap; gap: 6px 16px; padding: 40px 0 calc(48p
     <article class="card">
       <p class="eyebrow"><code>/ticket-up</code><span class="sep">·</span><code>/next-ticket</code></p>
       <h2>Work waits as Tickets anyone can pick up.</h2>
-      <p>A Ticket carries all a person or an agent needs to do one piece of work and know it's done. They line up by what waiting on each costs. Auto, the green mark, says a Ticket needs no one's judgment to finish and land.</p>
+      <p>A Ticket carries all a person or an agent needs to do one piece of work and know it's done. They line up by what waiting on each costs, and <code>/next-ticket</code> picks the one at the front. Auto, the green mark, says a Ticket needs no one's judgment to finish and land.</p>
       <svg class="still" viewBox="0 0 360 200" role="img" aria-label="A row of Tickets as standing cards, tallest first: the cost of waiting on each; some carry a green mark for Auto">
         <g fill="var(--card)" stroke="var(--line-2)" stroke-width="1.5">
           <rect x="30" y="50" width="24" height="120" rx="5"/><rect x="66" y="62" width="24" height="108" rx="5"/><rect x="102" y="78" width="24" height="92" rx="5"/><rect x="138" y="90" width="24" height="80" rx="5"/><rect x="174" y="106" width="24" height="64" rx="5"/><rect x="210" y="118" width="24" height="52" rx="5"/><rect x="246" y="130" width="24" height="40" rx="5"/>
@@ -457,7 +457,7 @@ footer { display: flex; flex-wrap: wrap; gap: 6px 16px; padding: 40px 0 calc(48p
   <section class="ch" data-name="Orchestrate" data-lv="5" style="--h:230">
     <article class="card">
       <p class="eyebrow"><code>/orchestrate</code></p>
-      <h2>Many Tickets at once, in the order between them.</h2>
+      <h2>Many Tickets at once, each waiting for the ones it needs.</h2>
       <p>It proposes a plan and runs it once you approve: each Ticket in its own session, landed one at a time. Auto Tickets land on their own; the rest stop at a ready pull request for you to land. The debt they leave becomes new Tickets.</p>
       <svg class="still" viewBox="0 0 420 320" role="img" aria-label="Tickets on parallel tracks toward the main branch: one landed, one waiting for the Ticket before it, one stopped to ask you, one without Auto waiting at a ready pull request for you, and a new Ticket written from the debt the first one left">
         <g stroke="var(--line-2)" stroke-width="2"><line x1="24" y1="70" x2="374" y2="70"/><line x1="24" y1="126" x2="374" y2="126"/><line x1="24" y1="182" x2="374" y2="182"/><line x1="24" y1="238" x2="374" y2="238"/><line x1="24" y1="294" x2="374" y2="294"/></g>
@@ -476,7 +476,7 @@ footer { display: flex; flex-wrap: wrap; gap: 6px 16px; padding: 40px 0 calc(48p
     <article class="card">
       <p class="eyebrow"><code>/orchestrate --autonomous</code></p>
       <h2>With <code>--autonomous</code>, it keeps going on its own.</h2>
-      <p>A scheduler you already run starts it. It fills free slots while work remains, and gives Auto to Tickets that agents wrote, wherever no one's judgment is needed.</p>
+      <p>A scheduler you already run starts it. It starts new runs as others finish, while work remains, and gives Auto to Tickets that agents wrote, wherever no one's judgment is needed.</p>
       <svg class="still" viewBox="0 0 360 200" role="img" aria-label="A clock, your scheduler, starts the run; a Ticket an agent wrote receives the green Auto mark; tracks fill again">
         <circle cx="60" cy="92" r="34" fill="none" stroke="var(--ink-3)" stroke-width="2"/><line x1="60" y1="92" x2="60" y2="68" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round"/><line x1="60" y1="92" x2="76" y2="100" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round"/>
         <path d="M100 92 h40" stroke="var(--think)" stroke-width="2" stroke-linecap="round"/>
@@ -620,28 +620,54 @@ footer { display: flex; flex-wrap: wrap; gap: 6px 16px; padding: 40px 0 calc(48p
     if (!io || el.getBoundingClientRect().top < innerHeight) el.classList.add("in"); else io.observe(el);
   });
 
-  // The story position s: chapter index plus progress through it, read at the middle of the viewport.
+  // The story position s: chapter index plus progress through it. Chapter N's card settles into place at N + LAND,
+  // once its picture has started to build, so the words, the picture, the level and the rail always agree.
   var root = document.documentElement;
   var secs = Array.prototype.slice.call(document.querySelectorAll(".ch"));
   var cards = secs.map(function (s) { return s.querySelector(".card"); });
   var fin = document.getElementById("final");
-  var tops = [], hs = [], finTop = 0;
+  var LAND = 0.15;
+  var tops = [], hs = [], finTop = 0, knots = [];
   function clamp(x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
+  // The scroll position at which a card settles: a phone holds it at the bottom, a desktop below the header.
+  function landY(i) {
+    var h = innerHeight, cs = getComputedStyle(cards[i]);
+    // Until it lands, a card rides at the top of its section, so it lands when that top reaches its resting place.
+    if (innerWidth < 900) return tops[i] - (h - parseFloat(cs.bottom) - cards[i].offsetHeight);
+    return tops[i] - parseFloat(cs.top);
+  }
   function measure() {
     tops = secs.map(function (s) { return s.getBoundingClientRect().top + scrollY; });
     hs = secs.map(function (s) { return s.offsetHeight; });
     finTop = fin.getBoundingClientRect().top + scrollY;
+    // (scroll y, s) pairs: the opening at the top of the page, each later card where it lands, and the end where
+    // the last chapter's section has scrolled past the middle of the viewport.
+    var n = secs.length, mid = innerHeight * 0.5;
+    knots = [[0, clamp((mid - tops[0]) / hs[0])]];
+    for (var i = 1; i < n; i++) knots.push([Math.max(knots[i - 1][0] + 1, landY(i)), i + LAND]);
+    knots.push([Math.max(knots[n - 1][0] + 1, tops[n - 1] + hs[n - 1] - mid), n]);
   }
   function sOf(y) {
-    var c = y + innerHeight * 0.5;
-    for (var i = 0; i < secs.length; i++) if (c < tops[i] + hs[i]) return i + clamp((c - tops[i]) / hs[i]);
+    if (y <= knots[0][0]) return knots[0][1];
+    for (var i = 1; i < knots.length; i++) {
+      var a = knots[i - 1], b = knots[i];
+      if (y < b[0]) return a[1] + (b[1] - a[1]) * (y - a[0]) / (b[0] - a[0]);
+    }
     return secs.length;
+  }
+  function yOf(s) {
+    if (s <= knots[0][1]) return knots[0][0];
+    for (var i = 1; i < knots.length; i++) {
+      var a = knots[i - 1], b = knots[i];
+      if (s < b[1]) return a[0] + (b[0] - a[0]) * (s - a[1]) / (b[1] - a[1]);
+    }
+    return knots[knots.length - 1][0];
   }
   // Where a chapter's picture is complete; the rail and the reduced-motion stills land there.
   var REST = [0.3, 0.62, 0.6, 0.66, 0.6, 0.6, 0.62, 0.62, 0.62, 0.52, 0.44, 0.66];
   var S = window.mdStory = {
     count: secs.length, REST: REST, sOf: sOf, covered: false,
-    yOf: function (s) { var c = Math.min(secs.length - 1, Math.floor(s)); return tops[c] + (s - c) * hs[c] - innerHeight * 0.5; }
+    yOf: yOf
   };
 
   // Chrome
@@ -686,7 +712,7 @@ footer { display: flex; flex-wrap: wrap; gap: 6px 16px; padding: 40px 0 calc(48p
       rects.forEach(function (e) {
         var r = e[1], restTop = e[0] === 0 ? Math.max(96, h * 0.22) : Math.max(96, h * 0.24);
         var lift = phone ? (h - 12) - r.bottom : restTop - r.top;
-        var o = 1 - clamp((lift - h * 0.04) / (h * 0.16));
+        var o = 1 - clamp((lift - h * 0.02) / (h * 0.07));
         var el = cards[e[0]], v = o.toFixed(3);
         if (el.style.opacity !== v) el.style.opacity = v;
       });
@@ -1019,7 +1045,7 @@ function start() {
     g.fillStyle = C.cssLine;
     ROWY.forEach((ry, k) => { const y = py(ry); [[0, 0.62 - 0.08 * k], [1, 0.44]].forEach(([i, w]) => { rr(g, px(-0.72), y - 20 + i * 26, w * 560, 12, 6); g.fill(); }); });
     g.fillStyle = C.cssInk3; g.font = "500 27px " + SANS;
-    g.fillText("Calls made for you  ·  Debt left", 60, py(-0.56));
+    g.fillText("Decisions made for you  ·  Debt left", 60, py(-0.56));
     cardTex.colorSpace = THREE.SRGBColorSpace;
     cardTex.anisotropy = 4;
     cardTex.needsUpdate = true;
@@ -1370,12 +1396,12 @@ function start() {
       K(V(0, -0.05, 0), V(-0.3, 0.35, 1), 1.35),              // 1 what you mean
       K(V(0.05, -0.4, 0), V(-0.35, 1.15, 0.9), 2.15),         // 2 the Manifest
       K(V(0.05, -0.25, 0), V(-0.15, 0.6, 1), 1.95),           // 3 /do
-      K(V(0, 0.22, 0.05), V(-0.1, 0.12, 1), 1.35),            // 4 the pull request
+      K(V(0, 0.22, 0.05), V(-0.1, 0.12, 1), L.phone ? 1.12 : 1.35), // 4 the pull request (closer on a phone, so its words read)
       K(V(0, 1.6, -0.6), V(-0.25, 0.12, 1), 2.35),            // 5 the North Star
       K(V(0.1, 0.55, -0.3), V(-0.95, 0.1, 1), 2.75),          // 6 its memory
       L.phone ? K(V(-0.95, -0.1, -3.6), V(0.25, 1.0, 1), 2.5) : K(V(-0.9, -0.1, -3.6), V(0.35, 0.9, 1), 2.4), // 7 the queue
       L.phone ? K(V(0.3, 0.3, -4.0), V(0.15, 0.85, 1), 3.7) : K(V(0.3, 0.35, -4.0), V(0.3, 0.75, 1), 3.4),   // 8 planning an effort
-      L.phone ? K(V(0.1, -0.4, L.LCZ), V(-0.12, 1.5, 1), 3.9) : K(V(0.2, -0.4, L.LCZ + 0.9), V(-0.35, 0.95, 1), 4.9), // 9 lanes
+      L.phone ? K(V(0.1, -0.4, L.LCZ + 1.6), V(-0.12, 1.5, 1), 4.3) : K(V(0.2, -0.4, L.LCZ + 0.9), V(-0.35, 0.95, 1), 4.9), // 9 lanes
       K(V(-0.5, -0.2, L.LCZ + 2.2), V(-0.45, 1.1, 1), L.phone ? 4.8 : 5.2), // 10 autonomous
       L.phone ? K(V(0.1, 0.0, -5.6), V(-0.35, 1.15, 1), 6.4) : K(V(0.3, 0.0, -5.4), V(-0.6, 0.8, 1), 6.6), // 11 the loop
       L.phone ? K(V(0.1, 0.0, -5.6), V(-0.35, 1.25, 1), 7.0) : K(V(0.3, 0.0, -5.4), V(-0.6, 0.9, 1), 7.2)  // 12 the end
@@ -1432,16 +1458,18 @@ function start() {
     { cls: "term", text: () => "who it's for", at: () => starTip(1), vis: s => s > 5.28 && s < 5.9, ax: 0, ay: 0.5 },
     { cls: "term", text: () => "what it never does", at: () => starTip(2), vis: s => s > 5.32 && s < 5.9, ay: 0 },
     { cls: "term", text: () => "what winning means", at: () => starTip(3), vis: s => s > 5.36 && s < 5.9, ax: 1, ay: 0.5 },
-    { cls: "term think", text: () => "North Star", at: () => star.position.clone().add(V(0, 0.75, 0)), vis: s => s > 6.05 && s < 6.9 },
-    { cls: "term", text: () => "Glossary", at: () => V(1.9, LAYER_Y[0], 1.5), vis: s => s > 6.12 && s < 6.9 },
-    { cls: "term", text: () => "Decisions", at: () => V(1.9, LAYER_Y[1], 1.5), vis: s => s > 6.2 && s < 6.9 },
-    { cls: "term", text: () => "Checks", at: () => V(1.9, LAYER_Y[2], 1.5), vis: s => s > 6.28 && s < 6.9 },
+    { cls: "term think", text: () => "North Star", at: () => star.position.clone().add(V(0, 0.75, 0)), vis: s => s > 6.05 && s < 6.74 },
+    { cls: "term", text: () => "Glossary", at: () => V(1.9, LAYER_Y[0], 1.5), vis: s => s > 6.12 && s < 6.74 },
+    { cls: "term", text: () => "Decisions", at: () => V(1.9, LAYER_Y[1], 1.5), vis: s => s > 6.2 && s < 6.74 },
+    { cls: "term", text: () => "Checks", at: () => V(1.9, LAYER_Y[2], 1.5), vis: s => s > 6.28 && s < 6.74 },
     { cls: "pass", text: () => "Auto", at: tileTop("#101", 0.14), vis: s => s > 7.4 && s < 7.95 },
     { cls: "", text: () => "costs most to wait", at: () => V(L.Q0, 0.48, L.QZ), vis: s => s > 7.55 && s < 7.95 },
     { cls: "think", text: () => "an effort", at: () => P.clone().add(V(0, 0.7, 0)), vis: s => s > 8.06 && s < 8.3 },
     { cls: "term", text: () => "its Tickets", at: tileTop("#138", 0.16), vis: s => s > 8.6 && s < 8.95 },
     ...["#131", "#146", "#138", "#141"].map(id => ({ cls: "id", lane: id, text: () => { const q = tile[id]; return q ? laneText[id][q.mode] || id : id; }, at: tileTop(id, 0.12), vis: s => { const q = tile[id]; return q && s > 9.1 && s < 9.95 && q.mode !== "queue" && (q.mode !== "landed" || s < RUNS[id].land[1] + 0.06); } })),
-    { cls: "id", text: () => "#160 · from #131's debt", at: tileTop("#160", 0.14), vis: s => s > 9.46 && s < 9.95 },
+    { cls: "id", text: () => "#160 · from #131's debt", at: tileTop("#160", 0.14), vis: s => s > 9.54 && s < 9.95 },
+    { cls: "", text: () => "a session per Ticket", at: () => V(L.X0 + 0.2, -0.3, L.laneZ(4)), vis: s => s > 9.12 && s < 9.4 },
+    { cls: "", text: () => "main branch", at: () => V(L.XM + 0.1, -0.2, L.laneZ(4) + 0.4), vis: s => s > 9.12 && s < 9.4, ay: 0 },
     { cls: "you", text: () => "next plan · waits for your yes", at: () => P.clone().add(V(0, 0.42, 0)), vis: s => s > 9.78 && s < 9.97 },
     { cls: "", text: () => "your scheduler", at: () => dial.position.clone().add(V(0, 0.62, 0)), vis: s => s > 10.06 && s < 10.9 },
     { cls: "pass id", text: () => "#160 · Auto granted", at: tileTop("#160", 0.14), vis: s => s > 10.2 && s < 10.52 },
@@ -1485,11 +1513,17 @@ function start() {
     live.sort((a, b) => a.y - b.y);
     // A label still fading out keeps its place, so nothing new lands on it while it goes.
     const ghosts = LABELS.filter(d => !d.shown && d.box && d.fadeEnd > now).map(d => d.box);
-    const clear = (a, b) => { if (Math.abs(a.x - b.x) < (a.w + b.w) / 2 + 6 && Math.abs(a.y - b.y) < (a.h + b.h) / 2 + 4) a.y = b.y + (a.h + b.h) / 2 + 4; };
+    const hit = (a, b) => Math.abs(a.x - b.x) < (a.w + b.w) / 2 + 6 && Math.abs(a.y - b.y) < (a.h + b.h) / 2 + 8;
+    const clear = (a, b) => { if (hit(a, b)) a.y = b.y + (a.h + b.h) / 2 + 8; };
     for (let i = 0; i < live.length; i++) {
-      const a = live[i];
+      const a = live[i], placed = ghosts.concat(live.slice(0, i));
       a.x = clamp(a.x, safe.x0 + a.w / 2, safe.x1 - a.w / 2);
       a.y = clamp(a.y, safe.y0 + a.h, safe.y1);
+      const touching = placed.filter(b => hit(a, b));
+      if (!touching.length) continue;
+      // A label pushed below its point covers what it names, so it moves above what it touches when there is room.
+      const up = Math.min(...touching.map(b => b.y - (a.h + b.h) / 2 - 8));
+      if (up >= safe.y0 + a.h && !placed.some(b => hit({ x: a.x, y: up, w: a.w, h: a.h }, b))) { a.y = up; continue; }
       ghosts.forEach(g => clear(a, g));
       for (let j = 0; j < i; j++) clear(a, live[j]);
     }
