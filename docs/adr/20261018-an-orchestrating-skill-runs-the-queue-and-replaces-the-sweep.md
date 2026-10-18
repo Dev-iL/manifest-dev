@@ -63,7 +63,9 @@ position: the sweep gives too little control and is too slow.
   check-in rewrites only that block. It shows the Tickets as a graph of the order between them,
   with what waits on the person listed apart. The orchestrator publishes it on the page surface
   the host offers, such as an Artifact or a hosted page, and writes it as a local file where the
-  host offers none.
+  host offers none. Where the host gives the page a live data store, the orchestrator writes each
+  check-in's data there, and every open view updates in place, animating what changed; elsewhere
+  the page shows the data as of its last rewrite.
   The orchestrator keeps one list of what waits on the person — held pull requests, escalations,
   follow-ups awaiting a person's grant, the next plan — ordered by what waiting costs.
 - The person's answers count by where they come from. The orchestrator writes an answer given in
