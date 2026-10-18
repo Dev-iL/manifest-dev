@@ -1,4 +1,4 @@
-# Upgrading a project from v5 to v6
+# Upgrading a project from v5: what v6 gives it
 
 A project recording v5 may keep the harness or verify its own way. v6 changes only a kept
 harness: every check the project keeps is a recipe, including the checks it runs across the whole
@@ -16,8 +16,6 @@ already does the job:
    runs, offered as a scenario of that recipe as `../VERIFICATION_HARNESS.md` → *Build on what
    exists* says, with the context file's wording pointing at the scenario so a reader meets one
    way to check each thing.
-3. **The context-file bullet** — v6's wording from `../NORTH_STAR_FORMAT.md` → *The
-   project-surfaces section*: the evidence a change rests on comes through the command, and the
-   project's own commands stay usable while iterating.
-
-Once every item has an answer, record v6.
+3. **The context-file bullet** — the newest wording from `../NORTH_STAR_FORMAT.md` → *The
+   project-surfaces section*, which says the evidence a change rests on comes through the command
+   and the project's own commands stay usable while iterating.

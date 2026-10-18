@@ -183,12 +183,15 @@ def test_a_new_version_replaces_the_one_behind_case_instead_of_adding_one() -> N
 
 
 GUIDE = re.compile(r"^v(\d+)-to-current\.md$")
+VERSION_NAMED = re.compile(r"\bv(\d+)\b")
 
 
 # Holds the decision in docs/adr/20261014-one-verification-harness-per-project.md.
-def test_one_upgrade_guide_per_older_version_each_to_the_newest() -> None:
-    # Each guide takes a project straight to the newest version, so a new version updates
-    # every guide: a guide still naming an older target would walk a project to a replaced shape.
+def test_one_upgrade_guide_per_older_version_each_covering_only_the_next() -> None:
+    # A project follows its own version's guide and then every later one, and setup-project
+    # adds up what they offer (SKILL.md -> *The update pass*). So a guide says only what the next
+    # version gives a project at its own version: one naming a later version, or recording one,
+    # restates a step another guide owns, and a new version would have to edit it.
     newest = versions()[-1][0]
     guides = {
         int(m.group(1)): p for p in UPGRADES.glob("*.md") if (m := GUIDE.match(p.name))
@@ -199,10 +202,28 @@ def test_one_upgrade_guide_per_older_version_each_to_the_newest() -> None:
         f"{sorted(p.name for p in guides.values())}"
     )
     for number, path in guides.items():
-        targets = set(
-            re.findall(r"\b(?:to|record) v(\d+)\b", path.read_text(encoding="utf-8"))
+        text = path.read_text(encoding="utf-8")
+        later = sorted(
+            {int(v) for v in VERSION_NAMED.findall(text) if int(v) > number + 1}
         )
-        assert targets == {str(newest)}, (
-            f"{path.relative_to(REPO_ROOT)} must upgrade v{number} to v{newest}, the newest; "
-            f"it names {sorted(targets)}"
+        assert not later, (
+            f"{path.relative_to(REPO_ROOT)} must say only what v{number + 1} gives a project "
+            f"at v{number}; it names v{later}. Later versions belong to their own guides"
         )
+        assert not re.search(r"\brecord v\d+", text), (
+            f"{path.relative_to(REPO_ROOT)} records a version; setup-project records the "
+            "newest once every guide on the path has an answer"
+        )
+
+
+def test_setup_project_follows_every_guide_from_the_recorded_version_on() -> None:
+    # The other half of the rule above: the loading layer walks the whole path and adds the
+    # guides up, so no single guide has to take a project to the newest version.
+    skill = re.sub(
+        r"\s+", " ", (SKILLS / "setup-project" / "SKILL.md").read_text("utf-8")
+    )
+    assert (
+        "`references/upgrades/vN-to-current.md`, then each later `vM-to-current.md`"
+        in skill
+    )
+    assert "an item a later version replaces is not offered" in skill
