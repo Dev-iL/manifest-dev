@@ -11,7 +11,7 @@ cases and why. A prompt change marks the cases it covers stale rather than runni
 
 ```bash
 scripts/evals/run_eval.sh define evals/results/define/aggregate-result.json \
-  --tag define --ablation with-without --judge-model sonnet --scaffold -j 8 --max-cost-usd 60
+  --tag define --ablation with-without --judge-model sonnet --scaffold -j 8 --max-cost-usd 65
 ```
 
 `--max-cost-usd` is the plan's estimate below, a hard stop as `../README.md` describes.
