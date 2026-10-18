@@ -501,6 +501,9 @@ of what waits for you. The `/orchestrate` skill does it.
 By default, it shows you a plan and waits until you approve it. With `--autonomous`, it does not
 wait. It keeps no state of its own: it reads all of it from the Tickets and from git.
 
+Some work still waits for you. You merge a Ticket without Auto and answer escalations. You plan
+large work. You approve a Ticket whose author cannot write to the repository.
+
 ## Pull requests
 
 ### Babysit PR

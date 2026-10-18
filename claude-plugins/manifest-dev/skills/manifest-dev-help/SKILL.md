@@ -73,7 +73,7 @@ on your team do not have to use any level. Stop at the level that fits your proj
 | 2. One piece of work | Use `/figure-out`, `/define` and `/do`, or `/auto`. | A result with evidence for each gate. | More tokens and time at the start. The Manifest and its log stay outside the repository. |
 | 3. Project Surfaces | Use `/setup-project` one time. | Each session starts from the direction, words, decisions and checks of the project. | Files in the repository that your team can see. |
 | 4. A shared queue | Write work with `/ticket-up` and take it with `/next-ticket`. | The next work is in a store, not in the head of one person. | A Ticket Store: GitHub Issues, files or your own tracker. |
-| 5. The queue runs | Start `/orchestrate` and approve its plan, or start `/orchestrate --autonomous` from a scheduler that you have. Mark a Ticket Auto when it needs no judgment of a person. | Many Tickets run at the same time. An Auto Ticket goes to the end. Other Tickets stop at a pull request that is ready. You act only for a blocker, a judgment, a taste or an authority. | Gates that you trust. A scheduler only if you want runs without you. |
+| 5. The queue runs | Start `/orchestrate` and approve its plan, or start `/orchestrate --autonomous` from a scheduler that you have. Mark a Ticket Auto when it needs no judgment of a person. | Many Tickets run at the same time. An Auto Ticket goes to the end. Other Tickets stop at a pull request that is ready. You merge a Ticket without Auto, answer escalations and plan large work. You approve each plan in default mode, and Tickets from authors who cannot write to the repository. | Gates that you trust. A scheduler only if you want runs without you. |
 
 To climb a level:
 
