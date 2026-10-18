@@ -11,7 +11,9 @@ Work through a Ticket Store's ready Tickets several at a time. A **Ticket** is a
 work packet in the project's store; an **effort** is a named group of Tickets with one
 destination and one **front item** (the effort's front file: the tracking item's body, or the
 effort's README in a file store). Each **run** is one `run-ticket` attempt on one Ticket, in its
-own session. This skill plans, launches, lands, and keeps the person informed. It keeps no state
+own session. This skill plans, launches, lands, and keeps the person informed, in **check-ins**:
+at each one it re-reads the store, gives one finished run its **landing turn** (its merge onto
+the target branch), gathers debt, and fills free run slots. It keeps no state
 of its own: everything it knows it reads from the Tickets and git, so a new orchestrator, or a
 second one, rebuilds the same picture.
 

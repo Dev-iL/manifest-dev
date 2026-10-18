@@ -15,7 +15,8 @@ Show the plan, and ask in the same message for every decision that would change 
 - **Planning start lines and refactor proposals** waiting on the person.
 
 Then wait. Whatever the person grants, through `ticket-up` with them named as grantor, or
-approves joins the plan; a grant they decline is recorded the same way, so it is not asked again.
+approves joins the plan. A grant they decline is recorded as withheld, naming them, so it is not
+asked again.
 An approved plan may include Tickets without Auto: each runs to a ready pull request with its
 evidence and waits for the person. Approving a plan is not an Auto grant.
 
