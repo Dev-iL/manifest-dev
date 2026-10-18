@@ -20,7 +20,7 @@ Turns shared understanding into a Manifest — Problem, Appetite, Deliverables w
 
 ### new-manifest
 Run: `scripts/drive-skill.sh define claude-plugins/manifest-dev/evals/define/d01-layer-cut/prompt.md`
-Proves: the drive's home holds `.manifest-dev/manifests/manifest-<timestamp>.md` and the reply ends with `Manifest complete: <path>`; the three-layer plan comes back re-cut into slices. Every gate in the Manifest ends with `Judgment gate.` or `Deterministic gate.` and the ceiling invariant is present verbatim.
+Proves: the drive's summary lists `manifests/manifest-<timestamp>.md` among what the session wrote under `.manifest-dev`, and the reply ends with `Manifest complete: <path>`; the three-layer plan comes back re-cut into slices. Every gate in the Manifest ends with `Judgment gate.` or `Deterministic gate.` and the ceiling invariant is present verbatim.
 Check: read
 Workload: varies
 

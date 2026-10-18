@@ -32,8 +32,6 @@ SHIPPED_HARNESS = (
 TOOL_FILES = ("verify", "verify.mts")
 NODE = shutil.which("node")
 RECIPES = REPO_ROOT / "verification" / "recipes"
-DRIVE = REPO_ROOT / "scripts" / "drive-skill.sh"
-WALK = REPO_ROOT / "scripts" / "walk.sh"
 
 INVOCABLE_FALSE = re.compile(r"^user-invocable:\s*false\s*$", re.MULTILINE)
 SECTION = r"\*([^*\n]+)\*"
@@ -948,63 +946,12 @@ def test_an_empty_evidence_file_is_reported_and_proves_nothing(tmp_path: Path) -
     assert checked.returncode == 1 and "empty" in checked.stdout, checked.stdout
 
 
-def test_runner_scripts_parse() -> None:
-    # A broken runner fails here, not in the first run that needs it.
-    for script in (DRIVE, WALK):
-        result = subprocess.run(
-            ["bash", "-n", str(script)], capture_output=True, text=True
-        )
-        assert result.returncode == 0, f"{script.name}: {result.stderr}"
-
-
-# No docker on PATH: a dry run that tried to start anything would fail. Node stays reachable for
+# A home with nothing in it, so a dry run reads no settings of yours. Node stays reachable for
 # the tool itself.
 DRY_ENV = {
     "PATH": ":".join(([str(Path(NODE).parent)] if NODE else []) + ["/usr/bin", "/bin"]),
     "HOME": "/nonexistent-home",
 }
-
-
-@pytest.mark.parametrize(
-    ("credentials", "named"),
-    [
-        (
-            {"CLAUDE_CODE_OAUTH_TOKEN": "tok", "ANTHROPIC_API_KEY": "key"},
-            "CLAUDE_CODE_OAUTH_TOKEN",
-        ),
-        ({"ANTHROPIC_API_KEY": "key"}, "ANTHROPIC_API_KEY"),
-        ({}, "none found"),
-    ],
-)
-def test_drive_dry_run_names_container_credential_and_evidence(
-    credentials: dict[str, str], named: str
-) -> None:
-    result = subprocess.run(
-        [str(DRIVE), "figure-out", str(RECIPES / "figure-out.md"), "--dry-run"],
-        capture_output=True,
-        text=True,
-        env={**DRY_ENV, **credentials},
-    )
-    assert result.returncode == 0, result.stderr
-    assert "docker run" in result.stdout and "--plugin-dir" in result.stdout
-    # Without an init process, the container ignores the signal that should stop the session.
-    assert "--init -e TINI_KILL_PROCESS_GROUP=1" in result.stdout
-    assert f"credential:  {named}" in result.stdout, result.stdout
-    assert "verification/evidence/figure-out/" in result.stdout
-    assert "tok" not in result.stdout.replace("CLAUDE_CODE_OAUTH_TOKEN", "")
-
-
-def test_walk_dry_run_names_container_and_credential() -> None:
-    result = subprocess.run(
-        [str(WALK), "Find the install steps.", "README.md", "--dry-run"],
-        capture_output=True,
-        text=True,
-        env={**DRY_ENV, "ANTHROPIC_API_KEY": "key"},
-    )
-    assert result.returncode == 0, result.stderr
-    assert "docker run" in result.stdout and '--tools ""' in result.stdout
-    assert "--init -e TINI_KILL_PROCESS_GROUP=1" in result.stdout
-    assert "credential: ANTHROPIC_API_KEY" in result.stdout
 
 
 @pytest.mark.parametrize(
@@ -1021,174 +968,9 @@ def test_verify_dry_run_reaches_the_runner_and_writes_no_evidence(
         command, recipe, "--dry-run", env={**DRY_ENV, "ANTHROPIC_API_KEY": "k"}
     )
     assert result.returncode == 0, result.stderr
-    assert "would run" in result.stdout and "docker run" in result.stdout, result.stdout
+    assert "would run" in result.stdout and "claude -p" in result.stdout, result.stdout
     after = sorted(evidence.glob("*.md")) if evidence.is_dir() else []
     assert before == after
-
-
-def test_drive_refuses_a_feature_with_no_recipe() -> None:
-    result = subprocess.run(
-        [str(DRIVE), "no-such-feature", str(RECIPES / "figure-out.md"), "--dry-run"],
-        capture_output=True,
-        text=True,
-    )
-    assert result.returncode != 0 and "no recipe" in result.stderr
-
-
-def _stub_docker(tmp_path: Path, transcript: str = "") -> Path:
-    # Answers every docker call with success; `docker run` writes the given transcript into the
-    # directory mounted at /out, standing in for the session.
-    bin_dir = tmp_path / "bin"
-    bin_dir.mkdir()
-    (tmp_path / "transcript.jsonl").write_text(transcript, encoding="utf-8")
-    stub = bin_dir / "docker"
-    stub.write_text(
-        "#!/bin/sh\n"
-        '[ "$1" = run ] || exit 0\n'
-        'while [ $# -gt 0 ]; do case "$1" in *:/out) out="${1%:/out}";; esac; shift; done\n'
-        f'cp "{tmp_path / "transcript.jsonl"}" "$out/transcript.jsonl"\n'
-    )
-    stub.chmod(0o755)
-    return bin_dir
-
-
-INIT = {
-    "type": "system",
-    "subtype": "init",
-    "model": "m",
-    "plugins": [{"name": "manifest-dev"}],
-}
-
-
-def _drive_with(
-    tmp_path: Path, transcript: str, prompt: str = "go\n"
-) -> subprocess.CompletedProcess[str]:
-    prompt_file = tmp_path / "prompt.md"
-    prompt_file.write_text(prompt, encoding="utf-8")
-    return subprocess.run(
-        [str(DRIVE), "figure-out", str(prompt_file)],
-        env={
-            "PATH": f"{_stub_docker(tmp_path, transcript)}:/usr/bin:/bin",
-            "HOME": str(tmp_path),
-            "ANTHROPIC_API_KEY": "test-key",
-            "MANIFEST_DEV_FEATURES_EVIDENCE": str(tmp_path / "store"),
-            "DRIVE_STAMP": "20990101T000000Z",
-        },
-        capture_output=True,
-        text=True,
-        timeout=60,
-    )
-
-
-@pytest.mark.parametrize(
-    ("events", "says"),
-    [
-        ([{"type": "assistant"}], "no init event"),
-        ([{**INIT, "skills": ["manifest-dev:define"]}], "did not load"),
-    ],
-)
-def test_a_session_that_did_not_load_the_skill_is_unreachable(
-    tmp_path: Path, events: list[dict[str, object]], says: str
-) -> None:
-    result = _drive_with(tmp_path, "".join(json.dumps(e) + "\n" for e in events))
-    assert result.returncode == 3 and says in result.stderr, result.stderr
-
-
-def test_a_prompt_with_front_matter_sends_only_its_body(tmp_path: Path) -> None:
-    events = [
-        {**INIT, "skills": ["manifest-dev:figure-out"]},
-        {"type": "result", "num_turns": 1, "result": "done"},
-    ]
-    result = _drive_with(
-        tmp_path,
-        "".join(json.dumps(e) + "\n" for e in events),
-        "---\ntags: a\n---\nthe body\n",
-    )
-    assert result.returncode == 0, result.stderr
-    sent = (
-        tmp_path / "store" / "figure-out" / "20990101T000000Z" / "prompt.md"
-    ).read_text(encoding="utf-8")
-    assert sent == "the body\n"
-
-
-def test_drive_never_reuses_an_evidence_directory(tmp_path: Path) -> None:
-    # Two drives of one feature started in the same second once shared a directory and
-    # interleaved their transcripts. Start two at once with the stamp pinned and a stub `docker`
-    # that does nothing, and require two distinct evidence directories.
-    bin_dir = _stub_docker(tmp_path)
-    store = tmp_path / "store"
-    env = {
-        "PATH": f"{bin_dir}:/usr/bin:/bin",
-        "HOME": str(tmp_path),
-        "ANTHROPIC_API_KEY": "test-key",
-        "MANIFEST_DEV_FEATURES_EVIDENCE": str(store),
-        "DRIVE_STAMP": "20990101T000000Z",
-    }
-    drives = [
-        subprocess.Popen(
-            [str(DRIVE), "figure-out", str(RECIPES / "figure-out.md")],
-            env=env,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-        )
-        for _ in range(2)
-    ]
-    try:
-        for drive in drives:
-            drive.communicate(timeout=60)
-    finally:
-        for drive in drives:
-            drive.kill()
-            drive.wait()
-    made = sorted(p.name for p in (store / "figure-out").iterdir())
-    assert made == ["20990101T000000Z", "20990101T000000Z-2"], made
-
-
-def test_drive_reports_a_session_that_never_started_as_unreachable(
-    tmp_path: Path,
-) -> None:
-    # `verify` records exit 3 as unreachable; a drive that produced no session is never a failure
-    # of the skill.
-    result = subprocess.run(
-        [str(DRIVE), "figure-out", str(RECIPES / "figure-out.md")],
-        env={
-            "PATH": f"{_stub_docker(tmp_path)}:/usr/bin:/bin",
-            "HOME": str(tmp_path),
-            "ANTHROPIC_API_KEY": "test-key",
-            "MANIFEST_DEV_FEATURES_EVIDENCE": str(tmp_path / "store"),
-        },
-        capture_output=True,
-        text=True,
-        timeout=60,
-    )
-    assert result.returncode == 3 and "unreachable" in result.stderr, result.stderr
-
-
-@pytest.mark.skipif(os.geteuid() == 0, reason="root ignores directory permissions")
-def test_drive_fails_fast_when_it_cannot_create_evidence(tmp_path: Path) -> None:
-    # Only "another drive holds this directory" may be retried; any other failure stops loudly.
-    bin_dir = _stub_docker(tmp_path)
-    store = tmp_path / "store"
-    (store / "figure-out").mkdir(parents=True)
-    (store / "figure-out").chmod(0o555)
-    try:
-        result = subprocess.run(
-            [str(DRIVE), "figure-out", str(RECIPES / "figure-out.md")],
-            env={
-                "PATH": f"{bin_dir}:/usr/bin:/bin",
-                "HOME": str(tmp_path),
-                "ANTHROPIC_API_KEY": "test-key",
-                "MANIFEST_DEV_FEATURES_EVIDENCE": str(store),
-                "DRIVE_STAMP": "20990101T000000Z",
-            },
-            capture_output=True,
-            text=True,
-            timeout=30,
-        )
-    finally:
-        (store / "figure-out").chmod(0o755)
-    assert result.returncode != 0 and "cannot create" in result.stderr, result.stderr
 
 
 # Holds the decision in docs/adr/20261014-one-verification-harness-per-project.md.
@@ -1606,94 +1388,6 @@ def test_a_run_with_nothing_left_behind_does_not_wait_the_grace(tmp_path: Path) 
     result = run_verify("drive", "thing", env=env)
     assert result.returncode == 0, result.stdout + result.stderr
     assert time.monotonic() - began < 1.9  # short of the 2s grace
-
-
-def _failing_docker(tmp_path: Path, code: int, transcript: str = "") -> Path:
-    # Answers every docker call with success except `docker run`, which writes a scaffold log
-    # (and the given transcript, for a session that started) into the directory mounted at
-    # /out, and exits with `code`.
-    bin_dir = tmp_path / "bin"
-    bin_dir.mkdir()
-    stub = bin_dir / "docker"
-    stub.write_text(
-        "#!/bin/sh\n"
-        '[ "$1" = run ] || exit 0\n'
-        'while [ $# -gt 0 ]; do case "$1" in *:/out) out="${1%:/out}";; esac; shift; done\n'
-        '[ -n "$out" ] && echo "seed step broke" >"$out/scaffold.log"\n'
-        + (
-            f"printf '%s' '{transcript}' >\"$out/transcript.jsonl\"\n"
-            if transcript
-            else ""
-        )
-        + f"exit {code}\n"
-    )
-    stub.chmod(0o755)
-    return bin_dir
-
-
-def test_a_drive_whose_container_fails_before_the_session_is_unreachable(
-    tmp_path: Path,
-) -> None:
-    prompt_file = tmp_path / "prompt.md"
-    prompt_file.write_text("go\n", encoding="utf-8")
-    result = subprocess.run(
-        [str(DRIVE), "figure-out", str(prompt_file)],
-        env={
-            "PATH": f"{_failing_docker(tmp_path, 7)}:/usr/bin:/bin",
-            "HOME": str(tmp_path),
-            "ANTHROPIC_API_KEY": "test-key",
-            "MANIFEST_DEV_FEATURES_EVIDENCE": str(tmp_path / "store"),
-            "DRIVE_STAMP": "20990101T000000Z",
-        },
-        capture_output=True,
-        text=True,
-        timeout=60,
-    )
-    assert result.returncode == 3, result.stderr
-    assert "seed step broke" in result.stderr and "container exit 7" in result.stderr
-    assert "stderr.log" not in result.stderr  # the session never ran, so it wrote none
-
-
-@pytest.mark.parametrize(
-    ("code", "expected"), [(124, 124), (125, 3), (126, 3), (127, 3), (128, 128), (1, 1)]
-)
-def test_a_walk_tells_a_container_that_never_ran_from_a_failed_walk(
-    tmp_path: Path, code: int, expected: int
-) -> None:
-    result = subprocess.run(
-        [str(WALK), "Find the install steps.", "README.md"],
-        env={
-            "PATH": f"{_failing_docker(tmp_path, code)}:/usr/bin:/bin",
-            "HOME": str(tmp_path),
-            "ANTHROPIC_API_KEY": "test-key",
-        },
-        capture_output=True,
-        text=True,
-        timeout=60,
-    )
-    assert result.returncode == expected, result.stderr
-
-
-def test_a_drive_whose_container_dies_mid_session_is_unreachable(
-    tmp_path: Path,
-) -> None:
-    prompt_file = tmp_path / "prompt.md"
-    prompt_file.write_text("go\n", encoding="utf-8")
-    result = subprocess.run(
-        [str(DRIVE), "figure-out", str(prompt_file)],
-        env={
-            "PATH": f"{_failing_docker(tmp_path, 137, json.dumps(INIT))}:/usr/bin:/bin",
-            "HOME": str(tmp_path),
-            "ANTHROPIC_API_KEY": "test-key",
-            "MANIFEST_DEV_FEATURES_EVIDENCE": str(tmp_path / "store"),
-            "DRIVE_STAMP": "20990101T000000Z",
-        },
-        capture_output=True,
-        text=True,
-        timeout=60,
-    )
-    assert result.returncode == 3, result.stdout + result.stderr
-    assert "exited 137 after the session started" in result.stderr
 
 
 def test_a_signal_during_a_stop_kills_at_once(tmp_path: Path) -> None:

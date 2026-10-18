@@ -27,6 +27,6 @@ Workload: varies
 - The prompt file carries the placeholder `THROWAWAY_SLACK_CHANNEL`; replace it with a channel or thread the run owns before driving.
 - Needs Slack access from the session and a channel or thread the run owns.
 - Posts reach real people and cannot be unsent. Use a throwaway channel.
-- The drive container has no Slack connection, so this recipe stays `unreachable` through `scripts/drive-skill.sh` until one is configured for a throwaway channel.
+- A drive through `scripts/drive-skill.sh` loads none of your MCP servers, so it has no Slack connection and this recipe stays `unreachable` there until one is configured for a throwaway channel.
 - It is a thin wrapper: a team-flow defect is almost always in figure-out's `references/team.md`.
 - `tests/test_skill_frontmatter.py` and `tests/test_entry_points.py` hold that the skill parses and stays in the declared set. No behavior case measures it. Team mechanics live in figure-out's `claude-plugins/manifest-dev/skills/figure-out/references/team.md`.

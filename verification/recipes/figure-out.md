@@ -22,7 +22,7 @@ Presses on a topic with the user until both understand it, and ends with a named
 
 ### current-setup
 Run: `scripts/drive-skill.sh figure-out claude-plugins/manifest-dev/evals/45-current-setup-offers-nothing/prompt.md --scaffold claude-plugins/manifest-dev/evals/45-current-setup-offers-nothing`
-Proves: the reply says the setup is current, lists nothing the project lacks, does not suggest a setup run, moves to the topic with one ask, and names a log under the drive's `~/.manifest-dev/logs/`; the summary shows no files written.
+Proves: the reply says the setup is current, lists nothing the project lacks, does not suggest a setup run, moves to the topic with one ask, and names a log under `~/.manifest-dev/logs/`, which the drive's summary lists; the summary shows no files written.
 Check: read
 Workload: varies
 

@@ -38,8 +38,8 @@ Workload: varies
 
 ## Gotchas
 
-- Render checks need Playwright with Chromium; the drive container has no browser, so drives there are source-only.
+- Render checks need Playwright with Chromium; a drive renders only where the driving machine has them, and is source-only elsewhere.
 - Reading source alone is not a design verdict; without rendering it reports BLOCKED or SKIPPED, never PASS.
 - The check script's exit 0 means it completed, not that the page is clean.
 - `tests/test_design_check.py` exercises its check script; `tests/test_design_standalone.py` keeps its support files reachable.
-- Not yet driven: a rendered review (no browser in the drive container), the description phrases, define's UI gates.
+- Not yet driven: a rendered review (no drive has run where Playwright and Chromium are installed), the description phrases, define's UI gates.

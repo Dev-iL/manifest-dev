@@ -36,10 +36,21 @@ the source tree it copies. It also fails when a shipped file points to a section
 
 `claude-plugins/manifest-dev/evals/` holds behavioral eval suites for `figure-out` and, under
 `evals/define/` with its own README, for `define`. Each run is many model sessions, so the
-owner runs a suite, or an agent runs one after asking and naming the cases and why; it runs with
-`claude plugin eval . --tag <figure-out|define> --ablation with-without --allow-tools Write Bash --scaffold` with the judge model and cost ceiling each README names (on macOS, inside the container `evals/Dockerfile` defines — `scripts/evals/run_eval.sh` starts it; its `README.md` also covers hill-climbing a prompt with the scripts beside it)
-from the plugin directory. It measures **uplift** — every case runs with the plugin and without
-it, and the headline number is Δ, not pass rate — so a case both arms pass teaches nothing and is
+owner runs a suite, or an agent runs one after asking and naming the cases and why. Every model
+session this repository starts — an eval suite, a skill drive (`scripts/drive-skill.sh`) or a
+document walk (`scripts/walk.sh`) — runs the `claude` CLI directly, with no container, the same
+way locally and in a cloud session: it needs only `claude` on PATH, signed in, and starts each
+session from a scratch directory outside the checkout, on a copy of the plugin, without the user's
+settings, installed plugins or MCP servers, recording the CLI version rather than pinning it.
+Drives and walks run through their recipes (`scripts/verify drive|walk <recipe>`, ask-first). A
+suite runs from the repository root with
+`scripts/evals/run_eval.sh <name> <out-json> --tag <figure-out|define> --ablation with-without --scaffold`
+and the judge model and cost ceiling each README names; it keeps running after the shell that
+started it exits, which a cloud session's command timeout needs, and `--wait` blocks until it
+ends. On macOS each eval child may raise a keychain dialog, so suites run best in a cloud session.
+`evals/README.md` → *Running a suite* has the rest, and also covers hill-climbing a prompt with
+the scripts beside `run_eval.sh`. The suite measures **uplift** — every case runs with the plugin
+and without it, and the headline number is Δ, not pass rate — so a case both arms pass teaches nothing and is
 removed. `tests/` is a property suite that must stay green; the eval suite is a measurement whose
 numbers go stale whenever a prompt it covers is edited, and its `evals/README.md` carries the
 baseline, the held-out split, and — most importantly before trusting any result from it — how

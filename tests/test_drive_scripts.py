@@ -1,0 +1,674 @@
+"""Skill drives, document walks and eval suites start the claude CLI directly, isolated.
+
+`scripts/drive-skill.sh`, `scripts/walk.sh` and `scripts/evals/run_eval.sh` run with no
+container: each starts `claude` from a scratch directory outside the checkout, hands it a copy
+of the plugin rather than the checkout's own directory, and starts it with no user settings and
+no MCP servers of the user's (`--setting-sources project,local --strict-mcp-config`, which
+`claude --help` describes as loading only the named setting sources and only the MCP servers
+given on the command line). The CLI version is recorded, not pinned. Every test here puts a
+stand-in `claude` first on PATH that records how it was called, with no `docker` anywhere on
+PATH, so a script that still reached for a container would fail.
+"""
+
+from __future__ import annotations
+
+import json
+import os
+import shutil
+import signal
+import subprocess
+import time
+import uuid
+from pathlib import Path
+from typing import TypedDict
+
+import pytest
+
+REPO_ROOT = Path(__file__).resolve().parent.parent
+DRIVE = REPO_ROOT / "scripts" / "drive-skill.sh"
+WALK = REPO_ROOT / "scripts" / "walk.sh"
+RUN_EVAL = REPO_ROOT / "scripts" / "evals" / "run_eval.sh"
+LIB = REPO_ROOT / "scripts" / "lib" / "claude-cli.sh"
+RECIPES = REPO_ROOT / "verification" / "recipes"
+PLUGIN = REPO_ROOT / "claude-plugins" / "manifest-dev"
+VERSION = "9.9.9 (Claude Code)"
+STAMP = "20990101T000000Z"
+ISOLATION = ["--setting-sources", "project,local", "--strict-mcp-config"]
+
+# A session the drive accepts: it loaded the copy it was handed and the skill under test.
+GOOD: list[dict[str, object]] = [
+    {
+        "type": "system",
+        "subtype": "init",
+        "model": "m",
+        "plugins": [{"name": "manifest-dev", "path": "{plugin_dir}"}],
+        "skills": ["manifest-dev:figure-out"],
+    },
+    {"type": "result", "num_turns": 1, "result": "done"},
+]
+
+STANDIN = r"""#!/usr/bin/env python3
+# Stands in for the claude CLI: answers --version and auth status, and records every other call
+# (arguments, working directory, environment, session) before acting like a session or a suite.
+import json, os, pathlib, sys, time
+args = sys.argv[1:]
+if args == ["--version"]:
+    print(os.environ["STANDIN_VERSION"]); sys.exit(0)
+if args[:2] == ["auth", "status"]:
+    print(json.dumps({"loggedIn": os.environ.get("STANDIN_LOGGED_IN", "1") == "1"})); sys.exit(0)
+with open(os.environ["STANDIN_RECORD"], "a", encoding="utf-8") as f:
+    f.write(json.dumps({"args": args, "cwd": os.getcwd(), "env": dict(os.environ),
+                        "pid": os.getpid(), "sid": os.getsid(0)}) + "\n")
+code = int(os.environ.get("STANDIN_EXIT", "0"))
+if "eval" in args:
+    release = os.environ.get("STANDIN_RELEASE")
+    deadline = time.monotonic() + 30
+    while release and not os.path.exists(release) and time.monotonic() < deadline:
+        time.sleep(0.05)
+    out = pathlib.Path(args[args.index("--json") + 1])
+    out.write_text(json.dumps({"cliVersion": "9.9.9"}), encoding="utf-8")
+    sys.exit(code)
+record = os.environ.get("STANDIN_WRITES_RECORD")
+if record:
+    path = pathlib.Path(os.environ["HOME"], ".manifest-dev", record)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("a workflow record\n", encoding="utf-8")
+time.sleep(float(os.environ.get("STANDIN_SLEEP", "0")))
+plugin_dir = args[args.index("--plugin-dir") + 1] if "--plugin-dir" in args else ""
+transcript = os.environ.get("STANDIN_TRANSCRIPT", "")
+sys.stdout.write(transcript.replace("{plugin_dir}", plugin_dir))
+sys.exit(code)
+"""
+
+
+@pytest.fixture(scope="session")
+def toolbox(tmp_path_factory: pytest.TempPathFactory) -> Path:
+    """The system's commands, less any container tool and any real claude."""
+    box = tmp_path_factory.mktemp("toolbox")
+    for directory in ("/usr/local/bin", "/usr/bin", "/bin"):
+        if not os.path.isdir(directory):
+            continue
+        for entry in os.scandir(directory):
+            if entry.name in {"docker", "colima", "podman", "claude"}:
+                continue
+            target = box / entry.name
+            if not target.exists() and os.access(entry.path, os.X_OK):
+                target.symlink_to(entry.path)
+    return box
+
+
+def lines(events: list[dict[str, object]]) -> str:
+    return "".join(json.dumps(e) + "\n" for e in events)
+
+
+def setup(
+    tmp_path: Path, toolbox: Path, *, claude: bool = True, **standin: str
+) -> dict[str, str]:
+    bin_dir = tmp_path / "bin"
+    bin_dir.mkdir(exist_ok=True)
+    if claude:
+        stub = bin_dir / "claude"
+        stub.write_text(STANDIN, encoding="utf-8")
+        stub.chmod(0o755)
+    (tmp_path / "home").mkdir(exist_ok=True)
+    (tmp_path / "tmp").mkdir(exist_ok=True)
+    return {
+        "PATH": f"{bin_dir}:{toolbox}",
+        "HOME": str(tmp_path / "home"),
+        "TMPDIR": str(tmp_path / "tmp"),
+        "MANIFEST_DEV_FEATURES_EVIDENCE": str(tmp_path / "store"),
+        "MANIFEST_DEV_EVAL_RUNS": str(tmp_path / "runs"),
+        "DRIVE_STAMP": STAMP,
+        # Set as it is when a drive is started from inside a session; the drive must drop it.
+        "CLAUDECODE": "1",
+        "STANDIN_RECORD": str(tmp_path / "calls.jsonl"),
+        "STANDIN_VERSION": VERSION,
+        **standin,
+    }
+
+
+class Call(TypedDict):
+    """One recorded call of the stand-in claude."""
+
+    args: list[str]
+    cwd: str
+    env: dict[str, str]
+    pid: int
+    sid: int
+
+
+def calls(tmp_path: Path) -> list[Call]:
+    record = tmp_path / "calls.jsonl"
+    if not record.exists():
+        return []
+    return [
+        json.loads(line) for line in record.read_text(encoding="utf-8").splitlines()
+    ]
+
+
+def after(args: list[str], flag: str) -> str:
+    return args[args.index(flag) + 1]
+
+
+def outside_checkout(path: str) -> bool:
+    return not Path(path).resolve().is_relative_to(REPO_ROOT)
+
+
+def assert_isolated(call: Call) -> None:
+    args = call["args"]
+    # No user settings (so no settings, hooks or plugins they enable) and none of the user's MCP
+    # servers; `user` is the source that would load them.
+    assert args[
+        args.index("--setting-sources") : args.index("--setting-sources") + 2
+    ] == (ISOLATION[:2])
+    assert "user" not in after(args, "--setting-sources").split(",")
+    assert "--strict-mcp-config" in args
+    assert "CLAUDECODE" not in call["env"]
+    assert outside_checkout(call["cwd"])
+
+
+def drive(
+    env: dict[str, str], *args: str, prompt: Path | None = None
+) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        [str(DRIVE), "figure-out", str(prompt or RECIPES / "figure-out.md"), *args],
+        env=env,
+        capture_output=True,
+        text=True,
+        timeout=60,
+    )
+
+
+def test_the_scripts_parse() -> None:
+    # A broken runner fails here, not in the first run that needs it.
+    for script in (DRIVE, WALK, RUN_EVAL, LIB):
+        result = subprocess.run(
+            ["bash", "-n", str(script)], capture_output=True, text=True
+        )
+        assert result.returncode == 0, f"{script.name}: {result.stderr}"
+
+
+def test_no_container_tool_is_on_the_tests_path(tmp_path: Path, toolbox: Path) -> None:
+    env = setup(tmp_path, toolbox)
+    for tool in ("docker", "colima", "podman"):
+        assert shutil.which(tool, path=env["PATH"]) is None
+
+
+def test_a_drive_runs_the_cli_isolated_on_a_copy_of_the_plugin(
+    tmp_path: Path, toolbox: Path
+) -> None:
+    env = setup(
+        tmp_path,
+        toolbox,
+        STANDIN_TRANSCRIPT=lines(GOOD),
+        STANDIN_WRITES_RECORD="logs/figure-out-log-1.md",
+    )
+    result = drive(env)
+    assert result.returncode == 0, result.stderr
+    assert "docker" not in result.stderr
+    (call,) = calls(tmp_path)
+    assert_isolated(call)
+    out = (tmp_path / "store" / "figure-out" / STAMP).resolve()
+    assert Path(call["cwd"]).resolve() == out / "project"
+    args = call["args"]
+    assert args[:1] == ["-p"]
+    plugin_dir = Path(after(args, "--plugin-dir"))
+    assert outside_checkout(str(plugin_dir)) and plugin_dir.resolve() != PLUGIN
+    assert (plugin_dir / ".claude-plugin" / "plugin.json").read_bytes() == (
+        PLUGIN / ".claude-plugin" / "plugin.json"
+    ).read_bytes()
+    assert call["env"]["HOME"] == env["HOME"]  # the user's own sign-in
+    # The CLI version is recorded, in the summary verify keeps and in the full record.
+    assert f"- **CLI version:** {VERSION}" in result.stdout
+    assert "- **Other plugins loaded:** none" in result.stdout
+    summary = json.loads((out / "summary.json").read_text(encoding="utf-8"))
+    assert summary["cli_version"] == VERSION
+    # What the session wrote under ~/.manifest-dev is listed and kept with the evidence.
+    assert summary["manifest_dev_records"] == ["logs/figure-out-log-1.md"]
+    assert (out / "manifest-dev" / "logs" / "figure-out-log-1.md").exists()
+
+
+def test_a_drive_with_tools_hands_in_a_copy_of_each_plugin(
+    tmp_path: Path, toolbox: Path
+) -> None:
+    env = setup(tmp_path, toolbox, STANDIN_TRANSCRIPT=lines(GOOD))
+    drive(env, "--tools")
+    (call,) = calls(tmp_path)
+    args = call["args"]
+    dirs = [args[i + 1] for i, a in enumerate(args) if a == "--plugin-dir"]
+    assert [Path(d).name for d in dirs] == ["manifest-dev", "manifest-dev-tools"]
+    assert all(outside_checkout(d) for d in dirs)
+
+
+def test_a_drive_names_a_plugin_it_did_not_hand_in(
+    tmp_path: Path, toolbox: Path
+) -> None:
+    plugins = [
+        {"name": "manifest-dev", "path": "{plugin_dir}"},
+        {"name": "someone-elses", "path": "/elsewhere/someone-elses"},
+    ]
+    events = [{**GOOD[0], "plugins": plugins}, GOOD[1]]
+    env = setup(tmp_path, toolbox, STANDIN_TRANSCRIPT=lines(events))
+    result = drive(env)
+    assert result.returncode == 0, result.stderr
+    assert "- **Other plugins loaded:** someone-elses" in result.stdout
+
+
+def test_a_walk_runs_the_cli_with_no_tools_and_no_plugin(
+    tmp_path: Path, toolbox: Path
+) -> None:
+    env = setup(tmp_path, toolbox, STANDIN_TRANSCRIPT="the reader's account\n")
+    result = subprocess.run(
+        [str(WALK), "Find the install steps.", "README.md"],
+        env=env,
+        capture_output=True,
+        text=True,
+        timeout=60,
+    )
+    assert result.returncode == 0, result.stderr
+    assert result.stdout.startswith(f"CLI: {VERSION}\n")
+    assert "the reader's account" in result.stdout
+    (call,) = calls(tmp_path)
+    assert_isolated(call)
+    args = call["args"]
+    assert after(args, "--tools") == "" and "--plugin-dir" not in args
+    assert Path(call["cwd"]).resolve().is_relative_to((tmp_path / "tmp").resolve())
+    assert not Path(call["cwd"]).exists()  # the scratch directory is removed after
+
+
+def run_eval(
+    env: dict[str, str], out: Path, *flags: str
+) -> subprocess.CompletedProcess[str]:
+    wait = [f for f in flags if f == "--wait"]
+    rest = [f for f in flags if f != "--wait"]
+    # Started through a shell of its own, which exits as soon as the script returns.
+    command = " ".join(
+        [str(RUN_EVAL), *wait, "suite", str(out), "--tag", "define", *rest]
+    )
+    return subprocess.run(
+        ["bash", "-c", command], env=env, capture_output=True, text=True, timeout=60
+    )
+
+
+def wait_for(path: Path, within: float = 20) -> bool:
+    deadline = time.monotonic() + within
+    while not path.exists() and time.monotonic() < deadline:
+        time.sleep(0.05)
+    return path.exists()
+
+
+def test_an_eval_run_outlives_the_shell_that_started_it(
+    tmp_path: Path, toolbox: Path
+) -> None:
+    release = tmp_path / "release"
+    env = setup(tmp_path, toolbox, STANDIN_RELEASE=str(release))
+    out = tmp_path / "results" / "aggregate-result.json"
+    result = run_eval(env, out)
+    # The launching shell has exited while the suite is still running.
+    assert result.returncode == 0, result.stderr
+    assert wait_for(tmp_path / "calls.jsonl")
+    assert not out.exists()
+    (call,) = calls(tmp_path)
+    assert_isolated(call)
+    assert call["sid"] != os.getsid(0)  # a session of its own: no hangup reaches it
+    args = call["args"]
+    target = Path(after(args, "eval"))
+    assert outside_checkout(str(target)) and target.resolve() != PLUGIN
+    assert (target / "evals" / "README.md").exists()
+    assert Path(call["cwd"]).resolve() == target.parent.resolve()
+    assert after(args, "--json") == str(out) and after(args, "--tag") == "define"
+    release.touch()
+    assert wait_for(out)
+    assert json.loads(out.read_text(encoding="utf-8")) == {"cliVersion": "9.9.9"}
+    exit_code = target.parent / "exit-code"
+    assert wait_for(exit_code) and exit_code.read_text().strip() == "0"
+    log = (target.parent / "eval.log").read_text(encoding="utf-8")
+    assert log.startswith(f"CLI: {VERSION}\n")
+    assert str(out) in result.stdout and "eval.log" in result.stdout
+
+
+def test_an_eval_run_waited_on_exits_with_the_suites_status(
+    tmp_path: Path, toolbox: Path
+) -> None:
+    env = setup(tmp_path, toolbox, STANDIN_EXIT="2")
+    out = tmp_path / "results" / "partial.json"
+    result = run_eval(env, out, "--wait")
+    assert result.returncode == 2, result.stderr
+    assert "exited 2" in result.stderr and "cost ceiling" in result.stderr
+    assert out.exists()
+
+
+def test_an_eval_result_path_is_relative_to_the_plugin_by_default(
+    tmp_path: Path, toolbox: Path
+) -> None:
+    env = setup(tmp_path, toolbox)
+    result = subprocess.run(
+        [str(RUN_EVAL), "--wait", "suite", "evals/results/x.json"],
+        env={**env, "STANDIN_RECORD": str(tmp_path / "calls.jsonl")},
+        capture_output=True,
+        text=True,
+        timeout=60,
+    )
+    written = PLUGIN / "evals" / "results" / "x.json"
+    try:
+        assert result.returncode == 0, result.stderr
+        (call,) = calls(tmp_path)
+        assert after(call["args"], "--json") == str(written)
+    finally:
+        written.unlink(missing_ok=True)
+        if not any(written.parent.iterdir()):
+            written.parent.rmdir()
+
+
+@pytest.mark.parametrize(
+    "command",
+    [
+        [str(DRIVE), "figure-out", str(RECIPES / "figure-out.md")],
+        [str(DRIVE), "preflight"],
+        [str(WALK), "Find the install steps.", "README.md"],
+        [str(RUN_EVAL), "suite", "/nonexistent/out.json"],
+    ],
+    ids=["drive", "preflight", "walk", "run_eval"],
+)
+def test_with_no_claude_on_path_each_script_exits_3_naming_it(
+    tmp_path: Path, toolbox: Path, command: list[str]
+) -> None:
+    env = setup(tmp_path, toolbox, claude=False)
+    result = subprocess.run(
+        command, env=env, capture_output=True, text=True, timeout=60
+    )
+    assert result.returncode == 3, result.stdout + result.stderr
+    assert "the claude CLI is not on PATH" in result.stderr
+    assert "claude auth login" in result.stderr  # the next step
+
+
+def test_a_cli_that_is_not_signed_in_is_unreachable(
+    tmp_path: Path, toolbox: Path
+) -> None:
+    env = setup(tmp_path, toolbox, STANDIN_LOGGED_IN="0")
+    result = drive(env)
+    assert result.returncode == 3 and "not signed in" in result.stderr
+    assert calls(tmp_path) == []
+
+
+def test_preflight_names_the_cli_version_and_starts_no_session(
+    tmp_path: Path, toolbox: Path
+) -> None:
+    env = setup(tmp_path, toolbox)
+    result = subprocess.run(
+        [str(DRIVE), "preflight"], env=env, capture_output=True, text=True
+    )
+    assert result.returncode == 0, result.stderr
+    assert VERSION in result.stdout and calls(tmp_path) == []
+
+
+@pytest.mark.parametrize("claude", [True, False])
+def test_a_dry_run_names_the_session_and_cli_and_starts_nothing(
+    tmp_path: Path, toolbox: Path, claude: bool
+) -> None:
+    env = setup(tmp_path, toolbox, claude=claude)
+    shown = drive(env, "--dry-run")
+    walked = subprocess.run(
+        [str(WALK), "Find the install steps.", "README.md", "--dry-run"],
+        env=env,
+        capture_output=True,
+        text=True,
+    )
+    for result in (shown, walked):
+        assert result.returncode == 0, result.stderr
+        assert "claude -p" in result.stdout and " ".join(ISOLATION) in result.stdout
+        assert (VERSION if claude else "not on PATH") in result.stdout
+    assert "--plugin-dir" in shown.stdout and "project" in shown.stdout
+    assert calls(tmp_path) == [] and not (tmp_path / "store").exists()
+
+
+def test_a_drive_refuses_a_feature_with_no_recipe(
+    tmp_path: Path, toolbox: Path
+) -> None:
+    result = subprocess.run(
+        [str(DRIVE), "no-such-feature", str(RECIPES / "figure-out.md")],
+        env=setup(tmp_path, toolbox),
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 1 and "no recipe" in result.stderr
+
+
+def test_an_option_missing_its_value_is_named(tmp_path: Path, toolbox: Path) -> None:
+    result = drive(setup(tmp_path, toolbox), "--max-turns")
+    assert result.returncode == 1 and "--max-turns needs a value" in result.stderr
+
+
+@pytest.mark.parametrize(
+    ("script", "variable"),
+    [(DRIVE, "MANIFEST_DEV_FEATURES_EVIDENCE"), (RUN_EVAL, "MANIFEST_DEV_EVAL_RUNS")],
+)
+def test_a_store_inside_the_checkout_is_refused_before_anything_is_made(
+    tmp_path: Path, toolbox: Path, script: Path, variable: str
+) -> None:
+    inside = REPO_ROOT / "no-such-store"
+    env = {**setup(tmp_path, toolbox), variable: str(inside)}
+    args = (
+        ["figure-out", str(RECIPES / "figure-out.md")]
+        if script == DRIVE
+        else ["suite", str(tmp_path / "out.json")]
+    )
+    result = subprocess.run(
+        [str(script), *args], env=env, capture_output=True, text=True, timeout=60
+    )
+    assert result.returncode == 1, result.stderr
+    assert "inside this checkout" in result.stderr and variable in result.stderr
+    assert not inside.exists() and calls(tmp_path) == []
+
+
+def test_a_run_name_with_a_slash_is_refused(tmp_path: Path, toolbox: Path) -> None:
+    result = subprocess.run(
+        [str(RUN_EVAL), "a/b", str(tmp_path / "out.json")],
+        env=setup(tmp_path, toolbox),
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 2 and "one plain word" in result.stderr
+
+
+@pytest.mark.parametrize(
+    ("events", "says"),
+    [
+        ([{"type": "assistant"}], "no init event"),
+        ([{**GOOD[0], "skills": ["manifest-dev:define"]}], "did not load"),
+    ],
+)
+def test_a_session_that_did_not_load_the_skill_is_unreachable(
+    tmp_path: Path, toolbox: Path, events: list[dict[str, object]], says: str
+) -> None:
+    result = drive(setup(tmp_path, toolbox, STANDIN_TRANSCRIPT=lines(events)))
+    assert result.returncode == 3 and says in result.stderr, result.stderr
+
+
+def test_a_prompt_with_front_matter_sends_only_its_body(
+    tmp_path: Path, toolbox: Path
+) -> None:
+    prompt = tmp_path / "prompt.md"
+    prompt.write_text("---\ntags: a\n---\nthe body\n", encoding="utf-8")
+    result = drive(
+        setup(tmp_path, toolbox, STANDIN_TRANSCRIPT=lines(GOOD)), prompt=prompt
+    )
+    assert result.returncode == 0, result.stderr
+    (call,) = calls(tmp_path)
+    assert call["args"][-1] == "the body"
+
+
+def test_a_drive_never_reuses_an_evidence_directory(
+    tmp_path: Path, toolbox: Path
+) -> None:
+    # Two drives of one feature started in the same second once shared a directory and
+    # interleaved their transcripts. Start two at once with the stamp pinned and require two
+    # distinct evidence directories.
+    env = setup(tmp_path, toolbox, STANDIN_TRANSCRIPT=lines(GOOD))
+    drives = [
+        subprocess.Popen(
+            [str(DRIVE), "figure-out", str(RECIPES / "figure-out.md")],
+            env=env,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+        for _ in range(2)
+    ]
+    try:
+        for each in drives:
+            each.communicate(timeout=60)
+    finally:
+        for each in drives:
+            each.kill()
+            each.wait()
+    made = sorted(p.name for p in (tmp_path / "store" / "figure-out").iterdir())
+    assert made == [STAMP, f"{STAMP}-2"], made
+
+
+def test_a_session_that_wrote_no_transcript_is_unreachable(
+    tmp_path: Path, toolbox: Path
+) -> None:
+    # `verify` records exit 3 as unreachable; a drive that produced no session is never a failure
+    # of the skill.
+    result = drive(setup(tmp_path, toolbox, STANDIN_EXIT="1"))
+    assert result.returncode == 3, result.stderr
+    assert "wrote no transcript (claude exit 1)" in result.stderr
+
+
+def test_a_session_stopped_by_a_signal_is_unreachable(
+    tmp_path: Path, toolbox: Path
+) -> None:
+    result = drive(
+        setup(tmp_path, toolbox, STANDIN_TRANSCRIPT=lines(GOOD[:1]), STANDIN_EXIT="137")
+    )
+    assert result.returncode == 3, result.stdout + result.stderr
+    assert "stopped by a signal (exit 137) after it started" in result.stderr
+
+
+def drive_scaffold(
+    tmp_path: Path, toolbox: Path, body: str, transcript: str = ""
+) -> subprocess.CompletedProcess[str]:
+    # A drive takes scaffolds from inside the checkout only, so the test's lives there briefly.
+    case = REPO_ROOT / "verification" / "scaffolds" / f"drive-test-{uuid.uuid4().hex}"
+    case.mkdir()
+    try:
+        (case / "scaffold.sh").write_text(body, encoding="utf-8")
+        env = setup(tmp_path, toolbox, STANDIN_TRANSCRIPT=transcript)
+        return drive(env, "--scaffold", str(case))
+    finally:
+        shutil.rmtree(case)
+
+
+def test_a_scaffold_builds_the_project_from_the_checkouts_path(
+    tmp_path: Path, toolbox: Path
+) -> None:
+    result = drive_scaffold(
+        tmp_path,
+        toolbox,
+        'pwd -P > where; printf %s "$DRIVE_CHECKOUT" > checkout\n',
+        lines(GOOD),
+    )
+    assert result.returncode == 0, result.stderr
+    project = tmp_path / "store" / "figure-out" / STAMP / "project"
+    assert Path((project / "where").read_text().strip()) == project.resolve()
+    assert Path((project / "checkout").read_text()) == REPO_ROOT
+
+
+def test_the_this_repository_scaffold_copies_the_last_commit(
+    tmp_path: Path, toolbox: Path
+) -> None:
+    # It once read a container's mount of the checkout; it now reads the path the drive passes.
+    env = setup(tmp_path, toolbox, STANDIN_TRANSCRIPT=lines(GOOD))
+    result = drive(
+        env, "--scaffold", str(REPO_ROOT / "verification/scaffolds/this-repository")
+    )
+    assert result.returncode == 0, result.stderr
+    project = tmp_path / "store" / "figure-out" / STAMP / "project"
+    assert (project / "CLAUDE.md").is_file() and (
+        project / "scripts/drive-skill.sh"
+    ).is_file()
+
+
+def test_a_scaffold_that_seeds_a_home_is_not_driven(
+    tmp_path: Path, toolbox: Path
+) -> None:
+    # A drive shares the user's home with its session, so a case that seeds one is an eval's.
+    result = drive_scaffold(
+        tmp_path,
+        toolbox,
+        'mkdir -p "$HOME/.manifest-dev/logs"; touch "$HOME/.manifest-dev/logs/x"\n',
+    )
+    assert result.returncode == 3, result.stderr
+    assert "seeds a home directory" in result.stderr and "eval suite" in result.stderr
+    assert not (tmp_path / "home" / ".manifest-dev").exists() and calls(tmp_path) == []
+
+
+def test_a_failed_scaffold_is_unreachable_and_shows_its_log(
+    tmp_path: Path, toolbox: Path
+) -> None:
+    result = drive_scaffold(tmp_path, toolbox, "echo seed step broke\nexit 7\n")
+    assert result.returncode == 3, result.stderr
+    assert "seed step broke" in result.stderr and "scaffold exited 7" in result.stderr
+    assert calls(tmp_path) == []
+
+
+@pytest.mark.skipif(os.geteuid() == 0, reason="root ignores directory permissions")
+def test_a_drive_fails_fast_when_it_cannot_create_evidence(
+    tmp_path: Path, toolbox: Path
+) -> None:
+    # Only "another drive holds this directory" may be retried; any other failure stops loudly.
+    store = tmp_path / "store"
+    (store / "figure-out").mkdir(parents=True)
+    (store / "figure-out").chmod(0o555)
+    try:
+        result = drive(setup(tmp_path, toolbox))
+    finally:
+        (store / "figure-out").chmod(0o755)
+    assert result.returncode != 0 and "cannot create" in result.stderr, result.stderr
+
+
+def test_a_walk_passes_on_a_failed_session_and_says_so(
+    tmp_path: Path, toolbox: Path
+) -> None:
+    result = subprocess.run(
+        [str(WALK), "Find the install steps.", "README.md"],
+        env=setup(tmp_path, toolbox, STANDIN_EXIT="1"),
+        capture_output=True,
+        text=True,
+        timeout=60,
+    )
+    assert result.returncode == 1 and "reader session exited 1" in result.stderr
+
+
+def test_stopping_a_drive_stops_its_session(tmp_path: Path, toolbox: Path) -> None:
+    # The session runs in the drive's process group, so the stop `scripts/verify` sends that group
+    # reaches it, as the container's init process once made sure.
+    env = setup(tmp_path, toolbox, STANDIN_SLEEP="30")
+    running = subprocess.Popen(
+        [str(DRIVE), "figure-out", str(RECIPES / "figure-out.md")],
+        env=env,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        start_new_session=True,
+    )
+    try:
+        assert wait_for(tmp_path / "calls.jsonl")
+        (call,) = calls(tmp_path)
+        os.killpg(running.pid, signal.SIGTERM)
+        running.wait(timeout=10)
+        deadline = time.monotonic() + 5
+        while _alive(call["pid"]) and time.monotonic() < deadline:
+            time.sleep(0.05)
+        assert not _alive(call["pid"])
+    finally:
+        running.kill()
+        running.wait()
+
+
+def _alive(pid: int) -> bool:
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return False
+    return True
