@@ -26,12 +26,12 @@ request's description or comments with `--attach`, through the same upload the w
   working, the decisions with the user's calls first, and the debt left. Long lists fold.
 - The proof comes from runs of the checks the change touches, on a local or dev instance, or on a
   preview deploy where the project's CI already makes one — never production. A user path in a UI
-  shows as screenshots, and motion as a short GIF.
-- Images are attached to the pull request with `gh pr create`, `gh pr edit` or `gh pr comment`
-  and `--attach`, so GitHub stores them as it stores images dropped into the web editor. No branch,
-  other repository or service is involved, and nothing needs cleaning up.
+  shows as screenshots, and motion as a short GIF or video.
+- Images and videos are attached to the pull request with `gh pr create`, `gh pr edit` or
+  `gh pr comment` and `--attach`, so GitHub stores them as it stores files dropped into the web
+  editor. No branch, other repository or service is involved, and nothing needs cleaning up.
 - Where the upload is unavailable — a `gh` older than 2.99, GitHub Enterprise Server, or a token the
-  upload refuses — the description says the images could not be attached and why, and the proof
+  upload refuses — the description says the media could not be attached and why, and the proof
   is command output.
 
 ## Alternatives Considered
