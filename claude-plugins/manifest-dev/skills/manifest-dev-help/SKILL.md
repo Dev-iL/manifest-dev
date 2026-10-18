@@ -73,7 +73,7 @@ on your team do not have to use any level. Stop at the level that fits your proj
 | 2. One piece of work | Use `/figure-out`, `/define` and `/do`, or `/auto`. | A result with evidence for each gate. | More tokens and time at the start. The Manifest and its log stay outside the repository. |
 | 3. Project Surfaces | Use `/setup-project` one time. | Each session starts from the direction, words, decisions and checks of the project. | Files in the repository that your team can see. |
 | 4. A shared queue | Write work with `/ticket-up` and take it with `/next-ticket`. | The next work is in a store, not in the head of one person. | A Ticket Store: GitHub Issues, files or your own tracker. |
-| 5. Unattended runs | Grant Auto on Tickets, and start `/run-ticket` or `/sweep-tickets` from a schedule or an orchestrator. | The project advances without you. You act only for a blocker, a judgment, a taste or an authority. | A scheduler or orchestrator that you install, and gates that you trust. |
+| 5. The queue runs | Start `/orchestrate` and approve its plan, or start `/orchestrate --autonomous` from a scheduler that you have. Mark a Ticket Auto when it needs no judgment of a person. | Many Tickets run at the same time. An Auto Ticket goes to the end. Other Tickets stop at a pull request that is ready. You act only for a blocker, a judgment, a taste or an authority. | Gates that you trust. A scheduler only if you want runs without you. |
 
 To climb a level:
 
@@ -88,8 +88,8 @@ To climb a level:
 | `/setup-project` | Give a project its North Star, glossary and decision-record conventions, and add a verification harness unless you opt out. Run it again to find gaps. |
 | `/ticket-up` | Write work into your Ticket Store as Tickets. |
 | `/next-ticket` | Select the next Ticket, claim it, and see why it is first. |
-| `/run-ticket` | Do one Ticket from start to end and record the result on it. |
-| `/sweep-tickets` | Start or continue one unattended Ticket from a schedule. |
+| `/run-ticket` | Do one Ticket until its pull request is ready, and record the result on the Ticket. |
+| `/orchestrate` | Run ready Tickets at the same time, land them, and keep a list of what waits for you. |
 | `/figure-out-team` | Do the work of `/figure-out` with a team in a Slack channel or thread. |
 | `/review-code` | Review a change for one quality dimension. Manifest gates use it. |
 | `/review-writing` | Review text against its style standards. |
@@ -116,7 +116,7 @@ or `/skill:name`.
   `/do` runs the recipes that a change touches. A project can opt out of the harness and keep its own
   checks. Then `/do` uses those checks.
 - A Ticket holds one unit of work. `/ticket-up` writes it, `/next-ticket` selects it, and
-  `/run-ticket` does it.
+  `/run-ticket` does it. `/orchestrate` runs many Tickets and lands them.
 - When a run corrects a mistake, it adds a Lock. What it finds and does not fix is Debt. The next
   run that changes that code offers to fix the Debt.
 
