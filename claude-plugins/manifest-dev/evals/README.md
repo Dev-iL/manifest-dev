@@ -6,10 +6,12 @@ tagged with its suite; run one with `--tag figure-out` or `--tag define`.
 Measures whether `figure-out` delivers the discipline its own prompt states — not whether it
 reaches a correct answer, which a strong base model does unaided.
 
-Run it:
+Run it from the repository root, the same way locally and in a cloud session (*Running a suite*
+says what the script does and how to follow a run):
 
 ```bash
-claude plugin eval . --tag figure-out --ablation with-without --judge-model sonnet --allow-tools Write Bash --scaffold -j 8 --max-cost-usd 120
+scripts/evals/run_eval.sh figure-out evals/results/figure-out/aggregate-result.json \
+  --tag figure-out --ablation with-without --judge-model sonnet --scaffold --max-cost-usd 120
 ```
 
 `--scaffold` runs each case's `scaffold.sh` (declared in its `case.yaml`) before the agent starts,
@@ -26,7 +28,8 @@ project (`52`). The no-plugin arm passes or fails them by construction. They car
 tag `figure-out-plugin-only` instead of `figure-out` and run on the plugin arm alone:
 
 ```bash
-claude plugin eval . --tag figure-out-plugin-only --ablation none --judge-model sonnet --allow-tools Write Bash --scaffold -j 8 --max-cost-usd 15
+scripts/evals/run_eval.sh figure-out-plugin-only evals/results/figure-out-plugin-only/aggregate-result.json \
+  --tag figure-out-plugin-only --ablation none --judge-model sonnet --scaffold --max-cost-usd 15
 ```
 
 `--max-cost-usd` is the hard stop: the CLI checks its list-price estimate, judge calls included,
@@ -35,8 +38,8 @@ ceiling is the suite's run count at the $1.52 a run measured under an opus judge
 an upper bound under sonnet; a run cut short exits 2 with a partial result, which
 `score_rounds.py` refuses to score.
 
-`--allow-tools Write Bash` is required. `allowed_tools` in a case's `prompt.md` declares what the
-case *wants*; the operator grant is what enables it. Without it, file graders fail in both arms and
+`--allow-tools Write Bash` is required, and `run_eval.sh` always passes it. `allowed_tools` in a
+case's `prompt.md` declares what the case *wants*; the operator grant is what enables it. Without it, file graders fail in both arms and
 cases burn their turn reporting that writing is disabled.
 
 The headline number is **Δ** — with-plugin score minus the no-plugin baseline.
@@ -102,25 +105,43 @@ where the skills stand, never a verdict on one case. Read a result this way:
   analyzer reads only train outputs. A kept change is confirmed by the full suite, both arms; a
   held-out case or guard grader that falls there gets its three-run re-run before the change stays.
 
-## Running on macOS
+## Running a suite
 
-Run the suites in the Linux container defined by `Dockerfile` in this directory. On macOS, every
-eval child tries to store a key in the login keychain from a sandboxed home that has no keychain,
-and macOS raises a "Keychain Not Found" dialog per child, hundreds per suite. A container has no
-macOS keychain, and a detached container also keeps running if the launching session ends:
+Every run goes through `scripts/evals/run_eval.sh <name> <out-json> [eval flags]`, from the
+repository root, the same way on your machine and in a cloud session. It needs only the `claude`
+CLI on PATH, signed in as you (`claude auth login`, or `ANTHROPIC_API_KEY`); there is no
+container. The script:
 
-```bash
-scripts/evals/run_eval.sh figure-out-run evals/results/figure-out-run/aggregate-result.json \
-  --tag figure-out --ablation with-without --judge-model sonnet --scaffold --max-cost-usd 120
-```
+- copies this plugin into a run directory outside the checkout and evaluates the copy, so the
+  checkout can change while a suite runs;
+- starts `claude plugin eval` from that directory with `--setting-sources project,local
+  --strict-mcp-config`, so your user settings and MCP servers stay out, and with `--allow-tools
+  Write Bash -j 8 --no-publish --trust-plugin`;
+- detaches the run, so it keeps going after the shell that started it exits.
 
-The script builds the image if it is missing, starts colima if Docker is down, reads
-a Claude credential from the shell profile when the environment lacks it — a subscription
-token from `claude setup-token` in `CLAUDE_CODE_OAUTH_TOKEN` when one is set, otherwise
-`ANTHROPIC_API_KEY`; on a subscription a full suite counts against its usage limits — and starts a named,
-detached container; `docker wait <name>` blocks until it exits. The Dockerfile pins the CLI
-version; bump it deliberately, since a different CLI can move scores. A run writes its results
-only when it finishes, so a killed run loses all of its work.
+`<out-json>` is relative to this directory unless it is absolute. The run directory is
+`~/.local/state/manifest-dev-evals/<name>/<stamp>/` (`MANIFEST_DEV_EVAL_RUNS` moves it): its
+`eval.log` opens with the CLI version and follows the run, and `exit-code` appears when the run
+ends. Put `--wait` first to block until then and exit with the suite's status. A run writes its
+results only when it finishes, so a killed run loses all of its work. A full suite is many
+sessions on your sign-in and counts against its usage limits, or bills your API key.
+
+- **Locally**, start it and follow `eval.log`, or pass `--wait`.
+- **In a cloud session**, start it without `--wait` and check `exit-code` later: the run outlives
+  the command that started it, so a command timeout does not cut it short, though it does not
+  outlive the session's machine.
+- **On macOS**, each eval child may raise a "Keychain Not Found" dialog: every child tries to store
+  a key in the login keychain from a sandboxed home that has none, one dialog per child and
+  hundreds per suite. Suites run best in a cloud session.
+
+The CLI version is recorded, not pinned. Note it beside every baseline (*Recording a baseline*),
+since a different CLI can move scores. `claude --help` does not say whether those settings flags
+reach the child sessions `claude plugin eval` starts, or whether your personal memory file stays
+out of a session; where either matters, run on a machine that carries no setup of your own.
+
+A skill drive (`scripts/drive-skill.sh`) and a document walk (`scripts/walk.sh`) start the CLI
+the same way, from a scratch directory outside the checkout, locally or in a cloud session;
+`verification/harness.md` says how `scripts/verify` runs them.
 
 ## What the pilots established
 
@@ -569,9 +590,8 @@ and `test_ids` and one `vN/` directory per round.
    per case, plugin arm only, three runs:
    ```bash
    for c in <climb set>; do
-     scripts/evals/run_eval.sh "hc-v0-$c" "evals/results/hillclimb-<suite>/v0/$c.json" \
+     scripts/evals/run_eval.sh --wait "hc-v0-$c" "evals/results/hillclimb-<suite>/v0/$c.json" \
        --case "$c" --tag <suite> --ablation none --runs 3 --judge-model sonnet --scaffold --max-cost-usd 6
-     docker wait "hc-v0-$c"
    done
    ```
 4. **Extract train outputs** for the analyzer. A finished run keeps each run's judged artifact
@@ -844,8 +864,8 @@ where it was stated.
 **Superseded** by both 2026-10-06 baselines above; kept as the hill-climb's starting point.
 
 Report `results/figure-out-baseline-20261005-1845`. Measured at `9a312219`, CLI 2.1.289,
-agent `claude-opus-5-5`, judge `claude-sonnet-5-5`, 12 runs per arm, run in the container
-`Dockerfile` defines.
+agent `claude-opus-5-5`, judge `claude-sonnet-5-5`, 12 runs per arm, run in the Linux eval
+container the suite used at the time.
 
 | Case | Split | With | Without | Δ |
 |---|---|---|---|---|

@@ -11,13 +11,14 @@ this recipe starts the suite and does not redefine them.
 
 ## How a user reaches it
 
-- `claude-plugins/manifest-dev/evals/define/README.md`; on macOS, `scripts/evals/run_eval.sh` runs
-  the same command in the eval container.
+- `claude-plugins/manifest-dev/evals/define/README.md`; `scripts/evals/run_eval.sh` starts every
+  run, locally or in a cloud session, as `claude-plugins/manifest-dev/evals/README.md` → *Running
+  a suite* says.
 
 ## Scenarios
 
 ### with-without
-Run: `cd claude-plugins/manifest-dev && claude plugin eval . --tag define --ablation with-without --judge-model sonnet --allow-tools Write Bash --scaffold -j 8 --max-cost-usd 60`
+Run: `scripts/evals/run_eval.sh --wait define-with-without evals/results/define-with-without/aggregate-result.json --tag define --ablation with-without --judge-model sonnet --scaffold --max-cost-usd 60`
 Proves: the suite ran both arms; the Δ it reports, read against the suite README's noise, is the measurement, and the README records it.
 Check: read
 Workload: varies
@@ -25,6 +26,6 @@ Workload: varies
 ## Gotchas
 
 - Read `claude-plugins/manifest-dev/evals/README.md` on noise before trusting a Δ from this suite.
-- `--allow-tools Write Bash` and `--scaffold` are required, as for the figure-out suite.
+- `--scaffold` is required, and `run_eval.sh` always passes `--allow-tools Write Bash`, as for the figure-out suite.
 - `--max-cost-usd` is a hard stop at the suite README's cost estimate; a run it cuts short exits 2 with a partial result, which is rerun, never scored.
-- On macOS run it inside the container (`scripts/evals/run_eval.sh`).
+- On macOS each eval child may raise a keychain dialog; run suites in a cloud session where you can.

@@ -28,6 +28,6 @@ Workload: varies
 - The prompt file carries the placeholder `THROWAWAY_PR_URL`; replace it with a throwaway pull request in a repository the run owns before driving.
 - Needs `gh auth status` to succeed in the session.
 - Posting is public and does not undo. Never drive it on someone else's pull request to test it.
-- The drive container carries no GitHub credentials, so a drive through `scripts/drive-skill.sh` reaches this recipe only after a GitHub token for a throwaway repository is added to it; until then its GitHub entry points are `unreachable`.
+- A drive through `scripts/drive-skill.sh` runs as you, with whatever GitHub access the driving machine has, so drive it only with a prompt naming a throwaway repository the run owns; where `gh` is not signed in, its GitHub entry points are `unreachable`.
 - Manifest mode needs the checkout at the pull request's head.
 - `tests/test_dist_skill_references.py` checks its markers, Manifest mode and fleet references. No behavior case.
