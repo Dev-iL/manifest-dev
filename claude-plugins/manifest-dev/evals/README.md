@@ -210,10 +210,11 @@ observed and stopped per run, or whose failure explains nothing, is repaired as 
 `55`, added the same day, holds the other half of that rule for a project with no harness: a
 touched check of the project's own that cannot be relied on is repaired in its own form.
 
-**Every recorded number in this file is stale as of 2026-10-15.** The 2026-10-13 change edited
+**Every recorded number in this file is stale as of 2026-10-18.** The 2026-10-13 change edited
 figure-out's spine, its docs-mode and autonomous references, and its task files, the
-2026-10-14 change moved its verification wording to one harness, and the 2026-10-15 change made
-that harness optional and the project's own checks a run's to repair, so no earlier result
+2026-10-14 change moved its verification wording to one harness, the 2026-10-15 change made
+that harness optional and the project's own checks a run's to repair, and the 2026-10-18 change
+made the host's question capability the default way figure-out asks, so no earlier result
 measures the skill as it ships now. The next baseline replaces them.
 
 Headroom per case comes from the current baseline, not from this table. The 2026-09-14 numbers
@@ -472,7 +473,8 @@ rubric that was simply miscalibrated.
   and the default log path is outside what a grader reads. Splitting questions into tickets needs
   a ticket-store fixture. Rendering beyond the draft offer needs operator opt-in to publishing and
   several turns. Under-firing is excluded because prompts name the skill by design. Asking through a host's question-selection capability has no case: the headless harness
-  offers no such tool, so neither the opt-in path nor the plain-text default can be observed. A mechanism
+  offers no such tool, so the default most users get cannot be observed, and every case measures
+  the plain-text path, one ask per turn, which the turn-discipline graders judge. A mechanism
   that only appears when components interact, and calibrating to the user's expertise, have no
   case: `10` already floors on reaching a mechanism, and expertise has no observable bar. Offering the cheapest sufficient option before durable
   machinery, and pricing "living with it" as a real option, are left to `01`: `12`, which priced
@@ -593,7 +595,8 @@ is with-arm minus without-arm, and a hill-climb round measures only the first ha
 
 **This baseline predates the change that added cases `17`–`29`.** That change also edited the
 skill this suite measures: figure-out now writes in Simplified Technical English style by
-default, asks through the host's question capability when the user's instructions ask for it,
+default, asks through the host's question capability when the user's instructions ask for it
+(the default where the host offers one since 2026-10-18),
 yields only for a fact the user holds, authority it lacks, or a user's call no Taste entry
 settles, flags the user's calls in autonomous mode by a disagreement test instead of low
 confidence, and captures a Taste entry from a reversal the user explains. Re-record both arms

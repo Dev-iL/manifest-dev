@@ -33,6 +33,16 @@ calls — invariant versus guidance, what a gate ranges over, where it binds, it
 kind. Surface the load-bearing ones with a recommended answer; auto-decide the
 rest and mark them `(auto)` with a matching `ASM-*`.
 
+Where the host offers a question-selection capability — a way to put a question
+to the user as options to pick from, with room to answer in their own words —
+ask through it by default, with your recommended answer as each ask's first
+option. Key calls are mostly independent of each other, so batch them there into
+as few turns as they allow; a call whose answer would change another's goes
+first, and the other waits for it. Without that capability, or once the user has
+asked you to ask in prose, write the ask in plain text, one ask per turn. An
+unattended caller is asked nothing: decide each call within its delegation and
+record it as below.
+
 An amendment from an unattended executor is unattended: self-answer within the
 caller's delegation, ask no questions, and wait for no approval. Validate a
 delegated Appetite revision before applying it: the broader work serves the

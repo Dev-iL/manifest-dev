@@ -53,6 +53,7 @@ Workload: varies
 ## Gotchas
 
 - The eval cases' `prompt.md` files open with the case's front matter; `scripts/drive-skill.sh` sends only the body below it.
+- A drive's headless session offers no question-selection capability, so the reply asks in plain text, one ask per turn; asking through the capability, the default on a host that offers one, shows only in an interactive session.
 - The reply ends at its one ask. A full read — conclusion, confidence, evidence, what would overturn it — needs the user's answers, which a one-prompt drive does not give; that path is the eval suite's.
 - Without the skill named in the prompt it may not fire; the eval README measures how often.
 - A user's agreement is not a go: it never edits code, so "it didn't implement" is the intended outcome, not a failure.
