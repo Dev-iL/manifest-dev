@@ -34,8 +34,9 @@ position: the sweep gives too little control and is too slow.
 - It has two modes, and each mode decides whether it chains, so no flag does. By default it
   proposes an execution plan and waits for the person's approval; when the plan ends, it proposes
   the next one, and no answer means stop. With `--autonomous` it acts on its own, keeps filling
-  free slots while granted work remains in scope, then stops. Autonomous runs take only Auto
-  Tickets.
+  free slots while work remains in scope, then stops. Autonomous runs take Auto Tickets end to
+  end, and Tickets without Auto up to a ready pull request, under
+  20261018-a-ticket-without-auto-runs-until-it-needs-a-person-and-never-lands-on-its-own.
 - An approved plan may include ungranted Tickets. They stop at a ready pull request with its
   evidence and land only after the person looks. Approving a plan is not an Auto grant.
 - Orchestrators never coordinate with each other. Each knows only itself; the store and git are
@@ -138,6 +139,7 @@ the person's answers count; `tests/test_entry_points.py` would declare `orchestr
   20260825-escalation-clears-the-claim-and-carries-its-own-mark,
   20260812-human-assignment-pauses-auto-ticket-execution; see also
   20261018-orchestrate-lands-and-run-ticket-stops-at-a-ready-pull-request,
+  20261018-a-ticket-without-auto-runs-until-it-needs-a-person-and-never-lands-on-its-own,
   20260814-ticket-selection-minimizes-delay-loss-across-available-executors,
   20261013-new-capabilities-live-inside-the-four-workflow-entry-points,
   20260703-figure-out-fog-discipline,
