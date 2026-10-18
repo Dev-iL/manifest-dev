@@ -1,7 +1,7 @@
 # ADR: Only a person grants Auto to a follow-up
 
 ## Status
-Accepted
+Superseded by 20261018-orchestrate-tickets-up-debt-and-grants-auto-where-the-criterion-holds
 
 ## Area
 Ticketing

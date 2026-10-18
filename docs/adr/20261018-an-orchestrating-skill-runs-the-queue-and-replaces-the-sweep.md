@@ -29,6 +29,8 @@ position: the sweep gives too little control and is too slow.
 - A new skill, `orchestrate`, takes an effort or, when none is named, the whole store. It runs
   ready Tickets in parallel, each through `run-ticket` in its own session, up to `--max-batch` at
   once (default 10; `none` removes the limit). It ranks candidates by the store's delay-loss rule.
+  An optional type filter limits it to Tickets of the named Ticket Types, as the sweep's did, and
+  an untyped Ticket never matches one.
 - It has two modes, and each mode decides whether it chains, so no flag does. By default it
   proposes an execution plan and waits for the person's approval; when the plan ends, it proposes
   the next one, and no answer means stop. With `--autonomous` it acts on its own, keeps filling
@@ -53,11 +55,12 @@ position: the sweep gives too little control and is too slow.
 - A person follows the run on a status page: a view rebuilt from the store at each check-in, never
   a record of its own, linked from the effort's front item so later plans update the same page.
   The orchestrator keeps one list of what waits on the person — held pull requests, escalations,
-  follow-ups awaiting an Auto grant, the next plan — ordered by what waiting costs.
+  follow-ups awaiting a person's grant, the next plan — ordered by what waiting costs.
 - The person's answers count by where they come from. The orchestrator writes an answer given in
   its conversation back to the Ticket, and on the person's explicit answer it may record the
   continuation and clear an escalation mark. On the venue, only a pull-request approval by someone
-  with write access counts. An Auto grant still goes through `ticket-up`.
+  with write access counts. An Auto grant still goes through `ticket-up`; in `--autonomous`, `orchestrate` itself grants it
+  where the criterion holds, under 20261018-orchestrate-tickets-up-debt-and-grants-auto-where-the-criterion-holds.
 - A line on the effort's front item pauses the effort: an orchestrator starting on it starts
   nothing new, and running sessions finish.
 - A failed launch is retried. After three failed launches, the Ticket goes to a person with the
@@ -128,4 +131,6 @@ the person's answers count; `tests/test_entry_points.py` would declare `orchestr
   20261018-orchestrate-lands-and-run-ticket-stops-at-a-ready-pull-request,
   20260814-ticket-selection-minimizes-delay-loss-across-available-executors,
   20261013-new-capabilities-live-inside-the-four-workflow-entry-points,
-  20260703-figure-out-fog-discipline
+  20260703-figure-out-fog-discipline,
+  20260811-ticket-type-is-a-rollout-selector-not-a-classification,
+  20261018-orchestrate-tickets-up-debt-and-grants-auto-where-the-criterion-holds

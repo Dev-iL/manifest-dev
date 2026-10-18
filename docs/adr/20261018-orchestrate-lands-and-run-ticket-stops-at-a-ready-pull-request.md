@@ -35,6 +35,7 @@ re-check. A run sees only its own Ticket; the orchestrator sees all of its runs.
 - Where two orchestrators land on one branch, the repository should require up-to-date branches or
   use a merge queue. An orchestrator does not refuse to run without one; its plan names the
   remaining race once.
+- A Question Ticket has nothing to land: `run-ticket` closes it once its answer is recorded on it.
 - A person who runs `run-ticket` by hand gets a ready pull request to merge.
 
 ## Alternatives Considered

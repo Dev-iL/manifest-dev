@@ -172,8 +172,6 @@ how many of our own projects are running all three tiers at once.
 - Requiring anyone else to adopt it: what a user adds to a shared repository reads as
   plain files and plain instructions, and nothing in it stops a colleague who does not use
   manifest-dev from working as they did.
-- Agents granting themselves work: a Ticket an agent writes carries Auto only when a person
-  grants it, so the queue grows on what people judge worth doing.
 
 — ruled: each enforced in practice today — the messaging boundaries since the first
   strategy doc, the bounded-not-cheap boundary added 2026-07-28 and revised 2026-08-20
@@ -190,10 +188,11 @@ how many of our own projects are running all three tiers at once.
   against requiring anyone else to adopt it was added 2026-10-15, when the owner ruled that
   the project fits inside teams and codebases where most colleagues do not use it; what
   setup adds to a shared context file has not yet been checked against it. The same day the
-  owner ruled that cost is judged per unit of merged work once runs go unattended, and that
-  agents never grant themselves work, which `ticket-up` carries out — see
-  docs/adr/20261015-projects-drive-themselves-as-far-as-each-user-climbs.md and
-  docs/adr/20261015-only-a-person-grants-auto-to-a-follow-up.md. The traction
+  owner ruled that cost is judged per unit of merged work once runs go unattended — see
+  docs/adr/20261015-projects-drive-themselves-as-far-as-each-user-climbs.md. A Never on agents
+  granting themselves work, ruled that day, was removed 2026-10-18, when the owner ruled that
+  `orchestrate --autonomous` grants Auto wherever the grant criterion holds — see
+  docs/adr/20261018-orchestrate-tickets-up-debt-and-grants-auto-where-the-criterion-holds.md. The traction
   rule lives in the repository's contributor instructions. Only the owner moves these.
 
 ## Open

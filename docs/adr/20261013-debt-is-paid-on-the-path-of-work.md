@@ -1,7 +1,7 @@
 # ADR: Debt is paid on the path of work, so a codebase converges through normal runs
 
 ## Status
-Accepted
+Accepted — amended by 20261018-orchestrate-tickets-up-debt-and-grants-auto-where-the-criterion-holds: `orchestrate` tickets up the debt left by the runs it lands, so debt off the path of later work no longer waits only for a change to reach it
 
 ## Area
 define / do
