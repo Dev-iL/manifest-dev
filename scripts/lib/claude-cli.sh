@@ -15,7 +15,8 @@
 #                               CLAUDECODE, which marks a session already running and would make
 #                               this one a nested session of whatever launched the script.
 #   copy_plugin <name> <dest>   copies claude-plugins/<name> to <dest>/<name> and prints the
-#                               copy's path, so a session can never change the checkout's plugin.
+#                               copy's path, so a session can never change the checkout's plugin;
+#                               returns 1, saying why, when the copy fails.
 #
 # What `--setting-sources` does not cover is the CLI's to say: whether your personal memory file
 # (~/.claude/CLAUDE.md) stays out is not stated by `claude --help`. The session uses your own
@@ -66,8 +67,11 @@ claude_cli_status() {
 
 copy_plugin() {
   local name=$1 dest=$2
-  mkdir -p "$dest"
-  cp -R "$root/claude-plugins/$name" "$dest/"
+  # Called inside $(...), where set -e does not reach: the caller adds `|| exit 3`.
+  mkdir -p "$dest" && cp -R "$root/claude-plugins/$name" "$dest/" || {
+    echo "${0##*/}: unreachable — could not copy claude-plugins/$name to $dest; free disk space or fix its permissions and rerun" >&2
+    return 1
+  }
   # Local eval results can be large and are never part of the plugin.
   rm -rf "$dest/$name/evals/results"
   printf '%s\n' "$dest/$name"

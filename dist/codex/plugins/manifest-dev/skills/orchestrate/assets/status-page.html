@@ -1500,18 +1500,23 @@ button.row:active { background: var(--fill); }
   /* ================= The one path every snapshot takes ================= */
   function strings(a) { return a == null || (Array.isArray(a) && a.every(function (x) { return typeof x === "string"; })); }
   function optStr(v) { return v == null || typeof v === "string"; }
+  function oneOf(v, list) { return list.indexOf(v) >= 0; }
+  var MODES = ["default", "autonomous"], STATES = ["running", "paused", "finished"], KINDS = ["debt", "refactor"];
+  var PHASE_IDS = PHASES.map(function (p) { return p[0]; });
   // Data is untyped input, so it is checked here, where it enters; a bad snapshot keeps the last good view.
   function valid(d) {
     if (!d || typeof d !== "object" || d.schema !== 1 || !Array.isArray(d.tickets) || !Array.isArray(d.needsYou)) return false;
     if (!d.effort || typeof d.effort.name !== "string" || !optStr(d.effort.destination)) return false;
-    if (typeof d.mode !== "string" || typeof d.state !== "string" || isNaN(Date.parse(d.checkedAt))) return false;
+    if (!oneOf(d.mode, MODES) || !oneOf(d.state, STATES) || isNaN(Date.parse(d.checkedAt))) return false;
+    if (typeof d.plan !== "number" || !isFinite(d.plan)) return false;
     if (d.nextCheckAt != null && isNaN(Date.parse(d.nextCheckAt))) return false;
     if (d.maxBatch != null && typeof d.maxBatch !== "number") return false;
     var ids = {};
     var ticketsOk = d.tickets.every(function (t) {
-      if (!t || typeof t.id !== "string" || ids[t.id] || t.id === "goal" || typeof t.title !== "string" || typeof t.status !== "string") return false;
+      if (!t || typeof t.id !== "string" || ids[t.id] || t.id === "goal" || typeof t.title !== "string" || !Object.prototype.hasOwnProperty.call(TONE, t.status)) return false;
       ids[t.id] = 1;
-      if (!optStr(t.url) || !optStr(t.phase) || !optStr(t.at) || !optStr(t.note) || !optStr(t.kind) || !optStr(t.grant)) return false;
+      if (!optStr(t.url) || !optStr(t.at) || !optStr(t.note) || !optStr(t.grant)) return false;
+      if ((t.phase != null && !oneOf(t.phase, PHASE_IDS)) || (t.kind != null && !oneOf(t.kind, KINDS)) || (t.auto != null && t.auto !== false)) return false;
       if (t.pr != null && (typeof t.pr !== "object" || typeof t.pr.id !== "string" || !optStr(t.pr.url))) return false;
       return strings(t.dependsOn) && strings(t.after) && strings(t.from);
     });

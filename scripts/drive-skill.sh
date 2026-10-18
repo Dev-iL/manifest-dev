@@ -32,8 +32,8 @@
 # ${MANIFEST_DEV_FEATURES_EVIDENCE:-$HOME/.local/state/manifest-dev-features}/<feature>/<stamp>/,
 # which must lie outside this checkout. A summary — CLI version, model, loaded plugins and
 # skills, final reply, files written — is printed, which `scripts/verify` keeps as the
-# scenario's evidence. A drive that could not start, or whose session did not load the plugin
-# or the skill, exits 3 (unreachable) and is not counted.
+# scenario's evidence. A drive that could not start, whose session did not load the plugin or
+# the skill, or whose session ended in an error, exits 3 (unreachable) and is not counted.
 #
 # Needs: the claude CLI on PATH, signed in (`claude auth login`, or ANTHROPIC_API_KEY), and
 # python3. The CLI version is recorded, not pinned. MODEL selects the model (default: opus).
@@ -128,7 +128,8 @@ fi
 
 plugins=()
 for name in "${plugin_names[@]}"; do
-  plugins+=(--plugin-dir "$(copy_plugin "$name" "$out/plugins")")
+  copy=$(copy_plugin "$name" "$out/plugins") || exit 3
+  plugins+=(--plugin-dir "$copy")
 done
 project="$out/project"
 mkdir "$project"
@@ -177,11 +178,12 @@ if [[ ! -s $out/transcript.jsonl ]]; then
   unreachable "the session wrote no transcript (claude exit $session); read stderr.log in $out for why, then rerun"
 fi
 # A session stopped by a signal (killed, out of memory) left a partial record: a drive that never
-# finished, not a skill that wrote nothing. Its own error exits are read from the transcript.
+# finished, not a skill that wrote nothing. Its own error exits are read with its result below.
 ((session <= 128)) || unreachable "the session was stopped by a signal (exit $session) after it started; its partial record is in $out — rerun the drive"
-python3 - "$out" "$feature" "$tools" "$CLAUDE_CLI_VERSION" <<'PY'
+python3 - "$out" "$feature" "$tools" "$CLAUDE_CLI_VERSION" "$session" <<'PY'
 import json, pathlib, sys
 out, feature, tools, cli = pathlib.Path(sys.argv[1]), sys.argv[2], sys.argv[3] == "1", sys.argv[4]
+session = int(sys.argv[5])
 events = []
 for line in (out / "transcript.jsonl").read_text(encoding="utf-8").splitlines():
     try:
@@ -229,9 +231,18 @@ summary = {
     "result": (result.get("result") or "").strip(),
     "files_written": (out / "files-written.txt").read_text(encoding="utf-8").strip(),
     "manifest_dev_records": (out / "manifest-dev-records.txt").read_text(encoding="utf-8").splitlines(),
+    "claude_exit": session,
+    "ended": result.get("subtype") or "no result event",
 }
 (out / "summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
 print(json.dumps(summary, indent=2))
+# A session that errored after it started (an API error, its turn limit) never finished the
+# skill: a drive that did not run, not a skill that wrote nothing.
+if session != 0 or not result or result.get("is_error"):
+    print(f"drive: unreachable — the session ended with {summary['ended']} (claude exit {session}); "
+          f"read transcript.jsonl in {out}, raise --max-turns if it ran out of turns, then rerun",
+          file=sys.stderr)
+    sys.exit(3)
 PY
 
 if [[ $feature == doctor ]]; then

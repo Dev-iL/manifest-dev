@@ -571,6 +571,58 @@ def test_a_session_stopped_by_a_signal_is_unreachable(
     assert "stopped by a signal (exit 137) after it started" in result.stderr
 
 
+@pytest.mark.parametrize(
+    ("ended", "code"), [("error_max_turns", "1"), ("error_during_execution", "0")]
+)
+def test_a_session_that_errored_after_it_started_is_unreachable(
+    tmp_path: Path, toolbox: Path, ended: str, code: str
+) -> None:
+    # The session loaded the skill, then stopped on an error before finishing it: no verdict on
+    # the skill, whether or not the CLI's own exit says so.
+    errored = {"type": "result", "subtype": ended, "is_error": True, "num_turns": 40}
+    result = drive(
+        setup(
+            tmp_path,
+            toolbox,
+            STANDIN_TRANSCRIPT=lines([GOOD[0], errored]),
+            STANDIN_EXIT=code,
+        )
+    )
+    assert result.returncode == 3, result.stdout + result.stderr
+    assert f"ended with {ended} (claude exit {code})" in result.stderr
+    (summary,) = (tmp_path / "store" / "figure-out").glob("*/summary.json")
+    recorded = json.loads(summary.read_text(encoding="utf-8"))
+    assert (recorded["ended"], recorded["claude_exit"]) == (ended, int(code))
+
+
+def failing_cp(tmp_path: Path) -> None:
+    stub = tmp_path / "bin" / "cp"
+    stub.write_text("#!/bin/sh\necho 'cp: no space left on device' >&2\nexit 1\n")
+    stub.chmod(0o755)
+
+
+def test_a_drive_whose_plugin_copy_fails_starts_no_session(
+    tmp_path: Path, toolbox: Path
+) -> None:
+    env = setup(tmp_path, toolbox, STANDIN_TRANSCRIPT=lines(GOOD))
+    failing_cp(tmp_path)
+    result = drive(env)
+    assert result.returncode == 3, result.stdout + result.stderr
+    assert "could not copy claude-plugins/manifest-dev" in result.stderr
+    assert calls(tmp_path) == []
+
+
+def test_an_eval_run_whose_plugin_copy_fails_starts_no_suite(
+    tmp_path: Path, toolbox: Path
+) -> None:
+    env = setup(tmp_path, toolbox)
+    failing_cp(tmp_path)
+    result = run_eval(env, tmp_path / "results" / "aggregate-result.json")
+    assert result.returncode == 3, result.stdout + result.stderr
+    assert "could not copy claude-plugins/manifest-dev" in result.stderr
+    assert calls(tmp_path) == []
+
+
 def drive_scaffold(
     tmp_path: Path, toolbox: Path, body: str, transcript: str = ""
 ) -> subprocess.CompletedProcess[str]:

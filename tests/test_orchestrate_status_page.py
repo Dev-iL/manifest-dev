@@ -10,8 +10,11 @@ from __future__ import annotations
 
 import json
 import re
+import subprocess
 from pathlib import Path
 from typing import Any
+
+import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 SKILL = ROOT / "claude-plugins" / "manifest-dev" / "skills" / "orchestrate"
@@ -129,3 +132,57 @@ def test_reference_names_the_data_block_and_the_live_sources_the_template_reads(
         assert name in text and name in code, name
     assert 'id="orchestrate-status"' in text
     assert "window.ORCHESTRATE_STATUS" in text and "window.ORCHESTRATE_STATUS" in code
+
+
+def validate(snapshot: dict[str, Any]) -> bool:
+    """The template's own `valid()`, run in Node on one snapshot."""
+    code = script()
+    tables = "\n".join(
+        re.search(rf"var {name} = .*?;\n", code, re.S).group(0)  # type: ignore[union-attr]
+        for name in ("PHASES", "TONE")
+    )
+    start = code.index("  function strings(")
+    end = code.index("  function apply(")
+    program = (
+        tables + code[start:end] + "process.stdout.write(String(valid(JSON.parse("
+        "require('fs').readFileSync(0, 'utf8')))));"
+    )
+    done = subprocess.run(
+        ["node", "-e", program],
+        input=json.dumps(snapshot),
+        capture_output=True,
+        text=True,
+        timeout=30,
+        check=True,
+    )
+    return done.stdout == "true"
+
+
+def test_the_sample_snapshot_is_valid() -> None:
+    assert validate(sample())
+
+
+@pytest.mark.parametrize(
+    ("path", "value"),
+    [
+        (("plan",), None),
+        (("plan",), "3"),
+        (("mode",), "fast"),
+        (("state",), "stopped"),
+        (("tickets", 0, "status"), "done"),
+        (("tickets", 0, "phase"), "review"),
+        (("tickets", 0, "kind"), "chore"),
+        (("tickets", 0, "auto"), True),
+    ],
+)
+def test_a_snapshot_outside_the_schema_is_refused(
+    path: tuple[str | int, ...], value: object
+) -> None:
+    # Data is untyped input, and the page renders whatever valid() lets in; a value the reference
+    # does not allow keeps the last good view instead.
+    snapshot = sample()
+    target: Any = snapshot
+    for step in path[:-1]:
+        target = target[step]
+    target[path[-1]] = value
+    assert not validate(snapshot), path

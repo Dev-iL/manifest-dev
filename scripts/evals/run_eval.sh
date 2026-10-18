@@ -24,7 +24,8 @@
 # exit-code, written when it ends. Exit 2 from the suite means --max-cost-usd stopped it with a
 # partial result.
 #
-# Needs: the claude CLI on PATH and signed in, and python3; exits 3 without them. A suite is many
+# Needs: the claude CLI on PATH and signed in, and python3; exits 3 without them, and when it
+# cannot copy the plugin into its run directory. A suite is many
 # sessions on your sign-in. On macOS each eval child may raise a keychain dialog (evals/README.md).
 set -euo pipefail
 
@@ -63,7 +64,7 @@ until mkdir "$run" 2>/dev/null; do
 done
 mkdir -p "$(dirname "$out")" 2>/dev/null || die "cannot create the directory for $out; name a writable result path"
 
-target=$(copy_plugin manifest-dev "$run")
+target=$(copy_plugin manifest-dev "$run") || exit 3
 log=$run/eval.log status_file=$run/exit-code
 echo "CLI: $CLAUDE_CLI_VERSION" >"$log"
 
