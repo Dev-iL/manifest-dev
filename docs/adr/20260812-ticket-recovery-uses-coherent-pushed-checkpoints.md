@@ -1,7 +1,7 @@
 # ADR: Ticket recovery uses coherent pushed checkpoints
 
 ## Status
-Accepted
+Accepted — amended by 20261018-the-tickets-attempt-record-carries-its-manifest-progress-and-run-facts: the attempt record also carries the run's Manifest, its progress and the run facts orchestrate reads, so a fresh attempt resumes the recorded Manifest
 
 ## Area
 Ticketing
@@ -44,7 +44,11 @@ Uncommitted work and commits that were not pushed may be lost when a runner stop
 - Agents must inspect existing branch, pull-request, and CI state before continuing.
 
 ## Enforced by
-`tests/test_ticket_automation_prompts.py` — `test_run_ticket_recovers_and_lands_before_done` fails if run-ticket drops the one stable branch, the marked attempt comment, reuse of the existing pull request, or pushing coherent checkpoints.
+`tests/test_ticket_automation_prompts.py` — `test_run_ticket_stops_at_a_ready_pull_request_and_lands_only_when_told` fails if
+run-ticket drops the one stable branch, reuse of the existing pull request, or pushing coherent
+checkpoints; `test_attempt_record_carries_the_manifest_progress_and_run_facts` fails if the marked
+attempt record loses the Manifest or progress the amendment added, or a fresh runner stops resuming
+it.
 
 ## Source
 

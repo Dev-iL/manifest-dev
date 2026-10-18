@@ -18,7 +18,9 @@ REFERENCES = (
     / "claude-plugins/manifest-dev/skills/setup-project/references"
 )
 SETUP = REFERENCES.parent / "SKILL.md"
-GUIDES = sorted((REFERENCES / "upgrades").glob("v*-to-current.md"))
+# The guides whose step builds a harness (v3: the move into one) or adds the whole-tree recipe
+# (v5); each guide offers only what the next version gives (test_setup_project_versions.py).
+GUIDES = [REFERENCES / "upgrades" / f"v{n}-to-current.md" for n in (3, 5)]
 
 # Per file: the clause that has a run adopt the checks run across the whole tree.
 ADOPTION = {

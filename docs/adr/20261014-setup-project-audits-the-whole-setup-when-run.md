@@ -1,7 +1,7 @@
 # ADR: setup-project audits the whole setup when run, and figure-out fixes what is on its path
 
 ## Status
-Accepted
+Accepted — amended by 20261018-the-harness-commits-no-evidence-and-time-lines-live-in-recipes: statuses are no longer a part setup offers an existing harness
 
 ## Area
 Project context

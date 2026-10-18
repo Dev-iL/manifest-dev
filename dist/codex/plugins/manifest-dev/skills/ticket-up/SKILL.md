@@ -40,11 +40,11 @@ In explicit split mode, apply the same translation to each Deliverable and copy 
 
 ## Auto grant
 
-For an ordinary new Ticket, grant Auto only when neither doing the work nor judging it done needs human knowledge, taste, or authority, and the author chooses to trust unattended execution. When in doubt, withhold.
+Grant Auto only when neither doing the work nor judging it done needs human knowledge, taste, or authority, and the grantor chooses to trust unattended execution. When in doubt, withhold.
 
-For a follow-up, Auto needs a person's grant at this `ticket-up` boundary: a person directly authoring here, or explicitly reviewing and authorizing Auto for the new Ticket here. That person grants only after the follow-up passes the same criterion, and still chooses whether to trust unattended execution; Shaped never implies Auto.
+Two grantors exist. A person grants: directly authoring here, or explicitly reviewing and authorizing Auto for the Ticket here. `orchestrate --autonomous` grants too: it invokes this skill for a Ticket an agent wrote — a debt Ticket it authored, or a follow-up a run wrote — and grants only where the criterion above holds. Record the grantor with the grant, as the venue renders it, so a person can tell an `orchestrate` grant from their own and withdraw it.
 
-Without that grant the follow-up carries no Auto, whatever its source carries. An agent never grants Auto to work it found, so the queue grows only on what a person judged worth doing. Merely invoking `run-ticket` manually on a source is not a grant for follow-ups discovered inside that run; a person must separately authorize Auto at this authoring boundary.
+A follow-up gets Auto only from one of those grants at this boundary. Without one it carries no Auto, whatever its source carries. The run that found the work never grants it, and merely invoking `run-ticket` manually on a source is not a grant for follow-ups discovered inside that run. Shaped never implies Auto.
 
 Never copy Auto from the source.
 
@@ -58,7 +58,7 @@ Encode `Depends on:` only when one Ticket's outcome is required to do or judge a
 
 Read `tickets/store-config.md` first. A project context file may name another fixed location. When neither does, ask once and recommend the project's shared tracker; GitHub Issues is the recommendation when the project has a reachable GitHub remote and no other tracker is in play. Recommend files only where no shared tracker exists or nobody else will pick work, and explain that claims do not cross clones, worktrees, or branches. Record the answer at `tickets/store-config.md`.
 
-**Files.** Write each Ticket to `tickets/<effort-slug>/NN-<ticket-slug>.md`. Open with `Kind:`, `Status:`, `Depends on:`, and `Claimed by:`, plus `Auto: yes` when granted and `Type: <value>` when typed. Keep the effort's stable destination, priority override, and context pointers in `tickets/<effort-slug>/README.md`; never add a Ticket list or status summary. Closed Tickets move to `done/`.
+**Files.** Read `references/FILE_STORE.md` and follow its mapping.
 
 **GitHub Issues.** Read `references/GITHUB_STORE.md` and follow its mapping.
 
@@ -68,11 +68,11 @@ Before outward-facing creation on a venue this project has not used before, show
 
 ## Report
 
-Present what was authored in a short table: ID, title, kind, type, Auto, and dependencies, plus where each Ticket landed. In Manifest mode, state whether the default coherent unit or explicit Deliverable split was used. In follow-up mode, include source links and which findings were grouped or deduplicated.
+Present what was authored in a short table: ID, title, kind, type, Auto and its grantor, and dependencies, plus where each Ticket landed. In Manifest mode, state whether the default coherent unit or explicit Deliverable split was used. In follow-up mode, include source links and which findings were grouped or deduplicated.
 
 ## Gotchas
 
 - A gate may name evaluator machinery a stranger cannot use. Translate its substance into observable done prose.
 - A list of small questions is not automatically a list of Question Tickets. The lifecycle test comes first.
 - A discovered defect inside the current definition of done is unfinished source work, not a follow-up that makes the source closable.
-- A follow-up carries Auto only when a person grants it at this `ticket-up` boundary; its source's Auto never carries over.
+- A follow-up carries Auto only when a person, or `orchestrate --autonomous` under the criterion, grants it at this `ticket-up` boundary; its source's Auto never carries over.

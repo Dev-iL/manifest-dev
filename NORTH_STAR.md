@@ -107,16 +107,18 @@ nothing has to be adopted whole to be useful. The levels form an autonomy ladder
 skill used on its own, one piece of work understood, defined and verified, a project that
 keeps its direction, vocabulary, decisions and checks, a shared queue of work, and
 unattended runs that take work from that queue — and each level works without the ones
-above it and without anyone else on the team adopting any of it. manifest-dev ships no
-orchestrator: unattended runs start from whatever scheduler or orchestrator the user already
-runs, and the skills are the protocol it drives.
+above it and without anyone else on the team adopting any of it. manifest-dev ships an
+orchestrating skill, not a scheduler: the user starts it by hand or from a scheduler they
+already run, and every skill it drives still works on its own.
 
 — ruled: 2026-08-21, arrival is not pursued; the standalone shape is kept because it is
   the honest entry to the method, not because it converts. Extended 2026-10-15 to the
-  autonomy ladder, each level working without the ones above it and without the team, and
-  the same day to stay the protocol any orchestrator drives rather than ship one. See
-  docs/adr/20260821-positioning-drops-the-conversion-funnel.md and
-  docs/adr/20261015-projects-drive-themselves-as-far-as-each-user-climbs.md. Only the owner moves this.
+  autonomy ladder, each level working without the ones above it and without the team.
+  Changed 2026-10-18 from shipping no orchestrator to shipping an orchestrating skill, after
+  the one-Ticket sweep gave too little control and ran too slowly for many agents at once. See
+  docs/adr/20260821-positioning-drops-the-conversion-funnel.md,
+  docs/adr/20261015-projects-drive-themselves-as-far-as-each-user-climbs.md and
+  docs/adr/20261018-an-orchestrating-skill-runs-the-queue-and-replaces-the-sweep.md. Only the owner moves this.
 
 ## Money — or what it feeds
 
@@ -170,8 +172,6 @@ how many of our own projects are running all three tiers at once.
 - Requiring anyone else to adopt it: what a user adds to a shared repository reads as
   plain files and plain instructions, and nothing in it stops a colleague who does not use
   manifest-dev from working as they did.
-- Agents granting themselves work: a Ticket an agent writes carries Auto only when a person
-  grants it, so the queue grows on what people judge worth doing.
 
 — ruled: each enforced in practice today — the messaging boundaries since the first
   strategy doc, the bounded-not-cheap boundary added 2026-07-28 and revised 2026-08-20
@@ -188,10 +188,11 @@ how many of our own projects are running all three tiers at once.
   against requiring anyone else to adopt it was added 2026-10-15, when the owner ruled that
   the project fits inside teams and codebases where most colleagues do not use it; what
   setup adds to a shared context file has not yet been checked against it. The same day the
-  owner ruled that cost is judged per unit of merged work once runs go unattended, and that
-  agents never grant themselves work, which `ticket-up` carries out — see
-  docs/adr/20261015-projects-drive-themselves-as-far-as-each-user-climbs.md and
-  docs/adr/20261015-only-a-person-grants-auto-to-a-follow-up.md. The traction
+  owner ruled that cost is judged per unit of merged work once runs go unattended — see
+  docs/adr/20261015-projects-drive-themselves-as-far-as-each-user-climbs.md. A Never on agents
+  granting themselves work, ruled that day, was removed 2026-10-18, when the owner ruled that
+  `orchestrate --autonomous` grants Auto wherever the grant criterion holds — see
+  docs/adr/20261018-orchestrate-tickets-up-debt-and-grants-auto-where-the-criterion-holds.md. The traction
   rule lives in the repository's contributor instructions. Only the owner moves these.
 
 ## Open

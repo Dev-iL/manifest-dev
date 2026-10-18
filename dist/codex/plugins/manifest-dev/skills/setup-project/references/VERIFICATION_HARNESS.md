@@ -4,15 +4,15 @@ A verification harness is a project's one way to check that its work still does 
 command-line tool, built once, kept current by the runs that touch it, and used by every later
 run instead of each run working out again how to launch, drive and observe the result. An agent
 or a person learns everything about verifying the project from one command, `verify --help`. A
-harness that is wrong is worse than none, so every status it shows comes from evidence.
+harness that is wrong is worse than none, so it claims nothing a run has not just shown: it keeps
+no status, and what a change runs comes from its diff.
 
 What follows is a default shape, not a specification. It is what setup seeds when a project takes
 a harness and what this workflow's skills expect of one that says nothing else, and it is worth
 converging on where it fits. A project's harness should fit the project and the people who work on it, so adopt each part
 where it fits, and adapt or replace it where it does not. Whatever its shape, every harness owes the
-same few things: one place a newcomer learns how to verify the project, statuses that come from
-evidence rather than anyone's say-so, the ask-first mark following cost, and the jobs in *Fit to
-trust*. It is judged by those, never by how closely it matches this file.
+same few things: one place a newcomer learns how to verify the project, the ask-first mark
+following cost, and the jobs in *Fit to trust*. It is judged by those, never by how closely it matches this file.
 
 ## When a project gets one
 
@@ -52,24 +52,25 @@ skills, prompts with behavior cases, and living documents are all recipes in the
   or later: a project that wants another language, or whose environments cannot run Node, ports
   the tool and keeps the `verify` entry, so nothing that calls it changes. A machine that merely
   lacks Node is not a reason to port: the entry's exit-3 message goes in the report. Its subcommands
-  are what this workflow's skills call: `--help` (the whole picture), `list` (every recipe, its kind,
-  status and ask-first mark), `help <recipe>`, `drive <recipe> [scenario]` (with `walk` and
-  `eval` as the same for those kinds), `judge` (record the verdict on evidence that needed
-  reading), `doctor` (prerequisites, free), `check` (every recipe parses and names only paths
-  that exist), `affected [BASE]` (the recipes a diff touches and the changed paths no recipe
-  covers), and `raise` and `freeze` (move or hold a time line, below). A port that keeps these
+  are what this workflow's skills call: `--help` (the whole picture, including where the recipes,
+  settings and evidence live), `list` (every recipe, its kind and ask-first mark), `help <recipe>`,
+  `drive <recipe> [scenario]` (with `walk` and `eval` as the same for those kinds), `doctor`
+  (prerequisites, free), `check` (every recipe parses and names only paths that exist),
+  `affected [BASE]` (the recipes a diff touches and the changed paths no recipe covers), and
+  `line`, `raise` and `freeze` (write a time line into its recipe, below). A port that keeps these
   subcommands and what they print keeps every skill's instructions working unchanged; one that
   departs from them says so in its own `--help`.
 - **Recipes.** Every check the project keeps is a recipe: one Markdown file per thing a user
   reaches or a reader relies on, and one for the checks the project runs across the whole tree —
   its lint, type checks, test suite, build or gate runner — in the recipes directory
   (`verification/recipes/` by default). Front matter: `kind` (a free label — feature, skill, walk,
-  eval, suite, …), `covers` (the paths whose change makes its evidence stale), `ask-first`
+  eval, suite, …), `covers` (the paths whose change the recipe checks), `ask-first`
   with a one-line reason when it applies, and `dry-run: honored` when its commands obey
   `VERIFY_DRY_RUN=1`. Body: a title and one paragraph on what the user sees it do; *How a user
   reaches it* — every entry point past the obvious one; *Scenarios* — each a `### name` heading
   with `Run:` (the exact command), `Proves:` (what a passing run shows), `Check: read` when the
-  exit code cannot decide, and `Workload: varies` when its work changes from run to run; *Gotchas* — traps that waste or invalidate a run. A recipe carries
+  exit code cannot decide, `Workload: varies` when its work changes from run to run, and otherwise
+  its time lines (`Line:`, below); *Gotchas* — traps that waste or invalidate a run. A recipe carries
   what a reader cannot get elsewhere; one that restates a description the artifact already shows
   its users costs upkeep and guides nobody. Where in the code a feature lives is read from the
   code at run time.
@@ -92,41 +93,42 @@ skills, prompts with behavior cases, and living documents are all recipes in the
   receives `VERIFY_RUN_ID`, one per invocation, so data directories, ports and containers can be
   per run and runs can go side by side. A later drive or control command reaches an instance an
   earlier one started with `--run ID`; `logs`, `reset` and `stop` refuse to run without one.
-- **Evidence.** Each run writes `evidence/<recipe>/<stamp>.md`: the scenario, command, exit
-  code, outcome, run identity, kind of machine, duration, time lines, a fingerprint of the files
-  the recipe covers, what it proves, and the output with local paths removed. It replaces that
-  scenario's older summary, so the tree holds one per scenario and git keeps the history. A
-  failed or unreachable run also keeps what the declared `logs:` command printed for it, so the
-  failure explains itself. Whatever a command started is stopped when it ends, SIGTERM first so
-  it can clean up. An interrupted run keeps none; a command that crashes is recorded failed. It
-  is committed with the change it checked. Fuller evidence — transcripts, screenshots — stays
-  where the scenario's command keeps it, and the summary says where.
+- **Evidence.** Each run writes `<evidence>/<recipe>/<stamp>.md`, in the evidence directory
+  `verify --help` names (`verification/evidence/` by default): the scenario, command, exit code,
+  outcome (`passed`, `failed`, or `unreachable` when a prerequisite was missing and the command
+  exited 3; a passing run whose proof needs reading says so), run identity, kind of machine,
+  duration, what it proves, and the output with local paths removed. It replaces that scenario's
+  older summary. A failed or unreachable run also keeps what the declared `logs:` command printed
+  for it, so the failure explains itself in the run that met it. Whatever a command started is
+  stopped when it ends, SIGTERM first so it can clean up. An interrupted run keeps none; a command
+  that crashes is failed. Evidence stays on the machine that ran: the tool has git ignore the
+  evidence directory, so nothing a run writes is committed. Fuller evidence — transcripts, screenshots — stays where
+  the scenario's command keeps it, and the summary says where.
 
-## Statuses come from evidence
-
-Nothing about a status is kept by hand. The tool works it out from the latest evidence of each
-of a recipe's scenarios and shows the worst: `unverified` (none yet — proves nothing),
-`verified` (every scenario's latest run passed; a scenario that never ran leaves the recipe
-`unverified`, naming it), `failed`, `unreachable` (a prerequisite was
-missing; the command exits 3), `unjudged` (the run finished and its proof needs reading,
-until `verify judge` records the verdict), or `over its line` (every scenario passed, but one
-crossed its time line), each with its date; and `stale` when a file the
-recipe covers no longer matches the fingerprint that evidence recorded, or when someone found it drifting and added a
-`Drift (YYYY-MM-DD): <what differs>` line to the recipe, which the run that repairs it removes. A run never reports an entry point as verified because a
-different one worked: the evidence names the scenario it came from.
+A recipe has no status. What a change runs comes from its diff and each recipe's `covers`
+(`verify affected`), and each run says what it found in the run itself. A run never reports an
+entry point as working because a different one did: each summary names the scenario it came from.
 
 ## Time lines
 
-A scenario with a fixed workload gets a time line: its first verified run on a kind of machine
-(a run whose proof needs reading counts once judged verified), plus headroom for noise. It is an alarm against a check slowly getting slower, and it only
-reports — it never decides when a check runs or who may run it. One run over is noise; two in a
-row show `over its line` and make `drive` exit non-zero. A run faster by more than the headroom
-lowers the line, so the gain is kept. It moves up only by `verify raise` with a reason, or is held at the overshoot by
-`verify freeze` naming the debt Ticket that pays it down. A scenario whose work varies — the affected
-tests, or an agent session whose work the model decides each run — declares `Workload: varies`
-and gets none. Lines are derived
-from each scenario's latest evidence, never kept in a file every run edits; when merged branches
-leave two summaries, the next run keeps the line allowing the most, so a raise or freeze survives.
+A scenario with a fixed workload carries a time line for each kind of machine its line was set on:
+a line in its recipe, `Line: <seconds> s on <kind of machine>`, taken from a passing run there, and
+a run is over it past those seconds plus headroom for noise. It is an alarm against a check slowly getting slower, and it only reports — it never
+decides when a check runs or who may run it. A run on a kind of machine its recipe has no line
+for reports its time and compares nothing. One run over is noise: `drive` runs the scenario once
+more at once, and only when that run is over too does the crossing count and `drive` exit 5.
+
+No run moves a line on its own. The change that changes a check moves its line, in that same
+change, with one of three commands that write it into the recipe: `verify line` sets a first line
+or lowers one the change made faster, `verify raise` moves it up to the latest run with the
+reason written beside it (`; raised: <reason>`), and `verify freeze` holds an overshoot at the
+latest run's level naming the debt Ticket that pays it down (`; frozen at <seconds> s by
+<Ticket>`); a run past the frozen level is new creep, and once a run is back under the line,
+`verify line` clears the freeze. Speed is never bought with proof: a check that proves less to
+meet its line has not met it. A scenario whose work varies — the affected tests, or an agent
+session whose work the model decides each run — declares `Workload: varies` and gets none. Two
+branches that raise the same line meet as a one-line conflict in the recipe, which the run that
+merges them resolves.
 
 ## Ask first
 
@@ -134,7 +136,7 @@ Some checks cost something a person should weigh: money or quota (an agent sessi
 API, cloud resources), load on shared environments or other teams, or effects outside the
 repository (a deploy, a message sent). Mark such a recipe `ask-first` with its reason. Run time
 alone is not a reason: every unmarked check is free, and agents run it as often as it helps,
-judging from the durations its evidence shows. The mark follows what a run costs, not its kind:
+judging from the durations its runs report and its lines state. The mark follows what a run costs, not its kind:
 driving a web app in a local browser, running a CLI, or calling a local API is unmarked and runs
 freely, as do tests, dry runs and static checks.
 
@@ -171,8 +173,8 @@ is always among the recipes `verify affected` names and never marks a path as co
 path a user reaches is judged covered or not by the other recipes alone. A verification command
 the context file names outside its verification bullet, run by no recipe, teaches a second way
 in, which an audit offers to close. Calling a command directly while iterating stays fine; the
-evidence a run reports a change on comes through the harness, so its statuses speak for every
-check.
+evidence a run reports a change on comes through the harness, so every check is run, timed and
+reported one way.
 
 An adopted asset keeps the scope the project gave it. Setup adds no recipes for what that scope
 leaves out: an eval suite that covers two skills on purpose is not a gap for every other skill.
@@ -224,7 +226,7 @@ check by the jobs it has to do there, never by how this file would have built it
 For a behavior case, the cold proof run is one case run against the prompt as shipped and
 graded; for a document walk, one task walked by a fresh reader given only the document, whose
 account is kept. A job with no counterpart for a recipe — an instance health check or control for a walk —
-is not a gap, and a case left unmeasured on purpose is a status, not a failed proof run. Scripts
+is not a gap, and a case left unmeasured on purpose is the suite's choice, not a failed proof run. Scripts
 instead of one tool, another test runner, another layout: those are the project's choices, not
 gaps, as long as one command still tells a newcomer how to verify.
 

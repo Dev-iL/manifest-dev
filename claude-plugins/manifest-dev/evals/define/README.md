@@ -6,10 +6,12 @@ which would therefore make every case a vanity win.
 
 A run is many model sessions: the owner runs it, or an agent runs it after asking, naming the
 cases and why. A prompt change marks the cases it covers stale rather than running them, as
-`../README.md` → *Scope and statuses* says. Run it from the plugin directory:
+`../README.md` → *Scope and statuses* says. Run it from the repository root, through the script
+`../README.md` → *Running a suite* describes:
 
 ```bash
-claude plugin eval . --tag define --ablation with-without --judge-model sonnet --allow-tools Write Bash --scaffold -j 8 --max-cost-usd 60
+scripts/evals/run_eval.sh define evals/results/define/aggregate-result.json \
+  --tag define --ablation with-without --judge-model sonnet --scaffold -j 8 --max-cost-usd 60
 ```
 
 `--max-cost-usd` is the plan's estimate below, a hard stop as `../README.md` describes.
@@ -46,12 +48,14 @@ Numbers judged by different models do not compare.
 | `d22-projectless-manifest-builds-no-harness` | A one-off script outside any project gets a Manifest whose gates check its output, with no harness, recipe, decision record or setup. A guard: the no-plugin arm is expected to pass it, so a Δ of zero is no reason to remove it |
 
 These have never been run; the first both-arm run decides which stay. **Every number below is stale
-as of 2026-10-15**: the 2026-10-13 change edited define's spine and its task files, the
-2026-10-14 change moved its verification wording to one harness, and the 2026-10-15 change made
-that harness optional and the project's own checks a run's to repair, so the next baseline
-replaces them. A single 2026-10-14 drive of `d01` (not a measurement) found define keeping the
+as of 2026-10-18**: the 2026-10-13 change edited define's spine and its task files, the
+2026-10-14 change moved its verification wording to one harness, the 2026-10-15 change made
+that harness optional and the project's own checks a run's to repair, and the 2026-10-18 change
+made define ask through the host's question capability by default, batching its key calls, and
+added the proof gate to its pull-request task file, so the next baseline replaces them. The
+headless harness offers no question capability, so the cases measure define's plain-text path. A single 2026-10-14 drive of `d01` (not a measurement) found define keeping the
 requested layer cut as a user's call; define's slicing rule now says a requested cut is never one,
-and a re-drive came back re-cut (`verification/evidence/define/`).
+and a re-drive came back re-cut (that drive's evidence is not kept in the repository).
 
 ## First measurement of `d11`–`d17` — 2026-10-12
 

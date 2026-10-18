@@ -2,7 +2,7 @@
 """Write each run's judged output and grades to files an analyzer can read.
 
 An eval run keeps, per run, the artifact its file-focused graders judged (the
-``evidence`` field) but no transcript once the container exits. This writes, for the
+``evidence`` field) but no transcript once the run ends. This writes, for the
 ``with`` arm of the chosen cases, ``<case>_rep<k>.md`` (the artifact) and
 ``<case>_rep<k>.grades.json`` (pass or fail per scored grader) into ``--out``.
 

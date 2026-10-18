@@ -6,20 +6,20 @@ dry-run: honored
 ---
 # run-ticket
 
-Takes one exact Ticket, recovers any earlier attempt, runs it through auto and its required landing, and writes DONE or ESCALATED evidence back on that same Ticket.
+Takes one exact Ticket, recovers any earlier attempt from the Manifest and progress its attempt record carries, runs it to a ready pull request, and writes its completion record, marked ready to land, or an escalation back on that same Ticket. It lands only when told to.
 
 ## How a user reaches it
 
 - `/run-ticket <ticket reference>`.
-- Phrases its description matches: "run this ticket end to end", a hosted trigger or agent runner supplying an issue.
-- `sweep-tickets` for the one Ticket it selects.
-- It reconciles an earlier attempt's marker, branch and pull request; it uses check-pr before merge; separate findings go to ticket-up as follow-ups.
+- Phrases its description matches: "run this ticket end to end", orchestrate, an agent runner or a person supplying an issue.
+- `orchestrate`, which starts it in its own session for each Ticket it runs.
+- It reconciles an earlier attempt's record, branch and pull request; it uses check-pr before marking the work ready; separate findings go to ticket-up as follow-ups.
 
 ## Scenarios
 
 ### run
 Run: `scripts/drive-skill.sh run-ticket verification/prompts/run-ticket-run.md --max-turns 120`
-Proves: the Ticket gains `<!-- manifest-dev-run-ticket-attempt -->` and, at the end, a DONE section or `<!-- manifest-dev-run-ticket-escalated -->`. The landing the Ticket asks for is observed, not assumed.
+Proves: the Ticket gains `<!-- manifest-dev-run-ticket-attempt -->` carrying the run's Manifest and progress, and, at the end, `<!-- manifest-dev-run-ticket-completion -->` marked ready to land or `<!-- manifest-dev-run-ticket-escalated -->`. Nothing is merged, since the prompt does not say to land.
 Check: read
 Workload: varies
 
@@ -29,4 +29,4 @@ Workload: varies
 - It does not pick from a backlog; a missing or ambiguous reference stops before any work.
 - Running it by hand does not grant Auto.
 - Everything auto and do may do, it may do — and a GitHub venue writes to real Issues.
-- `tests/test_ticket_automation_prompts.py` checks markers, recovery and follow-up routing.
+- `tests/test_ticket_automation_prompts.py` checks the records, recovery, the ready-pull-request ending and follow-up routing.

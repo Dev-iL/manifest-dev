@@ -29,8 +29,10 @@ USER_INVOCABLE = {
         "review-design",
         "review-writing",
         "run-ticket",
+        # orchestrate replaced sweep-tickets as the one optional queue runner; see
+        # docs/adr/20261018-an-orchestrating-skill-runs-the-queue-and-replaces-the-sweep.md.
+        "orchestrate",
         "setup-project",
-        "sweep-tickets",
         "ticket-up",
     },
     "manifest-dev-tools": {
@@ -62,6 +64,7 @@ def user_invocable(plugin: str) -> set[str]:
 # Holds the decision in docs/adr/20260809-init-context-skill-lives-in-core.md.
 # Holds the decision in docs/adr/20260901-design-skill-pair-distills-research-eval-deferred.md.
 # Holds the decision in docs/adr/20261015-manifest-dev-help-answers-questions-about-manifest-dev-in-simplified-english.md.
+# Holds the decision in docs/adr/20261018-an-orchestrating-skill-runs-the-queue-and-replaces-the-sweep.md.
 def test_user_invocable_skills_are_the_declared_set() -> None:
     for plugin, expected in USER_INVOCABLE.items():
         actual = user_invocable(plugin)

@@ -1,7 +1,7 @@
 # ADR: Human assignment pauses Auto Ticket execution
 
 ## Status
-Accepted — its escalation branch is narrowed by 20260825-escalation-clears-the-claim-and-carries-its-own-mark: escalation no longer assigns the person needed next, but clears the claim and records the escalated state in its own marked handoff record, which every unattended dispatch path excludes. The rejection of a separate marker is overturned for that state alone. Human claims continue to pause unattended execution, and an automation-held claim continues to mean an interrupted attempt eligible for the sweep's recovery path.
+Accepted — its escalation branch is narrowed by 20260825-escalation-clears-the-claim-and-carries-its-own-mark: escalation no longer assigns the person needed next, but clears the claim and records the escalated state in its own marked handoff record, which every unattended dispatch path excludes. The rejection of a separate marker is overturned for that state alone. Human claims continue to pause unattended execution, and an automation-held claim continues to mean an interrupted attempt eligible for the sweep's recovery path.; amended by 20261018-an-orchestrating-skill-runs-the-queue-and-replaces-the-sweep: orchestrate replaces the event and sweep dispatchers that honor a human claim, and an automation-held claim counts as an interrupted attempt only when no live run holds it
 
 ## Area
 Ticketing
@@ -42,7 +42,9 @@ No retry label, status, or automation-queue assignment is added. An open Ticket 
 - Without an unassignment event trigger, continuation waits for the next scheduled sweep.
 
 ## Enforced by
-`tests/test_ticket_automation_prompts.py` — `test_sweep_tickets_recovers_first_and_runs_at_most_one` fails if the sweep stops leaving human-assigned Tickets paused.
+`tests/test_ticket_automation_prompts.py` — `test_orchestrate_selects_recovers_first_and_leaves_paused_work_alone` fails if
+`orchestrate` stops leaving human-assigned Tickets alone, or counts an automation-held claim as an
+interrupted attempt while a live run holds it.
 
 ## Source
 

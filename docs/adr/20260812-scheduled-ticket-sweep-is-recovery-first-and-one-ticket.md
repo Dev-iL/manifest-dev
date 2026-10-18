@@ -1,7 +1,7 @@
 # ADR: The scheduled Ticket sweep is recovery-first and handles one Ticket
 
 ## Status
-Accepted
+Superseded by 20261018-an-orchestrating-skill-runs-the-queue-and-replaces-the-sweep
 
 ## Area
 Ticketing
@@ -52,7 +52,10 @@ controller is introduced.
 - The adapter must expose a stable automation claim identity so recovery candidates are recognizable.
 
 ## Enforced by
-`tests/test_ticket_automation_prompts.py` — `test_sweep_tickets_recovers_first_and_runs_at_most_one` fails if sweep-tickets stops recovering a Ticket claimed by its own automation identity first, drops a readiness filter, changes a claim while it selects, or selects a second Ticket. Also `tests/test_ticket_automation_prompts.py` — `test_ticket_execution_skills_ship_on_every_distribution` fails if the distributed copy loses recovery first or the one-Ticket limit.
+none — retired with `sweep-tickets`: `test_sweep_tickets_recovers_first_and_runs_at_most_one`
+was removed. Recovery first now lives in `orchestrate`, held by
+`test_orchestrate_selects_recovers_first_and_leaves_paused_work_alone` in `tests/test_ticket_automation_prompts.py` under
+20261018-an-orchestrating-skill-runs-the-queue-and-replaces-the-sweep.
 
 ## Source
 - Session: unattended Ticket automation design (2026-08-12)

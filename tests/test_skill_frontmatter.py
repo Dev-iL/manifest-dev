@@ -764,7 +764,8 @@ def test_shipped_text_names_no_plugin_qualifier_outside_html_comments() -> None:
 
 
 # Holds the decision in docs/adr/20260903-shipped-skills-are-host-neutral-and-distributions-read-source.md.
-# Holds the decision in docs/adr/20261012-figure-out-asks-through-the-hosts-question-capability-on-request.md.
+# Holds the decision in docs/adr/20261018-figure-out-and-define-ask-through-the-question-capability-by-default.md:
+# figure-out and define name the question-selection capability, never a host's tool for it.
 def test_shipped_text_names_no_host_tool() -> None:
     problems = []
     for path in shipped_markdown():

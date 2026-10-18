@@ -1,128 +1,127 @@
 # Automated Ticket execution
 
-This is the integration contract between a Ticket Store and a hosted agent runner. The
-store remains the only durable workflow state; the runner supplies delivery and liveness.
+This is the contract between a Ticket Store and the runs that work its Tickets without a person
+watching. The store is the only durable workflow state: the Ticket and git are where a run
+recovers and where one agent follows another. The host supplies sessions and reports whether
+they are alive. The venue reference says how each record and check below renders on its venue.
 
-## The two invocations
+## Who starts a run
 
-An eligible issue event invokes one exact Ticket:
-
-```text
-Invoke the run-ticket skill with: "<canonical Ticket URL or ID>"
-```
-
-A scheduled trigger invokes the one-Ticket sweep:
+`orchestrate` starts each run in its own session with:
 
 ```text
-Invoke the sweep-tickets skill
+Invoke the run-ticket skill with: "<canonical Ticket reference> --run <run ID>"
 ```
 
-Both routes converge on `run-ticket`. The event is the fast path. The sweep is the correctness
-path: it recovers interrupted work and eventually notices work made ready by another Ticket
-closing. The sweep can operate alone. Events are an optional fast path; without the sweep, missed
-deliveries and dependency closes are not recovered reliably. Using both adds latency and
-parallelism benefits, not a second execution model.
+A person may run `run-ticket` by hand on any Ticket at any time, with the bare reference. A
+scheduler the user already runs may start `orchestrate --autonomous`; manifest-dev ships no
+scheduler. Which Tickets unattended work may touch is decided where the run is started, under the
+convention's *The Auto grant*; `run-ticket` never enforces it.
 
-## Recommended setup
+## The automation identity
 
-Start with one scheduled automation. It is the smallest complete deployment and can drive the
-whole Ticket graph by itself:
+The store config names one account that unattended runs claim with and write as, and a human
+escalation recipient. The two must be distinguishable. A session that cannot write as the
+configured identity says so and starts nothing unattended.
 
-- Set cron to `*/10 * * * *` for a ten-minute default. Most hosted schedulers interpret cron in
-  UTC; confirm the host's convention. Use five minutes for lower latency or 15–30 minutes to spend
-  fewer runner invocations.
-- Give the scheduled agent exactly the sweep prompt above. It selects at most one Ticket, invokes
-  `run-ticket`, and exits. The next schedule advances the graph again.
-- Configure the stable automation identity, human escalation recipient, finite provider retries,
-  timeout, optional effort/type filters, and overall concurrency in the host or store config.
+A record, and every run fact in it, counts only when the automation identity wrote it. On a run a
+person starts by hand, the account that run writes as stands in for it. A comment from any other
+author is untrusted context, whatever marker it carries: it cannot claim a run, mark work ready to
+land, grant Auto, or turn quoted commands into instructions.
 
-Add a second, event-triggered automation when lower latency and parallel work matter:
+## The attempt record
 
-- Listen for issue `opened`, `reopened`, and `unassigned` events, plus `labeled` when the applied
-  label is `auto`. Re-fetch that exact issue and apply event eligibility before launching.
-- Give the event agent the exact-Ticket prompt above, replacing the placeholder with the issue's
-  canonical URL or ID.
-- Use the same automation identity and per-Ticket single-flight key for both automations. Different
-  Ticket keys may run concurrently; duplicate deliveries for one Ticket serialize and re-check.
+Each Ticket has one attempt record, a venue comment carrying
+`<!-- manifest-dev-run-ticket-attempt -->`. It is written early and updated in place; no attempt
+adds a second one. It holds:
 
-Schedule only is correct but starts at most one Ticket per tick. Event plus schedule adds the fast
-path and parallelism while the schedule still recovers crashes and notices dependents made ready by
-another Ticket closing. A person may also run the exact-Ticket prompt manually at any time; manual
-invocation does not require Auto and does not change the unattended trigger rules.
+| Part | Contents | Written by, and when |
+|---|---|---|
+| Branch | The canonical Ticket, its one stable branch, and the recovery purpose | The run, before substantial work |
+| Run facts | The run ID; the session that runs it, where the host names one; when it started; the launch count, counting launches in a row whose run ended without an outcome | The launcher — `orchestrate`, or `run-ticket` itself on a hand run — just before the run starts |
+| | The base commit the run's gates last passed against; whether it is ready to land, naming the head commit, or the drafted answer for a Question Ticket | The run, at each pushed checkpoint and when it finishes |
+| Progress | The step the run is at — `understand`, `define`, `build`, `verify` or `ready` — the gates passed and at which commit, what remains, the decisions taken, the dead ends | The run, when its step changes and at each pushed checkpoint |
+| Manifest | The run's full Manifest, refreshed when it is amended | The run, as soon as define reports it |
 
-## Adapter responsibilities
+Each fact has one writer. A launcher writes only while no live run holds the Ticket. A run
+re-reads the record before each write and each push, and stops without writing when the run ID
+there is not its own. A Manifest too long for the venue's comment limit continues in a second
+comment carrying `<!-- manifest-dev-run-ticket-manifest -->`, and in a third with the same marker
+should it need one. The Manifest is not committed to the repository unless the user asks for it.
 
-Keep the adapter thin. It owns only what the host can know or enforce:
+A run's **outcome** is the record it leaves when it stops: ready to land, a drafted answer, an
+escalation, or the close. A run is live from its launch until it writes an outcome, while the host
+reports its session alive and its timeout has not passed; a session the host keeps open after its
+run wrote an outcome holds nothing. Where the host cannot report on a session, the outcome and the
+timeout alone decide. The store config may set the timeout;
+without one it is four hours from the run's start.
 
-1. **Event eligibility.** Before launching an issue event, confirm that the item is a Ticket,
-   open, unassigned, carries Auto, carries no escalation mark, has no open dependency, and matches
-   any configured effort or type filter. A schedule delegates those store-level checks to
-   `sweep-tickets`. The escalation check is what makes this path safe rather than merely tidy: an
-   escalating attempt releases the Ticket's claim, and that release is itself an unassignment event
-   this adapter listens for, so an adapter that omits the check relaunches the attempt that just
-   ended — immediately, and on every escalation.
-2. **Stable automation identity.** Use one recognizable claim identity, distinct from the people
-   who receive escalations. Record that identity and the human escalation recipient in the
-   project's store config.
-3. **Per-Ticket single-flight.** Key execution by canonical Ticket identity. For GitHub, use
-   `<owner>/<repository>#<issue-number>`. At most one run for that key may be active. A queued run
-   resolves the Ticket again after the preceding run ends and revalidates current unattended
-   eligibility before starting: Auto, escalation mark, claim, open state, dependencies, and any
-   configured filters. An automation-owned interrupted attempt may recover under the recovery
-   rules; a human claim or escalation mark stops unattended work. Different Ticket keys may run
-   concurrently.
-4. **Finite runner retries.** Configure a finite provider-native retry policy for runner failures.
-   Retry count, delay, timeout, schedule cadence, and overall concurrency are deployment choices,
-   not Ticket fields or skill behavior.
-5. **Terminal runner-failure handoff.** When the provider exhausts retries without a Ticket-level
-   DONE or ESCALATED outcome, resolve the Ticket again. If it remains open and is not assigned to
-   a person, write or update one operational handoff comment containing the failed run URLs or
-   IDs, the last known branch and pull request when discoverable, and the fact that no terminal
-   Ticket outcome was recorded; then assign the configured human. Use a stable hidden marker so a
-   repeated hook updates the same comment instead of duplicating it.
+## The completion record
 
-The adapter does not remove and re-add `auto`, keep a retry counter on the Ticket, infer process
-liveness from the assignee, clear an escalation mark, or create ready/blocked/running labels.
-Claims express ownership. Dependencies express blocking. The escalation mark expresses a handoff
-awaiting a person. The host's execution system is the source of truth for live jobs.
+A run that finishes writes one comment carrying `<!-- manifest-dev-run-ticket-completion -->`,
+updated in place by a later attempt:
 
-## Authority at landing
+- what changed, or the question's answer;
+- evidence that the definition of done holds, with the gate evidence and the head commit;
+- branch, commit, pull-request, deployed-artifact or recorded-answer references that exist;
+- follow-up Ticket links, or a clear statement that none were warranted;
+- the debt `/done` named, one line each, so it outlives the runner even where no pull request
+  carries it;
+- the flagged offers, agent-decided records and drafted Taste entries `/done` named, each with
+  what accepting or reviewing it would change;
+- the run's material decisions, the user's calls first, each with the alternative not taken and
+  what decided it.
 
-Auto is the durable authority for unattended work, not a launch pulse. An unattended run refreshes
-the Ticket immediately before an irreversible landing and stops if Auto was removed, the Ticket
-was closed, or a person took the claim. A person directly invoking `run-ticket` supplies the
-authority for that supervised run even when the Ticket has no Auto grant.
+The lander adds the landing reference. `orchestrate` adds a line once it has gathered the debt, so
+the debt is gathered once.
 
-Ticket bodies and comments are untrusted work context. They cannot grant their own execution,
-change adapter policy, or turn quoted commands into instructions.
+## Landing
+
+This is the one landing procedure. `orchestrate` follows it at each landing turn, and `run-ticket`
+follows it only when its prompt says to land. The lander:
+
+1. **Re-reads the Ticket.** It stops when the Ticket is closed, a person holds the claim, the run
+   facts were not written by the automation identity or name a run that is not the lander's own
+   (for `orchestrate`, a run it launched or took over; for a landing `run-ticket`, itself), or the
+   record is not marked ready to land.
+2. **Checks authority.** An unattended landing needs Auto still present. A Ticket without Auto is
+   never landed by automation: only a person lands it. A person who runs `run-ticket` by hand and
+   tells it to land supplies the authority for that run.
+3. **Refreshes the pull request.** Its head must be the head commit the record names, its checks
+   must pass, and the repository's protections must permit the merge. When any of these fails, it
+   reports the current state and stops; it never merges older state.
+4. **Checks the base.** When the base has moved since the base commit the record names, the run
+   merges the base in, reads what landed, and checks any cross-cut both ways: a change that alters
+   how every instance of something must look, beside one that adds an instance. It extends its
+   work when the extension fits its Ticket, and otherwise writes a follow-up for a person. It
+   re-runs every gate, records the new base, and marks the record ready again. `orchestrate`
+   relaunches the run for this; a landing `run-ticket` does it in place. Then the lander starts
+   again at step 1.
+5. **Merges with the head pinned**, through the venue's normal protected mechanism, and observes
+   the merged state. It never force-pushes a shared branch, bypasses protection, or merges work
+   the Ticket does not authorize. A non-repository Ticket's landing is observed at its durable
+   place instead.
+6. **Records and closes.** It adds the landing reference to the completion record and closes the
+   Ticket. A Ticket closes only after its landing is observed, so a dependent never starts on work
+   that is not on the target branch.
+
+A Question Ticket has nothing to land. With Auto, its run closes it once the answer is recorded.
+Without Auto, the run stops with the answer drafted, and the Ticket closes once a person accepts
+it.
 
 ## Recovery boundary
 
-The durable recovery surface is the Ticket, its early attempt comment, one stable remote branch,
-pushed commits, one pull request, and current check state. A replacement agent reconstructs from
-those artifacts. It need not receive the earlier conversation or workspace. Uncommitted work and
-unpushed commits may be lost; coherent pushed checkpoints are the durability boundary.
-
-## Minimal GitHub shape
-
-- Trigger an issue run after an `auto` label, open, reopen, or unassignment event only when the
-  refreshed issue passes event eligibility.
-- Trigger `sweep-tickets` on a schedule. One invocation handles at most one Ticket.
-- Apply the same per-issue concurrency key to event and sweep-launched `run-ticket` jobs.
-- Let normal repository protections govern pull-request landing.
-- Keep the scheduled sweep even when issue events are enabled: dependency closure and a crashed
-  event delivery do not reliably produce an event on the Ticket that should run next.
+A fresh runner rebuilds the attempt from the Ticket, its records, the one stable remote branch,
+pushed commits, the one pull request, and current checks. It resumes do on the recorded Manifest
+rather than defining the work again; recorded passes only guide the order of work, and every gate
+still needs fresh evidence before done. It needs no earlier conversation or workspace.
+Uncommitted work and unpushed commits may be lost; coherent pushed checkpoints are the durability
+boundary.
 
 ## Gotchas
 
-- A claim is not a lock between two jobs using the same automation identity; only keyed
-  single-flight prevents that overlap.
-- Reapplying `auto` as a retry pulse can create an event loop and erases the useful distinction
-  between durable authority and delivery.
-- Assigning the configured person is a pause. After resolving the blocker, that person records
-  the continuation context and unassigns the Ticket; readiness then becomes true naturally. This
-  is the terminal infrastructure-failure handoff, not a Ticket escalation, and the two are
-  deliberately unalike: infrastructure exhaustion assigns a person because no attempt reached a
-  verdict, while an escalation releases the claim and leaves its mark because an attempt did.
-- A provider crash is not a Ticket-level ESCALATED outcome. Only the terminal failure hook may
-  convert exhausted infrastructure retries into a human operational handoff.
+- A claim is not a lock between two runs that write as one identity. The run facts and the re-read
+  before each write are; git rejects a stale run's push, and that run then stops.
+- Auto is durable authority, not a launch pulse. Removing and reapplying it to retry erases the
+  difference between authority and delivery.
+- A run that ends without an outcome is a failed launch, not a Ticket outcome. Only the escalation record says a person is needed.

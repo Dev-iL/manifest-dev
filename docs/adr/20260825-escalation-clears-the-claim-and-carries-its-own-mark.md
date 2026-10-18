@@ -1,7 +1,7 @@
 # ADR: Escalation clears the claim and carries its own mark
 
 ## Status
-Accepted
+Accepted — amended by 20261018-an-orchestrating-skill-runs-the-queue-and-replaces-the-sweep: orchestrate is the unattended dispatch path that excludes marked Tickets, and on the person's explicit answer in its conversation it may record the continuation and clear the mark
 
 ## Area
 Ticketing
@@ -97,7 +97,7 @@ escalation stops expressing its pause through the claim field.
   comment.
 
 ## Enforced by
-`tests/test_ticket_automation_prompts.py` — `test_convention_escalation_releases_the_claim_and_marks_the_ticket`, `test_run_ticket_escalation_releases_the_claim_and_marks_the_ticket`, `test_sweep_excludes_escalated_tickets_from_the_eligible_set`, `test_event_eligibility_excludes_escalated_tickets`, and `test_github_venue_renders_the_escalation_mark_as_a_label` fail if escalation stops marking the Ticket before it releases the claim, keeps or transfers the claim, or marked Tickets stop being excluded by the sweep, the event check, or the GitHub `escalated` label. Also `tests/test_ticket_automation_prompts.py` — `test_human_picker_needs_no_escalation_special_case`, `test_ticket_execution_skills_ship_on_every_distribution` fail if next-ticket gains an escalation special case or the distributed copies lose the claim release and escalation mark.
+`tests/test_ticket_automation_prompts.py` — `test_convention_escalation_releases_the_claim_and_marks_the_ticket`, `test_run_ticket_escalation_releases_the_claim_and_marks_the_ticket`, `test_orchestrate_excludes_escalated_tickets_where_it_decides`, and `test_github_venue_renders_the_escalation_mark_as_a_label` fail if escalation stops marking the Ticket before it releases the claim, keeps or transfers the claim, or marked Tickets stop being excluded where `orchestrate` decides or by the GitHub `escalated` label; `test_orchestrate_counts_answers_by_where_they_come_from` holds the amendment that `orchestrate` clears the mark only on the person's explicit answer. Also `tests/test_ticket_automation_prompts.py` — `test_human_picker_needs_no_escalation_special_case`, `test_ticket_execution_skills_ship_on_every_distribution` fail if next-ticket gains an escalation special case or the distributed copies lose the claim release and escalation mark.
 
 ## Source
 - Session: figure-out on cross-awareness among the Ticket skills (2026-08-25)

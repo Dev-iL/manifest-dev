@@ -1,7 +1,7 @@
 # ADR: figure-out asks through the host's question capability when the user asks for it
 
 ## Status
-Accepted
+Superseded by 20261018-figure-out-and-define-ask-through-the-question-capability-by-default
 
 ## Area
 figure-out
@@ -37,7 +37,7 @@ Plain text stays the default. When the user's instructions ask for it and the ho
 - Behavior differs between hosts that offer the capability and hosts that do not.
 
 ## Enforced by
-partly — `tests/test_skill_frontmatter.py` — `test_shipped_text_names_no_host_tool` fails if shipped text names a host's question tool instead of the capability; the plain-text default and asking through the capability only on the user's request are judgment.
+retargeted — `tests/test_skill_frontmatter.py` — `test_shipped_text_names_no_host_tool` now holds 20261018-figure-out-and-define-ask-through-the-question-capability-by-default. Before that: partly — the same test failed if shipped text named a host's question tool instead of the capability; the plain-text default and asking through the capability only on the user's request were judgment.
 
 ## Source
 - Session: figure-out investigation of how figure-out reaches its user.

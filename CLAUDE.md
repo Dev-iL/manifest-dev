@@ -36,10 +36,21 @@ the source tree it copies. It also fails when a shipped file points to a section
 
 `claude-plugins/manifest-dev/evals/` holds behavioral eval suites for `figure-out` and, under
 `evals/define/` with its own README, for `define`. Each run is many model sessions, so the
-owner runs a suite, or an agent runs one after asking and naming the cases and why; it runs with
-`claude plugin eval . --tag <figure-out|define> --ablation with-without --allow-tools Write Bash --scaffold` with the judge model and cost ceiling each README names (on macOS, inside the container `evals/Dockerfile` defines — `scripts/evals/run_eval.sh` starts it; its `README.md` also covers hill-climbing a prompt with the scripts beside it)
-from the plugin directory. It measures **uplift** — every case runs with the plugin and without
-it, and the headline number is Δ, not pass rate — so a case both arms pass teaches nothing and is
+owner runs a suite, or an agent runs one after asking and naming the cases and why. Every model
+session this repository starts — an eval suite, a skill drive (`scripts/drive-skill.sh`), or a
+document walk (`scripts/walk.sh`) — runs the `claude` CLI directly, with no container, the same
+way locally and in a cloud session. It needs only `claude` on PATH and signed in. Each session
+starts from a scratch directory outside the checkout, on a copy of the plugin, without the user's
+settings, installed plugins, or MCP servers, and records the CLI version rather than pinning it.
+Drives and walks run through their recipes (`scripts/verify drive|walk <recipe>`, ask-first). A
+suite runs from the repository root with
+`scripts/evals/run_eval.sh <name> <out-json> --tag <figure-out|define> --ablation with-without --scaffold`
+and the judge model and cost ceiling each README names; it keeps running after the shell that
+started it exits, which a cloud session's command timeout needs, and `--wait` blocks until it
+ends. On macOS each eval child may raise a keychain dialog, so suites run best in a cloud session.
+`evals/README.md` → *Running a suite* has the rest, and also covers hill-climbing a prompt with
+the scripts beside `run_eval.sh`. The suite measures **uplift** — every case runs with the plugin
+and without it, and the headline number is Δ, not pass rate — so a case both arms pass teaches nothing and is
 removed. `tests/` is a property suite that must stay green; the eval suite is a measurement whose
 numbers go stale whenever a prompt it covers is edited, and its `evals/README.md` carries the
 baseline, the held-out split, and — most importantly before trusting any result from it — how
@@ -55,7 +66,7 @@ Read before building plugins:
 
 ## Project Surfaces
 
-<!-- setup-project surfaces v6 -->
+<!-- setup-project surfaces v7 -->
 
 This project keeps its direction, vocabulary, and decision memory in the repo — shared ground for every contributor and agent, regardless of tooling.
 
@@ -165,7 +176,7 @@ Distributed skill files stay repo-agnostic — maintainer/governance notes like 
 
 ## Setup-Project Surfaces Version
 
-Every file setup-project copies or emits into projects — `figure-out/references/ADR_FORMAT.md`, `setup-project/references/NORTH_STAR_FORMAT.md`, and the verification harness under `setup-project/references/harness/` (the tool and its example settings and recipes) — is pinned to the latest surfaces version. `setup-project/references/CHANGES.md` lists one line per version and `setup-project/references/changes/vN.md` holds each version's items, so an update reads only the versions it offers and the always-read list grows by a line, not by every version's items. A change to any emitted file needs a new `changes/vN.md` and its line in `CHANGES.md` in the same change. The file lists what an installed project gains and carries the digest the version test prints on failure, and the version comment in the surfaces template of `NORTH_STAR_FORMAT.md` moves to `vN`. Installed projects record the version they carry, and an update offers only the entries after it, so a change shipped without a version never reaches them. HTML comments are outside the digest, so maintainer notes need no version. Each change that adds a version moves the one-behind eval case to the version before it — replacing that case, never adding one beside it, since every such case tests the same offer and each run is paid — graded on offering only the entries after that version, and moves `45-current-setup-offers-nothing` to the newest. `tests/test_setup_project_versions.py` fails when `45` does not record the newest version, when no case records the version before it, and when a case records an older version or two cases record that one. A new version also updates every upgrade guide in `setup-project/references/upgrades/` — one `vN-to-current.md` per older version, each taking a project straight to the newest — and adds the guide for the version it supersedes; the same test fails when a guide is missing, exists for the newest version, or names an older target. This repository's `scripts/verify` and `scripts/verify.mts` are copies of the shipped tool, and the eval scaffolds that seed a harness embed it, so edit the shipped copy and run `python3 scripts/sync_dist.py`, which copies it to the others; `tests/test_verify.py` and `sync_dist.py --check` fail when any differs. `scripts/tsconfig.json` type-checks both `verify.mts` copies in strict mode (`npm --prefix scripts run typecheck`), with its dev dependencies in `scripts/package.json`, never in the root `package.json`, which Pi installs from.
+Every file setup-project copies or emits into projects — `figure-out/references/ADR_FORMAT.md`, `setup-project/references/NORTH_STAR_FORMAT.md`, and the verification harness under `setup-project/references/harness/` (the tool and its example settings and recipes) — is pinned to the latest surfaces version. `setup-project/references/CHANGES.md` lists one line per version and `setup-project/references/changes/vN.md` holds each version's items, so an update reads only the versions it offers and the always-read list grows by a line, not by every version's items. A change to any emitted file needs a new `changes/vN.md` and its line in `CHANGES.md` in the same change. The file lists what an installed project gains and carries the digest the version test prints on failure, and the version comment in the surfaces template of `NORTH_STAR_FORMAT.md` moves to `vN`. Installed projects record the version they carry, and an update offers only the entries after it, so a change shipped without a version never reaches them. HTML comments are outside the digest, so maintainer notes need no version. Each change that adds a version moves the one-behind eval case to the version before it — replacing that case, never adding one beside it, since every such case tests the same offer and each run is paid — graded on offering only the entries after that version, and moves `45-current-setup-offers-nothing` to the newest. `tests/test_setup_project_versions.py` fails when `45` does not record the newest version, when no case records the version before it, and when a case records an older version or two cases record that one. The upgrade guides in `setup-project/references/upgrades/` hold one `vN-to-current.md` per older version, each saying only what the next version gives a project at vN; setup-project follows a project's own guide and every later one, and adds them up so the project goes straight to the newest shape (`setup-project/SKILL.md` → *The update pass*). A new version therefore adds the guide for the version it supersedes and edits no other version guide; `MOVE_TO_HARNESS.md`, the move of a pre-v4 surface into the harness, changes only when the new version changes that move. The same test fails when a guide is missing, exists for the newest version, names a version after the one it gives, or records a version. This repository's `scripts/verify` and `scripts/verify.mts` are copies of the shipped tool, and the eval scaffolds that seed a harness embed it, so edit the shipped copy and run `python3 scripts/sync_dist.py`, which copies it to the others; `tests/test_verify.py` and `sync_dist.py --check` fail when any differs. `scripts/tsconfig.json` type-checks both `verify.mts` copies in strict mode (`npm --prefix scripts run typecheck`), with its dev dependencies in `scripts/package.json`, never in the root `package.json`, which Pi installs from.
 
 ## Red-Flag Mirror Pairs
 
@@ -251,7 +262,7 @@ Prefer `cp` and `mv` bash commands over the Write tool when duplicating or movin
 
 ```bash
 scripts/check.sh --fix                # fix lint and format while iterating
-scripts/verify drive property-suite   # lint, types and tests through the harness; commit its evidence
+scripts/verify drive property-suite   # lint, types and tests through the harness; show its output in the PR
 ```
 
 Bump plugin version if plugin files changed.
@@ -260,7 +271,7 @@ Bump plugin version if plugin files changed.
 
 Ratified steering preferences for this repo. Each states the preference, why it holds, and when it should yield — weigh them rather than obey them.
 
-- **Default manifests here to no PR-lifecycle gates.** Pull requests in this repo run no CI and have a single maintainer as the only reviewer, so lifecycle criteria spend verification effort on nothing. Include them once a pull request carries required status checks, or a reviewer whose approval gates the merge.
+- **Default manifests here to no `check-pr` lifecycle gate.** Pull requests in this repo run no CI and have a single maintainer as the only reviewer, so CI, review-thread and mergeability criteria spend verification effort on nothing. The gate that the pull request shows the change working still applies: the maintainer reads it before merging. Include the lifecycle gate once a pull request carries required status checks, or a reviewer whose approval gates the merge.
 - **Prototype renderings ship as Artifacts where the harness offers them.** When a session renders a disposable draft for reaction — figure-out's prototyping, or any render-to-react flow — publish it as an Artifact page rather than loose .md/.html files: in remote and web sessions loose files are hard to open, and a page the user can actually look at is the whole point of rendering. Yield to a plain file when the session has no Artifact capability, or when the user asks for the file itself.
 
 ## Coding Conventions

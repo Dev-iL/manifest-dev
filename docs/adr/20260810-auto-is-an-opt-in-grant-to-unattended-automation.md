@@ -1,7 +1,7 @@
 # ADR: The Auto marker is an opt-in grant; absence fences automation off entirely
 
 ## Status
-Accepted — irreversible-act authority narrowed by 20260812-auto-ticket-completes-after-required-landing: ordinary landing through declared repository protections is within Auto; actions requiring separate human authority remain excluded
+Accepted — irreversible-act authority narrowed by 20260812-auto-ticket-completes-after-required-landing: ordinary landing through declared repository protections is within Auto; actions requiring separate human authority remain excluded; amended by 20261018-a-ticket-without-auto-runs-until-it-needs-a-person-and-never-lands-on-its-own: absence of Auto no longer keeps automation off a Ticket whose author has write access, only from completing or landing it
 
 ## Area
 Ticketing
@@ -44,7 +44,12 @@ Default-off is what makes shared venues safe: nothing is ever marked "not auto" 
 - Agent help on ungranted tickets must be dispatched and supervised manually; the store offers no middle tier.
 
 ## Enforced by
-partly — `tests/test_ticket_automation_prompts.py` — `test_ticket_up_preserves_auto_authority_boundary` fails if Shaped starts implying Auto or Auto stops needing a fresh human grant; the granting criterion is judgment. Also `tests/test_ticket_automation_prompts.py` — `test_ticket_execution_skills_ship_on_every_distribution` fails if the distributed copy loses the rule that Shaped never implies Auto.
+partly — `tests/test_ticket_automation_prompts.py` — `test_ticket_up_preserves_auto_authority_boundary` fails if Shaped starts
+implying Auto, a grant stops naming its grantor, or the run that found the work may grant it;
+`test_a_ticket_without_auto_runs_to_a_ready_pull_request_and_never_lands` holds the amended meaning
+of absence; the granting criterion is judgment. Also `tests/test_ticket_automation_prompts.py` —
+`test_ticket_execution_skills_ship_on_every_distribution` fails if the distributed copy loses the
+rule that Shaped never implies Auto.
 
 ## Source
 - Session: figure-out session, 2026-08-10

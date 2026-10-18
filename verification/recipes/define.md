@@ -13,14 +13,14 @@ Turns shared understanding into a Manifest — Problem, Appetite, Deliverables w
 - `/define [task] [<manifest-path>] [--babysit <pr-url>]`.
 - Phrases its description matches: "plan", "spec out", "make a manifest", "break down a task".
 - `auto` (with `--autonomous`); `do` to amend; `babysit-pr` with `--babysit`; figure-out's offer at the end of a read.
-- `--babysit <pr-url>` synthesizes a lifecycle-only Manifest from a pull request; `--autonomous` skips the approval wait and records decisions as `(auto)` assumptions.
+- `--babysit <pr-url>` synthesizes a lifecycle-only Manifest from a pull request — the `check-pr` gate and the gate that the pull request shows the change working; `--autonomous` skips the approval wait and records decisions as `(auto)` assumptions.
 - It reads earlier work on the repository before encoding.
 
 ## Scenarios
 
 ### new-manifest
 Run: `scripts/drive-skill.sh define claude-plugins/manifest-dev/evals/define/d01-layer-cut/prompt.md`
-Proves: the drive's home holds `.manifest-dev/manifests/manifest-<timestamp>.md` and the reply ends with `Manifest complete: <path>`; the three-layer plan comes back re-cut into slices. Every gate in the Manifest ends with `Judgment gate.` or `Deterministic gate.` and the ceiling invariant is present verbatim.
+Proves: the drive's summary lists `manifests/manifest-<timestamp>.md` among what the session wrote under `.manifest-dev`, and the reply ends with `Manifest complete: <path>`; the three-layer plan comes back re-cut into slices. Every gate in the Manifest ends with `Judgment gate.` or `Deterministic gate.` and the ceiling invariant is present verbatim.
 Check: read
 Workload: varies
 
@@ -67,6 +67,7 @@ Workload: varies
 - A plan handed over by layer (model, API, UI) must come back re-cut into slices; keeping the layers as a "user's call" is the defect `d01-layer-cut` exists to catch.
 - The Manifest is written to the home directory, not the project: in a drive it is in the evidence's `home-manifest-dev.tar`.
 - Attended, it waits for a yes after the digest; a headless drive needs `--autonomous` or a prompt that says to proceed.
+- A headless drive offers no question-selection capability, so define asks in plain text, one ask per turn; batching its key calls through the capability, the default on a host that offers one, shows only in an interactive session.
 - An old Manifest with a `verify` block is refused, not migrated.
 - A yes approves the Manifest, not execution: it never runs `/do` itself.
 - "It didn't stop for approval" is define only under `--autonomous` or when called by `auto`; a whole chain that never stopped is the auto entry.

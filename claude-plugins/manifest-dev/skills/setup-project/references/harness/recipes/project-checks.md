@@ -26,8 +26,10 @@ Proves: the TypeScript program compiles with no error.
 ### tests
 Run: `npm test`
 Proves: every unit test passes.
+Line: 14.0 s on linux-x64-8cpu
 
 ## Gotchas
 
-- It covers the whole tree, so any change makes it stale until it is driven again, as it should.
+- It covers the whole tree, so `verify affected` names it for every change, as it should; it never
+  counts as covering a path a user reaches, which the other recipes cover.
 - `npm run lint -- --fix` edits the tree it checks; the scenario runs without it.

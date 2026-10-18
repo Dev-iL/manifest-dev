@@ -22,19 +22,19 @@ Presses on a topic with the user until both understand it, and ends with a named
 
 ### current-setup
 Run: `scripts/drive-skill.sh figure-out claude-plugins/manifest-dev/evals/45-current-setup-offers-nothing/prompt.md --scaffold claude-plugins/manifest-dev/evals/45-current-setup-offers-nothing`
-Proves: the reply says the setup is current, lists nothing the project lacks, does not suggest a setup run, moves to the topic with one ask, and names a log under the drive's `~/.manifest-dev/logs/`; the summary shows no files written.
+Proves: the reply says the setup is current, lists nothing the project lacks, does not suggest a setup run, moves to the topic with one ask, and names a log under `~/.manifest-dev/logs/`, which the drive's summary lists; the summary shows no files written.
 Check: read
 Workload: varies
 
 ### one-version-behind
-Run: `scripts/drive-skill.sh figure-out claude-plugins/manifest-dev/evals/53-update-offer-from-v5/prompt.md --scaffold claude-plugins/manifest-dev/evals/53-update-offer-from-v5`
-Proves: the reply offers the update and names only what v6 adds — a recipe for the project's `pytest` and `ruff` checks, the *Before merging* section's commands pointed at it, and the bullet — and nothing v1 to v5 gave.
+Run: `scripts/drive-skill.sh figure-out claude-plugins/manifest-dev/evals/53-update-offer-from-v6/prompt.md --scaffold claude-plugins/manifest-dev/evals/53-update-offer-from-v6`
+Proves: the reply offers the update and names only what v7 adds — each time line moved from committed evidence into its scenario's recipe, keeping the raise's reason and the freeze's Ticket, committed evidence removed and its directory ignored, and the two context-file lines that commit evidence rewritten — and nothing v1 to v6 gave.
 Check: read
 Workload: varies
 
 ### from-v1
 Run: `scripts/drive-skill.sh figure-out verification/prompts/figure-out-from-v1.md --scaffold verification/scaffolds/project-at-v1`
-Proves: the reply offers the update and names only what v2 to v6 add, including the move to one harness.
+Proves: the reply offers the update and names only what v2 to v7 add, including the move to one harness.
 Check: read
 Workload: varies
 
@@ -53,6 +53,7 @@ Workload: varies
 ## Gotchas
 
 - The eval cases' `prompt.md` files open with the case's front matter; `scripts/drive-skill.sh` sends only the body below it.
+- A drive's headless session offers no question-selection capability, so the reply asks in plain text, one ask per turn; asking through the capability, the default on a host that offers one, shows only in an interactive session.
 - The reply ends at its one ask. A full read — conclusion, confidence, evidence, what would overturn it — needs the user's answers, which a one-prompt drive does not give; that path is the eval suite's.
 - Without the skill named in the prompt it may not fire; the eval README measures how often.
 - A user's agreement is not a go: it never edits code, so "it didn't implement" is the intended outcome, not a failure.

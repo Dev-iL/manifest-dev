@@ -1,0 +1,1663 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#f2f2f7">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000">
+<title>Orchestrate status</title>
+<!--
+  orchestrate's status page. This file is a fixed template: the orchestrator copies it unchanged and,
+  at each check-in, rewrites only the JSON inside <script id="orchestrate-status"> below. Every field
+  the page reads, and where the page is published, is documented in references/STATUS_PAGE.md.
+  The page loads nothing from the network: no fonts, styles or scripts. It links only to http(s).
+-->
+<style>
+:root {
+  --bg: #f2f2f7;
+  --card: #ffffff;
+  --shade: rgba(0, 0, 0, .05);
+  --fill: rgba(118, 118, 128, .12);
+  --text: #1d1d1f;
+  --text-2: rgba(60, 60, 67, .76);
+  --text-3: rgba(60, 60, 67, .36);
+  --sep: rgba(60, 60, 67, .18);
+  --edge: rgba(60, 60, 67, .4);
+  --dot: rgba(60, 60, 67, .16);
+  --blue: #0066d6;
+  --green: #1f7a36;
+  --orange: #c93400;
+  --red: #c4001a;
+  --blue-fill: #007aff;
+  --green-fill: #34c759;
+  --orange-fill: #ff9500;
+  --red-fill: #ff3b30;
+  --on-orange: #1d1d1f;
+  --solid-red: #d70015;
+  --solid-blue: #0066d6;
+  --blue-tint: rgba(0, 122, 255, .10);
+  --orange-tint: rgba(255, 149, 0, .14);
+  --red-tint: rgba(255, 59, 48, .11);
+  --material: rgba(255, 255, 255, .8);
+  --sheet-material: rgba(250, 250, 252, .9);
+  --float: 0 0 0 .5px rgba(0, 0, 0, .06), 0 6px 24px rgba(0, 0, 0, .08);
+  --lift: 0 0 0 .5px rgba(0, 0, 0, .06), 0 16px 48px rgba(0, 0, 0, .16);
+  --scrim: rgba(0, 0, 0, .2);
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #000000;
+    --card: #1c1c1e;
+    --shade: transparent;
+    --fill: rgba(118, 118, 128, .26);
+    --text: #f5f5f7;
+    --text-2: rgba(235, 235, 245, .66);
+    --text-3: rgba(235, 235, 245, .32);
+    --sep: rgba(84, 84, 88, .6);
+    --edge: rgba(235, 235, 245, .34);
+    --dot: rgba(235, 235, 245, .12);
+    --blue: #409cff;
+    --green: #30d158;
+    --orange: #ff9f0a;
+    --red: #ff6961;
+    --blue-fill: #0a84ff;
+    --green-fill: #30d158;
+    --orange-fill: #ff9f0a;
+    --red-fill: #ff453a;
+    --on-orange: #000000;
+    --solid-red: #d70015;
+    --solid-blue: #0071e3;
+    --blue-tint: rgba(10, 132, 255, .2);
+    --orange-tint: rgba(255, 159, 10, .18);
+    --red-tint: rgba(255, 69, 58, .18);
+    --material: rgba(36, 36, 38, .8);
+    --sheet-material: rgba(30, 30, 32, .92);
+    --float: 0 0 0 .5px rgba(255, 255, 255, .08), 0 6px 24px rgba(0, 0, 0, .5);
+    --lift: 0 0 0 .5px rgba(255, 255, 255, .08), 0 16px 48px rgba(0, 0, 0, .7);
+    --scrim: rgba(0, 0, 0, .45);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #000000;
+  --card: #1c1c1e;
+  --shade: transparent;
+  --fill: rgba(118, 118, 128, .26);
+  --text: #f5f5f7;
+  --text-2: rgba(235, 235, 245, .66);
+  --text-3: rgba(235, 235, 245, .32);
+  --sep: rgba(84, 84, 88, .6);
+  --edge: rgba(235, 235, 245, .34);
+  --dot: rgba(235, 235, 245, .12);
+  --blue: #409cff;
+  --green: #30d158;
+  --orange: #ff9f0a;
+  --red: #ff6961;
+  --blue-fill: #0a84ff;
+  --green-fill: #30d158;
+  --orange-fill: #ff9f0a;
+  --red-fill: #ff453a;
+  --on-orange: #000000;
+  --solid-red: #d70015;
+  --solid-blue: #0071e3;
+  --blue-tint: rgba(10, 132, 255, .2);
+  --orange-tint: rgba(255, 159, 10, .18);
+  --red-tint: rgba(255, 69, 58, .18);
+  --material: rgba(36, 36, 38, .8);
+  --sheet-material: rgba(30, 30, 32, .92);
+  --float: 0 0 0 .5px rgba(255, 255, 255, .08), 0 6px 24px rgba(0, 0, 0, .5);
+  --lift: 0 0 0 .5px rgba(255, 255, 255, .08), 0 16px 48px rgba(0, 0, 0, .7);
+  --scrim: rgba(0, 0, 0, .45);
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; overscroll-behavior: none; }
+html { -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; }
+body {
+  margin: 0; overflow: hidden;
+  background: var(--bg); color: var(--text);
+  font: 15px/1.45 -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--blue); text-decoration: none; }
+button { font: inherit; color: inherit; touch-action: manipulation; -webkit-user-select: none; user-select: none; }
+:focus-visible { outline: 2px solid var(--blue-fill); outline-offset: 2px; }
+.sheet .dismiss:focus-visible { outline-offset: -2px; }
+code { font-family: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace; font-size: 12.5px; }
+
+/* ---------- The graph owns the whole viewport ---------- */
+.stage { position: fixed; inset: 0; height: 100dvh; }
+.board { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; -webkit-user-select: none; user-select: none; }
+.board.dragging { cursor: grabbing; }
+.board text { fill: var(--text); }
+.board .node { cursor: pointer; outline: none; }
+.board .node.deco { cursor: inherit; }
+.board .press { transform-box: fill-box; transform-origin: center; transition: transform 160ms var(--ease-out); }
+.board .node.pressed .press { transform: scale(.97); }
+.board .el { fill: var(--text-2); font-weight: 500; font-variant-numeric: tabular-nums; }
+.board .pulse { fill: none; stroke: var(--c); stroke-width: 2; vector-effect: non-scaling-stroke; pointer-events: none; }
+.board .fillp { fill: none; stroke-dasharray: 1 1; }
+
+.tone-run  { --c: var(--blue-fill);   --ct: var(--blue); }
+.tone-done { --c: var(--green-fill);  --ct: var(--green); }
+.tone-you  { --c: var(--orange-fill); --ct: var(--orange); }
+.tone-stop { --c: var(--red-fill);    --ct: var(--red); }
+.tone-wait { --c: var(--text-3);      --ct: var(--text-2); }
+.tone-idle { --c: var(--text-3);      --ct: var(--text-2); }
+.tone-prop { --c: var(--blue-fill);   --ct: var(--blue); }
+
+.t-id { font-size: 11px; fill: var(--text-2) !important; font-variant-numeric: tabular-nums; }
+.t-kind { fill: var(--text-2) !important; font-weight: 500; }
+.t-title { font-size: 13px; font-weight: 600; letter-spacing: -.005em; }
+.t-status { font-size: 11px; font-weight: 600; fill: var(--ct) !important; }
+.t-col { font-size: 12px; font-weight: 600; fill: var(--text-2) !important; letter-spacing: .01em; }
+.dot { fill: var(--c); }
+.tone-wait .dot, .tone-idle .dot { fill: none; stroke: var(--c); stroke-width: 1.5; }
+.badge circle { fill: var(--orange-fill); }
+.badge text { fill: var(--on-orange) !important; font-size: 11px; font-weight: 700; text-anchor: middle; font-variant-numeric: tabular-nums; }
+.badge.tone-stop circle { fill: var(--solid-red); }
+.badge.tone-stop text { fill: #fff !important; }
+
+.edge { fill: none; stroke: var(--edge); stroke-width: 1.4; }
+.edge.k-after { stroke-dasharray: 5 4; }
+.edge.k-from { stroke-dasharray: .5 4.5; stroke-linecap: round; stroke-width: 2; }
+.edge.k-goal { stroke-opacity: .4; }
+.edge.hi { stroke: var(--blue-fill); stroke-width: 2; stroke-opacity: 1; opacity: 1 !important; }
+
+.sh { fill: var(--shade); }
+.box { fill: var(--card); stroke: var(--sep); stroke-width: 1; }
+.tone-run .box { stroke: var(--c); stroke-width: 1.25; }
+.tone-you .box, .tone-stop .box { stroke: var(--c); stroke-width: 1.75; }
+.tone-done .box { fill: transparent; }
+.tone-done .t-title, .tone-idle .t-title { fill: var(--text-2); font-weight: 500; }
+.tone-idle .box, .tone-prop .box { fill: transparent; stroke-dasharray: 4 3; stroke: var(--edge); }
+.tone-prop .box { stroke: var(--c); stroke-width: 1.5; }
+.bar-bg { fill: none; stroke: var(--fill); stroke-width: 4; stroke-linecap: round; }
+.bar { stroke: var(--c); stroke-width: 4; stroke-linecap: round; }
+.goal rect { fill: var(--text); }
+.goal text { fill: var(--bg) !important; }
+.goal .g-k { font-size: 11px; font-weight: 700; letter-spacing: .06em; opacity: .74; }
+.goal .g-t { font-size: 15px; font-weight: 700; letter-spacing: -.01em; }
+.goal .g-d { font-size: 12px; opacity: .82; }
+.node.sel .box, .node:focus-visible .box { stroke: var(--blue-fill); stroke-width: 2.25; stroke-dasharray: none; }
+
+/* ---------- Floating chrome ---------- */
+.hud {
+  position: fixed; z-index: 10; top: max(16px, env(safe-area-inset-top)); left: max(16px, env(safe-area-inset-left));
+  max-width: 380px; padding: 12px 16px; border-radius: 18px;
+  background: var(--material); -webkit-backdrop-filter: blur(24px) saturate(1.8); backdrop-filter: blur(24px) saturate(1.8);
+  box-shadow: var(--float); pointer-events: none;
+}
+.hud * { pointer-events: auto; }
+.hud .k { font-size: 12px; color: var(--text-2); font-weight: 500; }
+.hud .k .ex { color: var(--orange); font-weight: 600; }
+.hud .t { font-size: 22px; line-height: 1.15; font-weight: 700; letter-spacing: -.02em; margin: 1px 0 4px; overflow-wrap: anywhere; }
+.hud .s { font-size: 13.5px; color: var(--text-2); display: flex; align-items: center; flex-wrap: wrap; gap: 0 6px; font-variant-numeric: tabular-nums; }
+.hud .s b { color: var(--text); font-weight: 600; }
+.hud .s i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.hud .c { font-size: 12px; color: var(--text-2); margin-top: 1px; font-variant-numeric: tabular-nums; }
+.hud .src { display: inline-flex; align-items: center; gap: 5px; margin-right: 4px; color: var(--green); font-weight: 600; }
+.hud .src[hidden] { display: none; }
+.hud .src i { position: relative; width: 7px; height: 7px; border-radius: 50%; background: var(--green-fill); }
+.hud .src i b { position: absolute; inset: 0; border-radius: 50%; border: 1.5px solid var(--green-fill); opacity: 0; }
+.hud .src.lost { color: var(--red); }
+.hud .src.lost i { background: var(--red-fill); }
+.hud .b { font-size: 13px; margin-top: 8px; padding: 8px 12px; border-radius: 10px; }
+.hud .b[hidden] { display: none; }
+.hud .b.stop { background: var(--red-tint); color: var(--red); }
+.hud .b.idle { background: var(--fill); color: var(--text-2); }
+@media (max-width: 759px) {
+  .hud { top: max(12px, env(safe-area-inset-top)); left: max(12px, env(safe-area-inset-left)); right: max(12px, env(safe-area-inset-right)); max-width: none; }
+}
+
+.dock { position: fixed; z-index: 10; right: max(16px, env(safe-area-inset-right)); bottom: max(16px, env(safe-area-inset-bottom)); display: flex; gap: 8px; }
+.fbtn {
+  height: 44px; border: 0; border-radius: 22px; padding: 0 16px; display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
+  background: var(--material); -webkit-backdrop-filter: blur(24px) saturate(1.8); backdrop-filter: blur(24px) saturate(1.8);
+  box-shadow: var(--float); font-weight: 600; font-size: 15px; transition: transform 160ms var(--ease-out);
+}
+.fbtn:active { transform: scale(.97); }
+.fbtn.icon { width: 44px; padding: 0; justify-content: center; }
+.fbtn .count {
+  display: inline-grid; overflow: hidden; min-width: 22px; height: 22px; border-radius: 11px; padding: 0 6px;
+  background: var(--orange-fill); color: var(--on-orange); font-size: 12.5px; font-weight: 700; line-height: 22px; text-align: center; font-variant-numeric: tabular-nums;
+}
+.fbtn .count[hidden] { display: none; }
+.fbtn .count > span { grid-area: 1 / 1; }
+.fbtn.quiet { color: var(--text-2); font-weight: 500; }
+
+/* The detail sheet: a side panel on wide screens (the graph stays usable), a bottom sheet on phones (dims the rest).
+   Its position is driven by a spring in the script, so it always moves from where it is. */
+.sheet {
+  position: fixed; z-index: 30; display: flex; flex-direction: column;
+  background: var(--sheet-material); -webkit-backdrop-filter: blur(30px) saturate(1.8); backdrop-filter: blur(30px) saturate(1.8);
+  box-shadow: var(--lift); visibility: hidden; opacity: 0;
+}
+.sheet .grab { display: none; }
+.sheet .head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 16px 4px; }
+.sheet .kick { font-size: 12px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; color: var(--ct, var(--text-2)); }
+.sheet .dismiss { border: 0; border-radius: 8px; background: none; color: var(--blue); font-weight: 600; font-size: 16px; padding: 8px 6px; margin: -4px -6px -4px 0; cursor: pointer; transition: transform 160ms var(--ease-out); }
+.sheet .dismiss:active { transform: scale(.97); }
+.sheet .body { overflow-y: auto; overscroll-behavior: contain; padding: 0 16px 24px; }
+.sheet h2 { font-size: 20px; line-height: 1.25; letter-spacing: -.015em; margin: 2px 0 4px; }
+.sheet .meta { font-size: 13px; color: var(--text-2); font-variant-numeric: tabular-nums; }
+.sheet .ask { margin: 14px 0 0; padding: 12px 16px; border-radius: 12px; background: var(--orange-tint); }
+.sheet .ask.red { background: var(--red-tint); }
+.sheet .ask p { margin: 0; }
+.sheet .ask p + p { margin-top: 4px; font-size: 13px; color: var(--text-2); }
+.sheet .facts { list-style: none; margin: 14px 0 0; padding: 0; font-size: 14px; }
+.sheet .facts li { padding: 10px 0; border-top: .5px solid var(--sep); color: var(--text-2); }
+.sheet .facts li b { color: var(--text); font-weight: 600; }
+.sheet .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.btn { border: 0; border-radius: 11px; padding: 8px 16px; min-height: 36px; font-size: 14.5px; font-weight: 600; cursor: pointer; background: var(--blue-tint); color: var(--blue); transition: transform 160ms var(--ease-out); display: inline-flex; align-items: center; }
+.btn:active { transform: scale(.97); }
+.btn.primary { background: var(--solid-blue); color: #fff; }
+.track { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; margin: 14px 0 4px; }
+.track span { font-size: 10.5px; color: var(--text-2); text-align: center; }
+.track span::before { content: ""; display: block; height: 4px; border-radius: 2px; background: var(--fill); margin-bottom: 5px; }
+.track span.done::before { background: color-mix(in srgb, var(--blue-fill) 45%, transparent); }
+.track span.now { color: var(--blue); font-weight: 600; }
+.track span.now::before { background: var(--blue-fill); }
+.list { margin: 6px -18px 0; }
+.row { display: grid; grid-template-columns: 24px minmax(0, 1fr) 14px; gap: 0 12px; align-items: start; padding: 12px 16px; position: relative; width: 100%; border: 0; background: transparent; text-align: left; }
+.row + .row::before { content: ""; position: absolute; top: 0; left: 52px; right: 0; border-top: .5px solid var(--sep); }
+button.row { cursor: pointer; }
+button.row:active { background: var(--fill); }
+@media (hover: hover) and (pointer: fine) { button.row:hover { background: color-mix(in srgb, var(--fill) 55%, transparent); } }
+.row .n { width: 24px; height: 24px; border-radius: 12px; background: var(--orange-fill); color: var(--on-orange); font-size: 12.5px; font-weight: 700; line-height: 24px; text-align: center; }
+.row .n.red { background: var(--solid-red); color: #fff; }
+.row .w { font-weight: 600; line-height: 1.35; }
+.row .y { font-size: 13px; color: var(--text-2); margin-top: 2px; }
+.row .chev { color: var(--text-3); font-size: 20px; line-height: 1; }
+.copyline { display: flex; gap: 8px; margin-top: 10px; }
+.copyline code { flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap; background: var(--fill); border-radius: 9px; padding: 8px 10px; }
+
+@media (min-width: 760px) {
+  .sheet { top: max(16px, env(safe-area-inset-top)); right: max(16px, env(safe-area-inset-right)); width: 360px; max-height: calc(100dvh - 32px - 60px - env(safe-area-inset-bottom, 0px)); border-radius: 20px; } /* stops above the dock */
+  .scrim { display: none; }
+}
+@media (max-width: 759px) {
+  .sheet { left: 0; right: 0; bottom: 0; max-height: 82dvh; border-radius: 20px 20px 0 0; padding-bottom: env(safe-area-inset-bottom, 0px); opacity: 1; }
+  .sheet .grab { display: block; width: 36px; height: 5px; border-radius: 3px; background: var(--text-3); margin: 7px auto 0; }
+  .sheet .head { touch-action: none; padding-top: 6px; cursor: grab; }
+  .scrim { position: fixed; inset: 0; z-index: 29; background: var(--scrim); opacity: 0; pointer-events: none; }
+  .scrim.open { pointer-events: auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  /* Presses answer with a dim instead of a shrink; the script swaps every movement for a fade the same way. */
+  .board .press, .fbtn, .sheet .dismiss, .btn { transition: opacity 160ms ease; }
+  .fbtn:active, .sheet .dismiss:active, .btn:active, .board .node.pressed .press { transform: none; opacity: .6; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .hud, .fbtn, .sheet { background: var(--card); -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+@media (prefers-contrast: more) {
+  :root { --edge: rgba(60, 60, 67, .7); --sep: rgba(60, 60, 67, .5); }
+  .hud, .fbtn, .sheet { background: var(--card); -webkit-backdrop-filter: none; backdrop-filter: none; border: 1px solid var(--sep); }
+}
+</style>
+</head>
+<body>
+<main class="stage" id="stage"></main>
+<header class="hud" id="hud"></header>
+<div class="dock" id="dock">
+  <button type="button" class="fbtn" id="needsBtn"><span class="lbl">Needs you</span><span class="count" hidden></span></button>
+  <button type="button" class="fbtn icon" id="fitBtn" aria-label="Fit the whole graph">
+    <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6.5V2h4.5M11.5 2H16v4.5M16 11.5V16h-4.5M6.5 16H2v-4.5"/></svg>
+  </button>
+</div>
+<div class="scrim" id="scrim"></div>
+<aside class="sheet" id="sheet" role="dialog" aria-labelledby="sheetKick" tabindex="-1">
+  <div class="grab" aria-hidden="true"></div>
+  <div class="head" id="sheetHead"><span class="kick" id="sheetKick"></span><button type="button" class="dismiss" id="sheetDone">Done</button></div>
+  <div class="body" id="sheetBody"></div>
+</aside>
+
+<!--
+  The one data block. The orchestrator replaces only the JSON between these script tags at each
+  check-in (references/STATUS_PAGE.md documents every field). The sample below is an example:
+  "example": true marks it, and the page labels it "Example" until real data replaces it.
+-->
+<script type="application/json" id="orchestrate-status">
+{
+  "schema": 1,
+  "example": true,
+  "effort": {
+    "name": "Checkout v2",
+    "destination": "Customers pay in one step, and failed payments recover on their own."
+  },
+  "mode": "default",
+  "state": "running",
+  "plan": 2,
+  "checkedAt": "2026-10-18T09:40:00Z",
+  "nextCheckAt": "2026-10-18T09:46:00Z",
+  "maxBatch": 5,
+  "tickets": [
+    { "id": "#131", "title": "Remove the second confirmation screen", "url": "https://example.com/acme/shop/issues/131", "status": "landed", "at": "2026-10-18T07:58:00Z", "pr": { "id": "#201", "url": "https://example.com/acme/shop/pull/201" }, "note": "Left no debt." },
+    { "id": "#132", "title": "Keep the cart when a payment fails", "url": "https://example.com/acme/shop/issues/132", "status": "landed", "at": "2026-10-18T09:20:00Z", "pr": { "id": "#203", "url": "https://example.com/acme/shop/pull/203" }, "note": "Left 2 debt items." },
+    { "id": "#133", "title": "Retry a declined card once with 3-D Secure", "url": "https://example.com/acme/shop/issues/133", "status": "running", "phase": "land", "at": "2026-10-18T08:06:00Z", "pr": { "id": "#205", "url": "https://example.com/acme/shop/pull/205" }, "note": "The base moved. Re-running gates before it lands." },
+    { "id": "#138", "title": "Round refunds in the customer's currency", "url": "https://example.com/acme/shop/issues/138", "status": "running", "phase": "define", "at": "2026-10-18T09:02:00Z" },
+    { "id": "#143", "title": "Pay with a saved wallet in one tap", "url": "https://example.com/acme/shop/issues/143", "status": "running", "phase": "verify", "at": "2026-10-18T08:06:00Z", "pr": { "id": "#214", "url": "https://example.com/acme/shop/pull/214" }, "note": "Merged the new base in early." },
+    { "id": "#144", "title": "Email a receipt after a recovered payment", "url": "https://example.com/acme/shop/issues/144", "status": "running", "phase": "build", "at": "2026-10-18T08:40:00Z" },
+    { "id": "#147", "title": "Log every payment state change", "url": "https://example.com/acme/shop/issues/147", "status": "running", "phase": "understand", "at": "2026-10-18T09:31:00Z" },
+    { "id": "#149", "title": "Speed up the payment page on slow phones", "url": "https://example.com/acme/shop/issues/149", "status": "queued", "note": "Starts when a slot frees up." },
+    { "id": "#141", "title": "Show saved cards first at checkout", "url": "https://example.com/acme/shop/issues/141", "status": "waiting", "dependsOn": ["#133"], "auto": false },
+    { "id": "#146", "title": "Remember the last card used", "url": "https://example.com/acme/shop/issues/146", "status": "waiting", "dependsOn": ["#141"] },
+    { "id": "#153", "title": "Refund to the original card", "url": "https://example.com/acme/shop/issues/153", "status": "waiting", "dependsOn": ["#138"] },
+    { "id": "#148", "title": "Show a clear message when a card expires", "url": "https://example.com/acme/shop/issues/148", "status": "waiting", "after": ["#147"], "note": "#147 changes how every payment state is recorded, and this adds a new one." }
+  ],
+  "needsYou": [
+    { "ask": "Plan in depth: how should failed charges be retried?", "detail": "This needs its own session with you. Its Tickets appear here at the next check-in.", "startLine": "/figure-out How should failed charges be retried? Then ticket-up the read into effort \"Checkout v2\"", "cost": "3 Tickets wait on the answer" }
+  ]
+}
+</script>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ================= Vocabulary and helpers ================= */
+  var PHASES = [["understand", "Understand"], ["define", "Define"], ["build", "Build"], ["verify", "Verify"], ["ready", "Ready PR"], ["land", "Land"]];
+  var LABEL = { held: "Your look", escalated: "Your answer", failed: "Launch failed", grant: "Grant Auto?", proposal: "Your call", queued: "Up next", skipped: "Left alone", proposed: "Proposed" };
+  var TONE = { running: "run", landed: "done", held: "you", grant: "you", proposal: "you", escalated: "stop", failed: "stop", queued: "wait", waiting: "idle", skipped: "idle", proposed: "prop" };
+  var TONES = ["tone-run", "tone-done", "tone-you", "tone-stop", "tone-wait", "tone-idle", "tone-prop"];
+  var POLL_MS = 15000, GRACE_MS = 2 * 60000, MINREAD = 0.72, WIDE = 760;
+  // Explanatory motion runs once per check-in, so it may take longer than ordinary UI motion.
+  var MS = { fadeIn: 220, fadeOut: 150, exit: 180, edge: 260, enter: 380, glide: 440, pulse: 560, stagger: 50, cause: 260 };
+  var CURVE = { out: "cubic-bezier(0.23, 1, 0.32, 1)" };
+  var rmq = window.matchMedia("(prefers-reduced-motion: reduce)"), reduced = rmq.matches;
+  if (rmq.addEventListener) rmq.addEventListener("change", function (e) { reduced = e.matches; Sheet.draw(); });
+  var FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+  var NS = "http://www.w3.org/2000/svg";
+  var $ = function (id) { return document.getElementById(id); };
+
+  function el(tag, attrs, kids) {
+    var n = document.createElement(tag);
+    for (var k in attrs || {}) {
+      if (k === "text") n.textContent = attrs[k];
+      else if (k === "class") n.className = attrs[k];
+      else n.setAttribute(k, attrs[k]);
+    }
+    (kids || []).forEach(function (c) { if (c != null && c !== false) n.appendChild(typeof c === "string" ? document.createTextNode(c) : c); });
+    return n;
+  }
+  function sv(tag, attrs, parent) {
+    var n = document.createElementNS(NS, tag);
+    for (var k in attrs || {}) { if (k === "text") n.textContent = attrs[k]; else n.setAttribute(k, attrs[k]); }
+    if (parent) parent.appendChild(n);
+    return n;
+  }
+  // Ticket and pull-request text comes from the store, so links are limited to http(s).
+  function link(url, text, cls) {
+    if (typeof url === "string" && /^https?:\/\//i.test(url)) return el("a", { href: url, target: "_blank", rel: "noopener", text: text, "class": cls || "" });
+    return el("span", { text: text });
+  }
+  function r2(n) { return Math.round(n * 100) / 100; }
+  function r4(n) { return Math.round(n * 10000) / 10000; }
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+  function time(iso) { var d = new Date(iso); return isNaN(d) ? "?" : d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }); }
+  function ago(ms) {
+    var s = Math.max(0, Math.floor(ms / 1000));
+    if (s < 60) return s + " s";
+    var m = Math.floor(s / 60);
+    if (m < 60) return m + " min";
+    return Math.floor(m / 60) + " h" + (m % 60 ? " " + (m % 60) + " min" : "");
+  }
+  function stopwatch(ms) {
+    var s = Math.max(0, Math.floor(ms / 1000)), h = Math.floor(s / 3600), m = Math.floor(s / 60) % 60;
+    return (h ? h + ":" + pad(m) : String(m)) + ":" + pad(s % 60);
+  }
+  function clampTo(v, lo, hi) { return v < lo ? lo : v > hi ? hi : v; }
+  // Resistance past an edge: the further past it, the less the content follows.
+  function band(over, dim) { return over * dim * 0.55 / (dim + 0.55 * over); }
+  function rubber(v, lo, hi, dim) { return v < lo ? lo - band(lo - v, dim) : v > hi ? hi + band(v - hi, dim) : v; }
+  function phaseIndex(p) { for (var i = 0; i < PHASES.length; i++) if (PHASES[i][0] === p) return i; return 0; }
+  function lowerFirst(s) { return s.charAt(0).toLowerCase() + s.slice(1); }
+  function kindName(k) { return k === "debt" ? "Debt" : "Proposal"; }
+
+  var mctx = document.createElement("canvas").getContext("2d");
+  function measure(text, px, weight) { mctx.font = weight + " " + px + "px " + FONT; return mctx.measureText(text).width; }
+  function clip(text, px, weight, maxW) {
+    if (measure(text, px, weight) <= maxW) return text;
+    var lo = 0, hi = text.length;
+    while (lo < hi) { var mid = (lo + hi + 1) >> 1; if (measure(text.slice(0, mid) + "…", px, weight) <= maxW) lo = mid; else hi = mid - 1; }
+    return text.slice(0, lo).replace(/\s+$/, "") + "…";
+  }
+  function wrap(text, px, weight, maxW, maxLines) {
+    var words = text.split(/\s+/), lines = [], cur = "";
+    for (var i = 0; i < words.length; i++) {
+      var w = cur ? cur + " " + words[i] : words[i];
+      if (measure(w, px, weight) <= maxW) { cur = w; continue; }
+      if (cur) lines.push(cur);
+      if (lines.length === maxLines - 1) { cur = words.slice(i).join(" "); break; }
+      cur = words[i];
+    }
+    lines.push(cur);
+    lines[lines.length - 1] = clip(lines[lines.length - 1], px, weight, maxW);
+    return lines;
+  }
+
+  /* ================= Motion: tweens that always start from what is on screen ================= */
+  function bez(x1, y1, x2, y2) {
+    var cx = 3 * x1, bx = 3 * (x2 - x1) - cx, ax = 1 - cx - bx;
+    var cy = 3 * y1, by = 3 * (y2 - y1) - cy, ay = 1 - cy - by;
+    function sx(t) { return ((ax * t + bx) * t + cx) * t; }
+    function sy(t) { return ((ay * t + by) * t + cy) * t; }
+    function dx(t) { return (3 * ax * t + 2 * bx) * t + cx; }
+    return function (x) {
+      if (x <= 0) return 0;
+      if (x >= 1) return 1;
+      var t = x, i;
+      for (i = 0; i < 8; i++) {
+        var e = sx(t) - x;
+        if (Math.abs(e) < 1e-5) return sy(t);
+        var d = dx(t);
+        if (Math.abs(d) < 1e-6) break;
+        t -= e / d;
+        if (t < 0 || t > 1) break;
+      }
+      var lo = 0, hi = 1; t = x;
+      for (i = 0; i < 30; i++) { var v = sx(t); if (Math.abs(v - x) < 1e-5) break; if (v < x) lo = t; else hi = t; t = (lo + hi) / 2; }
+      return sy(t);
+    };
+  }
+  var EASE = { out: bez(0.23, 1, 0.32, 1), inOut: bez(0.77, 0, 0.175, 1) };
+
+  var Motion = (function () {
+    var live = new Set(), hooks = [], raf = 0;
+    function frame(t) {
+      raf = 0;
+      live.forEach(function (th) {
+        var active = false, moved = false;
+        for (var p in th.tw) {
+          var w = th.tw[p];
+          if (t < w.t0) { active = true; continue; }
+          var u = Math.min(1, (t - w.t0) / w.ms);
+          th.v[p] = w.from + (w.to - w.from) * w.ease(u);
+          moved = true;
+          if (u >= 1) delete th.tw[p]; else active = true;
+        }
+        if (moved) th.draw(th.v);
+        if (!active) { live.delete(th); if (th.onEnd) { var f = th.onEnd; th.onEnd = null; f(); } }
+      });
+      for (var i = 0; i < hooks.length; i++) hooks[i]();
+      if (live.size) raf = requestAnimationFrame(frame);
+    }
+    function kick() { if (!raf) raf = requestAnimationFrame(frame); }
+    return {
+      thing: function (draw) { return { v: {}, tw: {}, draw: draw, onEnd: null }; },
+      set: function (th, props) { for (var p in props) { th.v[p] = props[p]; delete th.tw[p]; } th.draw(th.v); },
+      // A new target retargets from the current on-screen value; [from, to] starts from a given value.
+      to: function (th, props, o) {
+        o = o || {};
+        var t0 = performance.now() + (o.delay || 0), any = false, instant = !o.ms && !o.delay;
+        for (var p in props) {
+          var tg = props[p], from = th.v[p], w = th.tw[p];
+          if (Array.isArray(tg)) { from = tg[0]; tg = tg[1]; }
+          else if (w && w.to === tg) { any = true; continue; }
+          if (from == null || instant) { th.v[p] = tg; delete th.tw[p]; continue; }
+          if (from === tg && !w) continue;
+          th.tw[p] = { from: from, to: tg, t0: t0, ms: Math.max(1, o.ms || 0), ease: o.ease || EASE.out };
+          any = true;
+        }
+        if (o.onEnd !== undefined) th.onEnd = o.onEnd;
+        for (var q in th.tw) { any = true; break; }
+        if (any) { live.add(th); kick(); if (instant) th.draw(th.v); return th; }
+        th.draw(th.v);
+        if (th.onEnd) { var f = th.onEnd; th.onEnd = null; f(); }
+        return th;
+      },
+      cancel: function (th) { th.tw = {}; th.onEnd = null; live.delete(th); },
+      hook: function (f) { hooks.push(f); },
+      busy: function () { return live.size > 0; }
+    };
+  })();
+
+  // A critically damped spring (or a slightly underdamped one after a flick) for one value.
+  // It always continues from the current value and velocity, so a new target never makes it jump.
+  function springStep(st, dt, w, zeta) {
+    var n = Math.max(1, Math.ceil(dt * 240)), h = dt / n;
+    for (var i = 0; i < n; i++) { st.v += (-w * w * (st.x - st.to) - 2 * zeta * w * st.v) * h; st.x += st.v * h; }
+  }
+
+  /* ================= Clock: the page ticks between check-ins ================= */
+  // Example data runs on its own clock, starting a few seconds after its check-in.
+  var CLOCK = { example: false, base: 0, at: 0, skew: 0, checked: null };
+  function now() { return (CLOCK.example ? CLOCK.base + (performance.now() - CLOCK.at) : Date.now()) + CLOCK.skew; }
+  function setClock(d) {
+    var c = Date.parse(d.checkedAt);
+    if (d.example && (!CLOCK.example || CLOCK.checked !== c)) { CLOCK.base = c + 4000; CLOCK.at = performance.now(); CLOCK.skew = 0; }
+    CLOCK.example = !!d.example;
+    CLOCK.checked = c;
+  }
+
+  /* ================= Model: everything derived from the one data block ================= */
+  function model(d) {
+    var byId = {}, idx = {}, ask = {}, kids = {};
+    d.tickets.forEach(function (t, i) { byId[t.id] = t; idx[t.id] = i; });
+    d.needsYou.forEach(function (a, i) { if (a.ticket && byId[a.ticket] && !ask[a.ticket]) ask[a.ticket] = { n: i + 1, a: a }; });
+    function edgesOf(t) {
+      var out = [];
+      (t.dependsOn || []).forEach(function (p) { if (byId[p] && p !== t.id) out.push([p, "dep"]); });
+      (t.after || []).forEach(function (p) { if (byId[p] && p !== t.id) out.push([p, "after"]); });
+      (t.from || []).forEach(function (p) { if (byId[p] && p !== t.id) out.push([p, "from"]); });
+      return out;
+    }
+    d.tickets.forEach(function (t) { edgesOf(t).forEach(function (e) { (kids[e[0]] = kids[e[0]] || []).push(t.id); }); });
+    for (var k in kids) kids[k].sort(function (a, b) { return idx[a] - idx[b]; });
+    var depth = {};
+    function dep(t, seen) {
+      if (depth[t.id] != null) return depth[t.id];
+      if (seen[t.id]) return 0;
+      seen[t.id] = 1;
+      var ps = edgesOf(t);
+      return (depth[t.id] = ps.length ? 1 + Math.max.apply(null, ps.map(function (e) { return dep(byId[e[0]], seen); })) : 0);
+    }
+    d.tickets.forEach(function (t) { dep(t, {}); });
+    // Reading and focus order is plan order: roots as listed, each followed by what waits on it. Status never reorders it.
+    var order = [], seen = {};
+    function visit(t) {
+      if (seen[t.id]) return;
+      seen[t.id] = 1; order.push(t);
+      (kids[t.id] || []).forEach(function (id) { visit(byId[id]); });
+    }
+    d.tickets.forEach(function (t) { if (!edgesOf(t).length) visit(t); });
+    d.tickets.forEach(function (t) { visit(t); });
+    return { d: d, byId: byId, idx: idx, ask: ask, kids: kids, depth: depth, order: order, edgesOf: edgesOf, paused: d.state === "paused" };
+  }
+  function tone(t) { return TONE[t.status] || "wait"; }
+  function statusText(m, t) {
+    if (t.status === "running") return PHASES[phaseIndex(t.phase)][1];
+    if (t.status === "landed") return "Landed " + time(t.at);
+    if (t.status === "waiting") {
+      if (m.paused) return "Paused";
+      var open = m.edgesOf(t).map(function (e) { return e[0]; }).filter(function (id) { return m.byId[id].status !== "landed"; });
+      return open.length ? "After " + open.join(", ") : "Up next";
+    }
+    if (t.status === "queued" && m.paused) return "Paused";
+    return LABEL[t.status] || t.status;
+  }
+  function aria(m, t) { return t.id + ", " + t.title + ": " + statusText(m, t) + (m.ask[t.id] ? ", needs you (" + m.ask[t.id].n + ")" : ""); }
+  function firstParent(t) { return (t.from && t.from[0]) || (t.dependsOn && t.dependsOn[0]) || (t.after && t.after[0]) || null; }
+  function parentsMap(m) {
+    var out = {};
+    m.d.tickets.forEach(function (t) { out[t.id] = m.edgesOf(t).map(function (e) { return e[0]; }); });
+    return out;
+  }
+  // The status label; a running Ticket also shows how long it has run, ticking on the client clock.
+  function statusEl(g, m, t, attrs) {
+    var tx = sv("text", attrs, g);
+    tx.appendChild(document.createTextNode(statusText(m, t)));
+    if (t.status === "running" && t.at && !isNaN(Date.parse(t.at))) {
+      var since = Date.parse(t.at);
+      sv("tspan", { "class": "el", "data-since": since, "data-pre": " · ", text: " · " + stopwatch(now() - since) }, tx);
+    }
+    return tx;
+  }
+
+  /* ================= Board: a pannable, zoomable canvas ================= */
+  var W0 = 2 * Math.PI / 0.42; // critically damped spring, response 0.42 s
+  function makeBoard(stage, opts) {
+    var s = sv("svg", { "class": "board", role: "group", "aria-label": opts.label }, stage);
+    var defs = sv("defs", {}, s);
+    ["n", "hi"].forEach(function (k) {
+      var mk = sv("marker", { id: "ar-" + k, viewBox: "0 0 8 8", refX: "7.4", refY: "4", markerWidth: "6.5", markerHeight: "6.5", orient: "auto" }, defs);
+      sv("path", { d: "M0,.6 L8,4 L0,7.4 z", style: "fill:" + (k === "hi" ? "var(--blue-fill)" : "var(--edge)") }, mk);
+    });
+    var world = sv("g", { "class": "world" }, s);
+    var pat = sv("pattern", { id: "dots", width: "22", height: "22", patternUnits: "userSpaceOnUse" }, defs);
+    sv("circle", { cx: "1", cy: "1", r: "1", style: "fill:var(--dot)" }, pat);
+    sv("rect", { x: -6000, y: -6000, width: 12000, height: 12000, fill: "url(#dots)" }, world);
+    var B = {
+      svg: s, statics: sv("g", {}, world), edgeLayer: sv("g", {}, world), nodeLayer: sv("g", {}, world),
+      nodes: new Map(), edges: new Map(), spec: null, edgesDirty: false
+    };
+    var T = { x: 0, y: 0, k: 1 }, raf = 0, fading = null, vCache = null, vKey = "", vAt = 0;
+    function applyT() { world.setAttribute("transform", "translate(" + r2(T.x) + "," + r2(T.y) + ") scale(" + r4(T.k) + ")"); }
+    function stop() {
+      if (raf) cancelAnimationFrame(raf);
+      raf = 0;
+      if (fading) { fading.cancel(); fading = null; world.style.opacity = ""; }
+    }
+    // What the chrome and an open sheet leave visible. Sizes come from layout, so this holds while the sheet moves.
+    function view() {
+      var key = (S.sheet || "") + innerWidth + "x" + innerHeight, t = performance.now();
+      if (vCache && key === vKey && t - vAt < 250) return vCache;
+      var hud = $("hud").getBoundingClientRect(), dock = $("needsBtn").getBoundingClientRect(), sh = $("sheet");
+      var A = { l: 16, r: innerWidth - 16, t: hud.bottom + 14, b: dock.top - 14 };
+      if (S.sheet) {
+        if (innerWidth >= WIDE) A.r = Math.min(A.r, innerWidth - 16 - sh.offsetWidth - 16);
+        else A.b = Math.min(A.b, innerHeight - sh.offsetHeight - 12);
+      }
+      if (A.b - A.t < 80) A.b = A.t + 80;
+      vCache = A; vKey = key; vAt = t;
+      return A;
+    }
+    function kRange() {
+      var b = B.spec && B.spec.bounds, A = view();
+      var fk = b ? Math.min((A.r - A.l) / b.w, (A.b - A.t) / b.h) : 1;
+      return [Math.min(0.45, fk * 0.9), 2.5];
+    }
+    // Any point of the content can be brought to the middle of the view, and no further.
+    function xyRange(k) {
+      var b = B.spec ? B.spec.bounds : { x: 0, y: 0, w: 1, h: 1 }, A = view(), cx = (A.l + A.r) / 2, cy = (A.t + A.b) / 2;
+      return { x0: cx - (b.x + b.w) * k, x1: cx - b.x * k, y0: cy - (b.y + b.h) * k, y1: cy - b.y * k };
+    }
+    function spring(tg, v0) {
+      stop();
+      var V = { x: v0 ? v0.x || 0 : 0, y: v0 ? v0.y || 0 : 0, k: v0 ? v0.k || 0 : 0 }, last = performance.now(), AX = ["x", "y", "k"];
+      raf = requestAnimationFrame(function step(t) {
+        var dt = Math.min(0.064, Math.max(0, (t - last) / 1000)); last = t;
+        var n = Math.max(1, Math.ceil(dt * 240)), h = dt / n, i, c;
+        for (i = 0; i < n; i++) for (c = 0; c < 3; c++) {
+          var a = AX[c];
+          V[a] += (-W0 * W0 * (T[a] - tg[a]) - 2 * W0 * V[a]) * h;
+          T[a] += V[a] * h;
+        }
+        var settled = true;
+        for (c = 0; c < 3; c++) { var ax = AX[c], tol = ax === "k" ? 0.0005 : 0.3; if (Math.abs(T[ax] - tg[ax]) > tol || Math.abs(V[ax]) > tol * 10) settled = false; }
+        if (settled) { T.x = tg.x; T.y = tg.y; T.k = tg.k; applyT(); raf = 0; return; }
+        applyT();
+        raf = requestAnimationFrame(step);
+      });
+    }
+    // Reduced motion: no travel, a brief dip of the canvas instead.
+    function fadeJump(tg) {
+      stop();
+      if (!world.animate) { T.x = tg.x; T.y = tg.y; T.k = tg.k; applyT(); return; }
+      var a = world.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 90, easing: CURVE.out, fill: "forwards" });
+      fading = a;
+      a.onfinish = function () {
+        T.x = tg.x; T.y = tg.y; T.k = tg.k; applyT();
+        var b = world.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 160, easing: CURVE.out });
+        a.cancel(); fading = b;
+        b.onfinish = function () { if (fading === b) fading = null; };
+      };
+    }
+    function moveTo(tg, animate, v0) {
+      if (!animate) { stop(); T.x = tg.x; T.y = tg.y; T.k = tg.k; applyT(); return; }
+      if (reduced) { fadeJump(tg); return; }
+      spring(tg, v0);
+    }
+    function zoomAt(cx, cy, k2) {
+      var wx = (cx - T.x) / T.k, wy = (cy - T.y) / T.k;
+      T.k = k2; T.x = cx - wx * k2; T.y = cy - wy * k2; applyT();
+    }
+    // Back inside the bounds, carrying the release velocity so the edge bounces softly.
+    function settle(vel, c, instant) {
+      var kr = kRange(), k = clampTo(T.k, kr[0], kr[1]), tg = { x: T.x, y: T.y, k: k };
+      if (Math.abs(k - T.k) > 1e-6) {
+        var A = view();
+        c = c || { x: (A.l + A.r) / 2, y: (A.t + A.b) / 2 };
+        var wx = (c.x - T.x) / T.k, wy = (c.y - T.y) / T.k;
+        tg.x = c.x - wx * k; tg.y = c.y - wy * k;
+      }
+      var R = xyRange(k);
+      tg.x = clampTo(tg.x, R.x0, R.x1); tg.y = clampTo(tg.y, R.y0, R.y1);
+      if (Math.abs(tg.x - T.x) < 0.3 && Math.abs(tg.y - T.y) < 0.3 && Math.abs(tg.k - T.k) < 1e-4) return;
+      if (instant || reduced) { moveTo(tg, false); return; }
+      spring(tg, vel ? { x: vel.x, y: vel.y, k: 0 } : null);
+    }
+    // Momentum after a flick, decaying like a scroll view; at an edge the spring takes over with the same speed.
+    function glide(v) {
+      stop();
+      var last = performance.now(), R = xyRange(T.k), P = 0.995 / (1 - 0.995);
+      raf = requestAnimationFrame(function step(t) {
+        var ms = Math.min(32, Math.max(0, t - last)); last = t;
+        T.x += v.x * ms; T.y += v.y * ms;
+        var dec = Math.pow(0.995, ms); v.x *= dec; v.y *= dec;
+        var outX = T.x < R.x0 || T.x > R.x1, outY = T.y < R.y0 || T.y > R.y1;
+        if (outX || outY) {
+          applyT();
+          spring({ k: T.k,
+            x: clampTo(outX ? T.x : T.x + v.x * P, R.x0, R.x1),
+            y: clampTo(outY ? T.y : T.y + v.y * P, R.y0, R.y1) }, { x: v.x * 1000, y: v.y * 1000, k: 0 });
+          return;
+        }
+        applyT();
+        raf = Math.hypot(v.x, v.y) > 0.02 ? requestAnimationFrame(step) : 0;
+      });
+    }
+    function fit(mode, animate) {
+      if (!B.spec) return;
+      var b = B.spec.bounds, A = view(), aw = A.r - A.l, ah = A.b - A.t, kAll = Math.min(aw / b.w, ah / b.h), tg;
+      if (mode === "all" || kAll >= MINREAD) {
+        var k = Math.min(kAll, 1.15);
+        tg = { k: k, x: A.l + (aw - b.w * k) / 2 - b.x * k, y: A.t + (ah - b.h * k) / 2 - b.y * k };
+      } else {
+        // Too big to read whole: start at a readable size on the first column, where the live work is.
+        tg = { k: MINREAD, x: A.l + 6 - b.x * MINREAD, y: A.t + 4 - b.y * MINREAD };
+      }
+      moveTo(tg, animate);
+    }
+    // Bring a world point into what the open sheet leaves visible; leave the canvas alone if it already is.
+    function reveal(p, animate) {
+      var A = view(), k = Math.max(T.k, MINREAD), sx = T.x + p.x * T.k, sy = T.y + p.y * T.k, M = 56;
+      if (k === T.k && sx > A.l + M && sx < A.r - M && sy > A.t + M && sy < A.b - M) return;
+      moveTo({ k: k, x: (A.l + A.r) / 2 - p.x * k, y: (A.t + A.b) / 2 - p.y * k }, animate);
+    }
+
+    // Gestures: drag to pan, pinch or ctrl+wheel to zoom, tap a Ticket to open it.
+    var pts = new Map(), g0 = null, moved = false, pinch = null, hist = [], downHit = null, lastC = null, wheelT = 0, wheelC = null;
+    function hitAt(t) { var g = t && t.closest ? t.closest("[data-id]") : null; return g && s.contains(g) ? g : null; }
+    function beginPan(x, y) {
+      var R = xyRange(T.k), A = view();
+      // Bounds widen to include where the gesture starts, so a touch never makes the canvas jump.
+      g0 = { x: x, y: y, tx: T.x, ty: T.y, w: A.r - A.l, h: A.b - A.t,
+        R: { x0: Math.min(R.x0, T.x), x1: Math.max(R.x1, T.x), y0: Math.min(R.y0, T.y), y1: Math.max(R.y1, T.y) } };
+      hist = [];
+    }
+    function beginPinch() {
+      var a = Array.from(pts.values()), mx = (a[0].x + a[1].x) / 2, my = (a[0].y + a[1].y) / 2, kr = kRange();
+      pinch = { d: Math.hypot(a[0].x - a[1].x, a[0].y - a[1].y) || 1, k: T.k, wx: (mx - T.x) / T.k, wy: (my - T.y) / T.k,
+        lo: Math.log(Math.min(kr[0], T.k)), hi: Math.log(Math.max(kr[1], T.k)) };
+      g0 = null;
+    }
+    s.addEventListener("pointerdown", function (e) {
+      if (e.button) return;
+      if (pts.size >= 2) return; // a third finger never takes over
+      stop();
+      try { s.setPointerCapture(e.pointerId); } catch (x) {}
+      pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (pts.size === 1) {
+        moved = false; lastC = null;
+        beginPan(e.clientX, e.clientY);
+        downHit = hitAt(e.target);
+        if (downHit) downHit.classList.add("pressed");
+      } else {
+        moved = true;
+        if (downHit) { downHit.classList.remove("pressed"); downHit = null; }
+        beginPinch();
+      }
+    });
+    s.addEventListener("pointermove", function (e) {
+      var p = pts.get(e.pointerId);
+      if (!p) return;
+      p.x = e.clientX; p.y = e.clientY;
+      if (pinch && pts.size === 2) {
+        var a = Array.from(pts.values()), mx = (a[0].x + a[1].x) / 2, my = (a[0].y + a[1].y) / 2;
+        var lk = Math.log(pinch.k * Math.hypot(a[0].x - a[1].x, a[0].y - a[1].y) / pinch.d);
+        if (lk > pinch.hi) lk = pinch.hi + band(lk - pinch.hi, 0.5);
+        else if (lk < pinch.lo) lk = pinch.lo - band(pinch.lo - lk, 0.5);
+        var k = Math.exp(lk);
+        T.k = k; T.x = mx - pinch.wx * k; T.y = my - pinch.wy * k; applyT();
+        lastC = { x: mx, y: my };
+        return;
+      }
+      if (!g0) return;
+      var dx = e.clientX - g0.x, dy = e.clientY - g0.y;
+      if (!moved) {
+        if (Math.hypot(dx, dy) <= 8) return;
+        moved = true; s.classList.add("dragging");
+        if (downHit) downHit.classList.remove("pressed");
+        g0.x = e.clientX; g0.y = e.clientY; dx = 0; dy = 0;
+      }
+      T.x = rubber(g0.tx + dx, g0.R.x0, g0.R.x1, g0.w);
+      T.y = rubber(g0.ty + dy, g0.R.y0, g0.R.y1, g0.h);
+      applyT();
+      var t = performance.now();
+      hist.push({ x: e.clientX, y: e.clientY, t: t });
+      while (hist.length > 2 && t - hist[0].t > 100) hist.shift();
+    });
+    function up(e) {
+      if (!pts.has(e.pointerId)) return;
+      pts.delete(e.pointerId);
+      if (downHit) downHit.classList.remove("pressed");
+      if (pts.size === 1) { var q = Array.from(pts.values())[0]; pinch = null; beginPan(q.x, q.y); return; }
+      if (pts.size) return;
+      s.classList.remove("dragging");
+      var hit = downHit; downHit = null; pinch = null;
+      if (!moved) {
+        var tapped = e.type === "pointerup" && g0;
+        g0 = null;
+        if (tapped) opts.onTap(hit ? hit.getAttribute("data-id") : null, false);
+        return;
+      }
+      var v = { x: 0, y: 0 };
+      if (hist.length > 1) {
+        var f = hist[0], l = hist[hist.length - 1], dt = Math.max(8, l.t - f.t);
+        if (performance.now() - l.t < 80) v = { x: (l.x - f.x) / dt, y: (l.y - f.y) / dt };
+      }
+      g0 = null; hist = [];
+      var c = lastC; lastC = null;
+      if (reduced) { settle(null, c, true); return; }
+      var R = xyRange(T.k), kr = kRange();
+      var out = T.x < R.x0 || T.x > R.x1 || T.y < R.y0 || T.y > R.y1 || T.k < kr[0] - 1e-4 || T.k > kr[1] + 1e-4;
+      if (out) settle({ x: v.x * 350, y: v.y * 350 }, c);
+      else if (Math.hypot(v.x, v.y) > 0.12) glide(v);
+    }
+    s.addEventListener("pointerup", up);
+    s.addEventListener("pointercancel", up);
+    // Wheel and trackpad input resist past the bounds, then settle once the input stops.
+    function resist(v, dv, lo, hi, dim) {
+      var over = v > hi ? v - hi : v < lo ? lo - v : 0;
+      if ((v + dv > hi && dv > 0) || (v + dv < lo && dv < 0)) dv *= 0.35 * Math.max(0.05, 1 - over / (dim * 0.45));
+      return v + dv;
+    }
+    s.addEventListener("wheel", function (e) {
+      e.preventDefault(); stop();
+      var unit = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? innerHeight : 1;
+      if (e.ctrlKey || e.metaKey) {
+        var kr = kRange(), k = T.k * Math.exp(-e.deltaY * unit * 0.01);
+        if (k > kr[1] || k < kr[0]) k = T.k * Math.exp(-e.deltaY * unit * 0.0025);
+        zoomAt(e.clientX, e.clientY, k);
+        wheelC = { x: e.clientX, y: e.clientY };
+      } else {
+        var R = xyRange(T.k), A = view();
+        T.x = resist(T.x, -e.deltaX * unit, R.x0, R.x1, A.r - A.l);
+        T.y = resist(T.y, -e.deltaY * unit, R.y0, R.y1, A.b - A.t);
+        applyT();
+      }
+      clearTimeout(wheelT);
+      wheelT = setTimeout(function () { settle(null, wheelC); wheelC = null; }, 160);
+    }, { passive: false });
+    // Tabbing to a card off screen brings it into view. A pointer press focuses the card too, and must not move it.
+    s.addEventListener("focusin", function (e) {
+      var g = hitAt(e.target), kb = true;
+      try { kb = g && g.matches(":focus-visible"); } catch (x) {}
+      var p = kb && B.spec && B.spec.center(g.getAttribute("data-id"));
+      if (p) reveal(p, !reduced);
+    });
+    // Keyboard zoom and pan are instant: they repeat, and motion would only slow them down.
+    s.addEventListener("keydown", function (e) {
+      var g = hitAt(e.target);
+      if (g && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); opts.onTap(g.getAttribute("data-id"), true); return; }
+      var kr = kRange(), A = view();
+      if (e.key === "+" || e.key === "=" || e.key === "-") {
+        stop();
+        zoomAt((A.l + A.r) / 2, (A.t + A.b) / 2, clampTo(T.k * (e.key === "-" ? 1 / 1.2 : 1.2), kr[0], kr[1]));
+      }
+    });
+    applyT();
+    B.drawEdges = function () {
+      B.edgesDirty = false;
+      B.edges.forEach(function (e) {
+        var a = B.nodes.get(e.spec.a), b = B.nodes.get(e.spec.b);
+        if (a && b) e.el.setAttribute("d", e.spec.path(a.v, b.v));
+      });
+    };
+    B.fit = fit; B.reveal = reveal; B.stop = stop;
+    B.contain = function () { stop(); settle(null, null, true); };
+    B.getT = function () { return { x: T.x, y: T.y, k: T.k }; };
+    B.setT = function (t) { moveTo(t, false); };
+    return B;
+  }
+
+  /* ================= Reconciler: each check-in animates only what changed ================= */
+  // A spec lists nodes (keyed by Ticket id), each made of parts (keyed, with a signature of how they look).
+  // Same signature: the part glides or its fill advances. New signature: the old look cross-fades into the new.
+  // Class and tone are part of the look, so they join the signature here rather than at every call site.
+  function P(k, sig, make, o) {
+    var p = { k: k, make: make }; for (var x in o || {}) p[x] = o[x];
+    p.sig = sig + "|" + (p.cls || "") + "|" + (p.tone || "");
+    return p;
+  }
+
+  function makeNode(B, n) {
+    var g = sv("g", { "class": "node" + (n.deco ? " deco" : "") });
+    if (!n.deco) { g.setAttribute("data-id", n.id); g.setAttribute("tabindex", "0"); g.setAttribute("role", "button"); }
+    var press = sv("g", { "class": "press" }, g);
+    var o = Motion.thing(function (v) {
+      var tr = "translate(" + r2(v.x) + "," + r2(v.y) + ")";
+      if (v.s !== 1) tr += " translate(" + o.cx + "," + o.cy + ") scale(" + r4(v.s) + ") translate(" + -o.cx + "," + -o.cy + ")";
+      g.setAttribute("transform", tr);
+      g.style.opacity = v.o >= 1 ? "" : String(r4(Math.max(0, v.o)));
+      B.edgesDirty = true;
+    });
+    o.g = g; o.inner = press; o.parts = new Map(); o.cx = n.cx; o.cy = n.cy;
+    return o;
+  }
+  function makePart(o, p, before) {
+    var g = sv("g", { "class": "part" + (p.cls ? " " + p.cls : "") + (p.tone ? " tone-" + p.tone : "") });
+    o.inner.insertBefore(g, before || null);
+    var fill = p.make(g) || null;
+    var q = Motion.thing(function (v) {
+      var tr = "translate(" + r2(v.x) + "," + r2(v.y) + ")";
+      if (v.s !== 1) tr += " scale(" + r4(v.s) + ")";
+      g.setAttribute("transform", tr);
+      g.style.opacity = v.o >= 1 ? "" : String(r4(Math.max(0, v.o)));
+      if (fill) { fill.style.strokeDashoffset = String(r4(1 - v.f)); fill.style.visibility = v.f < 0.002 ? "hidden" : ""; }
+    });
+    q.g = g; q.sig = p.sig; q.solid = !!p.solid; q.r = p.r || 0;
+    q.px = p.x || 0; q.py = p.y || 0; q.pf = p.f == null ? 0 : p.f;
+    return q;
+  }
+  function partsDiffer(o, n) {
+    if (o.parts.size !== n.parts.length) return true;
+    for (var i = 0; i < n.parts.length; i++) {
+      var p = n.parts[i], q = o.parts.get(p.k);
+      if (!q || q.sig !== p.sig || q.px !== (p.x || 0) || q.py !== (p.y || 0) || q.pf !== (p.f == null ? 0 : p.f)) return true;
+    }
+    return false;
+  }
+  function reconcileParts(o, n, dl, an) {
+    var R = reduced, seen = {}, prev = null;
+    var mv = an && !R ? MS.glide : 0, fi = an ? (R ? 160 : MS.fadeIn) : 0, fo = an ? (R ? 120 : MS.fadeOut) : 0;
+    var d = an && !R ? dl : 0;
+    n.parts.forEach(function (p) {
+      seen[p.k] = 1;
+      var q = o.parts.get(p.k), x = p.x || 0, y = p.y || 0, f = p.f == null ? 0 : p.f;
+      if (!q) {
+        q = makePart(o, p, prev ? prev.nextSibling : o.inner.firstChild);
+        var pop = an && p.pop && !R;
+        Motion.set(q, { x: x, y: y, o: an ? 0 : 1, s: pop ? 0.95 : 1, f: an && !R ? 0 : f });
+        if (an) {
+          Motion.to(q, { o: 1, s: 1 }, { ms: pop ? MS.enter : fi, delay: d, ease: EASE.out });
+          Motion.to(q, { f: f }, { ms: mv, delay: d, ease: EASE.inOut });
+        }
+        o.parts.set(p.k, q);
+      } else if (q.sig !== p.sig) {
+        // Same thing, new state: an opaque old look stays on top and fades, so nothing behind it shows through.
+        var ratio = q.r && p.r ? q.r / p.r : 1, nq = makePart(o, p, q.solid ? q.g : q.g.nextSibling);
+        if (an) {
+          Motion.set(nq, { x: q.v.x, y: q.v.y, o: q.solid ? 1 : 0, s: R ? 1 : ratio, f: q.v.f == null ? f : q.v.f });
+          Motion.to(nq, { x: x, y: y, f: f, s: 1 }, { ms: mv, delay: d, ease: EASE.inOut });
+          // A see-through look (a label) fades in as the old one is mostly gone, so two texts never sit on top of each other.
+          if (!q.solid) Motion.to(nq, { o: 1 }, { ms: fi, delay: d + fo * 0.6, ease: EASE.out });
+          Motion.to(q, { x: x, y: y, f: f, s: R ? 1 : 1 / ratio }, { ms: mv, delay: d, ease: EASE.inOut });
+          var old = q;
+          Motion.to(q, { o: 0 }, { ms: q.solid ? fi : fo, delay: d, ease: EASE.out, onEnd: function () { old.g.remove(); } });
+        } else {
+          Motion.set(nq, { x: x, y: y, o: 1, s: 1, f: f });
+          Motion.cancel(q); q.g.remove();
+        }
+        o.parts.set(p.k, nq); q = nq;
+      } else {
+        Motion.to(q, { x: x, y: y, f: f }, { ms: mv, delay: d, ease: EASE.inOut });
+      }
+      q.px = x; q.py = y; q.pf = f;
+      prev = q.g;
+    });
+    o.parts.forEach(function (q, k) {
+      if (seen[k]) return;
+      o.parts.delete(k);
+      if (an) Motion.to(q, { o: 0 }, { ms: fo, delay: d, ease: EASE.out, onEnd: function () { q.g.remove(); } });
+      else { Motion.cancel(q); q.g.remove(); }
+    });
+  }
+  // A landing gets one ring, once.
+  function pulse(o, p, delay) {
+    var c = sv("circle", { "class": "pulse tone-" + p.tone, r: p.r });
+    o.inner.insertBefore(c, o.inner.firstChild);
+    var th = Motion.thing(function (v) { c.setAttribute("transform", "translate(" + p.x + "," + p.y + ") scale(" + r4(v.s) + ")"); c.style.opacity = String(r4(v.o)); });
+    Motion.set(th, { s: 1, o: 0 });
+    Motion.to(th, { s: (p.r + 14) / p.r, o: [0.6, 0] }, { ms: MS.pulse, delay: delay, ease: EASE.out, onEnd: function () { c.remove(); } });
+  }
+  function makeEdge(B, es) {
+    var p = sv("path", { "class": es.cls }, B.edgeLayer);
+    if (es.marker) p.setAttribute("marker-end", "url(#ar-n)");
+    var e = Motion.thing(function (v) { p.style.opacity = v.o >= 1 ? "" : String(r4(Math.max(0, v.o))); });
+    e.el = p; e.spec = es;
+    return e;
+  }
+  function render(B, spec, anim) {
+    B.spec = spec;
+    B.statics.textContent = "";
+    spec.statics(B.statics);
+    var an = !!anim, R = reduced, specIds = {}, changed = {}, rank = {}, r = 0, isNew = {}, room = false;
+    spec.nodes.forEach(function (n) {
+      specIds[n.id] = n;
+      var o = B.nodes.get(n.id), moves = o && (o.tx !== n.x || o.ty !== n.y);
+      if (!o || partsDiffer(o, n)) { changed[n.id] = 1; rank[n.id] = r++; }
+      // A Ticket that only moves is making room.
+      else if (moves) room = true;
+    });
+    // Causes before effects: a Ticket moves after the change it waited on, and a group never moves all at once.
+    var cdMemo = {};
+    function chain(id, seen) {
+      if (cdMemo[id] != null) return cdMemo[id];
+      if (seen[id]) return 0;
+      seen[id] = 1;
+      var best = 0;
+      (spec.parents[id] || []).forEach(function (p) { if (changed[p]) best = Math.max(best, chain(p, seen) + 1); });
+      return (cdMemo[id] = best);
+    }
+    function delayOf(id) { return an && !R && changed[id] ? Math.min(1000, MS.stagger * rank[id] + MS.cause * chain(id, {})) : 0; }
+    var enterAfter = an && !R && room ? MS.glide * 0.45 : 0;
+    // New Tickets from one source share one offset, so siblings keep their spacing while they emerge.
+    var emerge = {};
+    spec.nodes.forEach(function (n) {
+      var src = n.from && !B.nodes.get(n.id) && B.nodes.get(n.from);
+      if (!src || emerge[n.from]) return;
+      emerge[n.from] = { x: (src.v.x + src.cx - n.x - n.cx) / 2, y: (src.v.y + src.cy - n.y - n.cy) / 2 };
+    });
+    spec.nodes.forEach(function (n) {
+      var o = B.nodes.get(n.id), dl = delayOf(n.id);
+      if (!o) {
+        dl = Math.max(dl, enterAfter);
+        o = makeNode(B, n);
+        B.nodes.set(n.id, o);
+        isNew[n.id] = 1;
+        var src = n.from && B.nodes.get(n.from);
+        if (an && !R && src) {
+          // A new Ticket grows out of the one it came from, starting halfway along the edge between them.
+          var off = emerge[n.from];
+          B.nodeLayer.insertBefore(o.g, src.g);
+          Motion.set(o, { x: n.x + off.x, y: n.y + off.y, o: 0, s: 0.95 });
+          Motion.to(o, { x: n.x, y: n.y }, { ms: MS.enter, delay: dl, ease: EASE.out });
+          Motion.to(o, { o: 1, s: 1 }, { ms: MS.enter, delay: dl, ease: EASE.out });
+        } else {
+          B.nodeLayer.appendChild(o.g);
+          Motion.set(o, { x: n.x, y: n.y, o: an ? 0 : 1, s: an && !R ? 0.95 : 1 });
+          if (an) Motion.to(o, { o: 1, s: 1 }, { ms: R ? 160 : MS.enter, delay: dl, ease: EASE.out });
+        }
+        reconcileParts(o, n, 0, false);
+      } else {
+        // While the layout reflows, every move starts together; only the change of look waits for its cause.
+        Motion.to(o, { x: n.x, y: n.y }, { ms: an && !R ? MS.glide : 0, delay: an && !R && !room ? dl : 0, ease: EASE.inOut });
+        reconcileParts(o, n, dl, an);
+        if (an && !R && n.status === "landed" && o.status !== "landed" && n.pulse) pulse(o, n.pulse, dl + MS.glide * 0.6);
+      }
+      o.cx = n.cx; o.cy = n.cy; o.tx = n.x; o.ty = n.y; o.status = n.status;
+      if (n.label) o.g.setAttribute("aria-label", n.label);
+      if (n.deco && n.label) o.g.setAttribute("role", "img");
+    });
+    // Keyboard and reading order follow plan order, whatever order the nodes were created in. A Ticket still growing
+    // out of its source keeps its place under it until the next check-in; focus survives the move.
+    var want = spec.nodes.filter(function (n) { return !(isNew[n.id] && n.from && an && !R); }).map(function (n) { return B.nodes.get(n.id).g; });
+    var have = Array.prototype.filter.call(B.nodeLayer.children, function (g) { return want.indexOf(g) >= 0; });
+    if (have.some(function (g, i) { return g !== want[i]; })) {
+      var fa = document.activeElement;
+      want.forEach(function (g) { B.nodeLayer.appendChild(g); });
+      if (fa && fa !== document.activeElement && B.nodeLayer.contains(fa)) fa.focus({ preventScroll: true });
+    }
+    B.nodes.forEach(function (o, id) {
+      if (specIds[id]) return;
+      B.nodes.delete(id);
+      o.g.removeAttribute("data-id"); o.g.removeAttribute("tabindex"); o.g.setAttribute("aria-hidden", "true"); o.g.style.pointerEvents = "none";
+      if (an) Motion.to(o, { o: 0 }, { ms: R ? 120 : MS.exit, ease: EASE.out, onEnd: function () { o.g.remove(); } });
+      else { Motion.cancel(o); o.g.remove(); }
+    });
+    var seenE = {};
+    spec.edges.forEach(function (es) {
+      seenE[es.key] = 1;
+      var e = B.edges.get(es.key);
+      var dl = an && !R ? Math.max(delayOf(es.a), delayOf(es.b)) + (isNew[es.a] || isNew[es.b] ? MS.enter * 0.6 : 0) : 0;
+      var ms = an ? (R ? 160 : MS.edge) : 0;
+      if (!e) {
+        e = makeEdge(B, es);
+        B.edges.set(es.key, e);
+        Motion.set(e, { o: an ? 0 : es.op });
+        if (an) Motion.to(e, { o: es.op }, { ms: ms, delay: dl, ease: EASE.out });
+      } else {
+        e.el.setAttribute("class", es.cls);
+        if (!es.marker) e.el.removeAttribute("marker-end");
+        Motion.to(e, { o: es.op }, { ms: ms, delay: dl, ease: EASE.out });
+      }
+      e.spec = es;
+    });
+    B.edges.forEach(function (e, key) {
+      if (seenE[key]) return;
+      B.edges.delete(key);
+      if (an) Motion.to(e, { o: 0 }, { ms: R ? 120 : MS.exit, ease: EASE.out, onEnd: function () { e.el.remove(); } });
+      else { Motion.cancel(e); e.el.remove(); }
+    });
+    B.drawEdges();
+  }
+  Motion.hook(function () { var B = S.board; if (B && B.edgesDirty) B.drawEdges(); });
+
+  /* ================= Flow: the order between Tickets, converging on the goal ================= */
+  function barF(t) {
+    if (t.status === "landed") return 1;
+    if (t.status === "held") return 5 / 6;
+    if (t.status === "running" || t.status === "escalated") return (phaseIndex(t.phase) + 1) / PHASES.length;
+    return null;
+  }
+  function curve(x1, y1, x2, y2) { var mx = x1 + (x2 - x1) / 2; return "M" + r2(x1) + "," + r2(y1) + " C" + r2(mx) + "," + r2(y1) + " " + r2(mx) + "," + r2(y2) + " " + r2(x2) + "," + r2(y2); }
+  function flow(m) {
+    var W = 212, GX = 78, GY = 12, H = 64, d = m.d;
+    // The goal grows to hold its whole destination, up to twelve lines; a screen reader hears it in full either way.
+    var dest = wrap(d.effort.destination || "", 12, 400, W - 32, 12), GH = Math.max(96, 80 + 16 * (dest.length - 1));
+    var maxD = 0;
+    d.tickets.forEach(function (t) { maxD = Math.max(maxD, m.depth[t.id]); });
+    var cols = [];
+    for (var i = 0; i <= maxD; i++) cols.push([]);
+    d.tickets.forEach(function (t) { cols[m.depth[t.id]].push(t); });
+    var pos = {}, maxY = 0;
+    cols.forEach(function (list, ci) {
+      var want = {};
+      if (ci > 0) {
+        list.forEach(function (t) {
+          var ps = m.edgesOf(t).map(function (e) { return pos[e[0]]; }).filter(Boolean);
+          want[t.id] = ps.length ? ps.reduce(function (s, p) { return s + p.y; }, 0) / ps.length : 0;
+        });
+        list.sort(function (a, b) { return (want[a.id] - want[b.id]) || (m.idx[a.id] - m.idx[b.id]); });
+      }
+      var y = 0;
+      list.forEach(function (t) {
+        var ty = ci === 0 ? y : Math.max(y, want[t.id]);
+        pos[t.id] = { x: ci * (W + GX), y: ty };
+        y = ty + H + GY;
+        maxY = Math.max(maxY, ty + H);
+      });
+    });
+    var goal = { x: (maxD + 1) * (W + GX), y: maxY / 2 - GH / 2 };
+    var nodes = m.order.map(function (t) {
+      var tn = tone(t), dim = tn === "done" || tn === "idle", filled = !/^(done|idle|prop)$/.test(tn);
+      var a = m.ask[t.id], st = statusText(m, t), run = t.status === "running", f = barF(t);
+      var parts = [
+        P("box", "box|" + tn, function (g) {
+          if (filled) sv("rect", { "class": "sh", y: 1, width: W, height: H, rx: 12 }, g);
+          sv("rect", { "class": "box", width: W, height: H, rx: 12 }, g);
+        }, { tone: tn, solid: filled }),
+        P("dot", "dot|" + tn, function (g) { sv("circle", { "class": "dot", r: 3.6 }, g); }, { tone: tn, x: 15, y: 15.5, r: 3.6, solid: tn !== "wait" && tn !== "idle" }),
+        P("id", "id|" + t.id + "|" + (t.kind || ""), function (g) {
+          var tx = sv("text", { "class": "t-id", x: 25, y: 19.5, text: t.id }, g);
+          if (t.kind) sv("tspan", { "class": "t-kind", text: "  ·  " + kindName(t.kind) }, tx);
+        }),
+        P("title", "title|" + t.title + "|" + dim, function (g) { sv("text", { "class": "t-title", x: 12, y: 38.5, text: clip(t.title, 13, dim ? 500 : 600, W - 24) }, g); }, { tone: tn }),
+        P("status", "st|" + st + "|" + tn + "|" + (run ? t.at : ""), function (g) { statusEl(g, m, t, { "class": "t-status", x: 12, y: 55 }); }, { tone: tn })
+      ];
+      if (f != null) parts.push(P("bar", "bar|" + tn, function (g) {
+        var dd = "M" + (W - 74) + ",51 H" + (W - 14);
+        sv("path", { "class": "bar-bg", d: dd }, g);
+        return sv("path", { "class": "bar fillp", d: dd, pathLength: 1 }, g);
+      }, { tone: tn, f: f, solid: true }));
+      if (a) parts.push(P("badge", "badge|" + a.n + "|" + tn, function (g) {
+        sv("circle", { r: 10.5 }, g);
+        sv("text", { y: 3.8, text: String(a.n) }, g);
+      }, { tone: tn === "stop" ? "stop" : "you", cls: "badge", x: W - 2, y: 2, r: 10.5, solid: true, pop: true }));
+      return { id: t.id, x: pos[t.id].x, y: pos[t.id].y, cx: W / 2, cy: H / 2, from: firstParent(t), status: t.status, label: aria(m, t), parts: parts,
+        pulse: { x: 15, y: 15.5, r: 3.6, tone: "done" } };
+    });
+    nodes.push({ id: "goal", deco: true, x: goal.x, y: goal.y, cx: W / 2, cy: GH / 2, status: d.state,
+      label: "Done when: " + d.effort.name + (d.effort.destination ? ". " + d.effort.destination : ""), parts: [
+      P("goal", "goal|" + d.effort.name + "|" + (d.effort.destination || ""), function (g) {
+        sv("rect", { width: W, height: GH, rx: 16 }, g);
+        sv("text", { "class": "g-k", x: 16, y: 24, text: "DONE WHEN" }, g);
+        sv("text", { "class": "g-t", x: 16, y: 44, text: clip(d.effort.name, 15, 700, W - 32) }, g);
+        dest.forEach(function (line, k) { sv("text", { "class": "g-d", x: 16, y: 63 + k * 16, text: line }, g); });
+      }, { cls: "goal" })
+    ] });
+    var edges = [];
+    d.tickets.forEach(function (t) {
+      m.edgesOf(t).forEach(function (e) {
+        edges.push({ key: e[0] + ">" + t.id, a: e[0], b: t.id, cls: "edge k-" + e[1], marker: true, op: m.byId[e[0]].status === "landed" ? 0.4 : 1,
+          path: function (A, Bv) { return curve(A.x + W, A.y + H / 2, Bv.x - 2, Bv.y + H / 2); } });
+      });
+      if (!m.kids[t.id]) edges.push({ key: t.id + ">goal", a: t.id, b: "goal", cls: "edge k-goal", marker: false, op: 1,
+        path: function (A, Bv) { return curve(A.x + W, A.y + H / 2, Bv.x, Bv.y + GH / 2); } });
+    });
+    var top = Math.min(-34, goal.y), bottom = Math.max(maxY, goal.y + GH) + 12;
+    return {
+      nodes: nodes, edges: edges, parents: parentsMap(m),
+      bounds: { x: -12, y: top, w: goal.x + W + 24, h: bottom - top },
+      center: function (id) { var p = pos[id]; return p && { x: p.x + W / 2, y: p.y + H / 2 }; },
+      statics: function (g) {
+        var names = ["Now", "Next", "Then", "Later", "After that"];
+        for (var ci = 0; ci <= maxD + 1; ci++) {
+          var name = ci === maxD + 1 ? "Goal" : ci < names.length ? names[ci] : "Step " + (ci + 1);
+          sv("text", { "class": "t-col", x: ci * (W + GX) + 2, y: -14, text: name }, g);
+        }
+      }
+    };
+  }
+
+  /* ================= The detail sheet: one spring for open, close and drag ================= */
+  // p is how far open the sheet is (0 closed, 1 open). A phone sheet slides up from the bottom; a wide-screen panel
+  // slides in from the right and fades. Every change starts from the current p and velocity, so it never jumps.
+  var Sheet = (function () {
+    var sh = $("sheet"), sc = $("scrim"), dk = $("dock"), st = { x: 0, v: 0, to: 0 }, raf = 0, last = 0, w = 2 * Math.PI / 0.36, zeta = 1, done = null;
+    function wide() { return innerWidth >= WIDE; }
+    function travel() { return sh.offsetHeight + 24; }
+    function draw() {
+      var p = st.x, q = clampTo(p, 0, 1);
+      if (reduced) { sh.style.transform = "none"; sh.style.opacity = String(r4(q)); }
+      else if (wide()) { sh.style.transform = "translate3d(" + r2((1 - p) * 20) + "px,0,0)"; sh.style.opacity = String(r4(q)); }
+      else { sh.style.transform = "translate3d(0," + r2((1 - p) * travel()) + "px,0)"; sh.style.opacity = "1"; }
+      sc.style.opacity = wide() ? "0" : String(r4(q));
+      // The phone sheet covers the dock, so the dock steps back rather than showing through the sheet.
+      dk.style.opacity = wide() ? "" : String(r4(1 - q));
+      dk.style.visibility = wide() || q < 0.999 ? "" : "hidden";
+      sh.style.visibility = q > 0.001 || st.to > 0 ? "visible" : "hidden";
+    }
+    function frame(t) {
+      var dt = Math.min(0.064, Math.max(0, (t - last) / 1000)); last = t;
+      springStep(st, dt, w, zeta);
+      if (Math.abs(st.x - st.to) < 0.001 && Math.abs(st.v) < 0.02) {
+        st.x = st.to; st.v = 0; raf = 0; draw();
+        if (done) { var f = done; done = null; f(); }
+        return;
+      }
+      draw();
+      raf = requestAnimationFrame(frame);
+    }
+    // vel is in sheet-heights per second; a release that carried momentum gets a little bounce.
+    function go(to, vel, momentum, onDone) {
+      st.to = to; if (vel != null) st.v = vel;
+      zeta = momentum ? 0.82 : 1; done = onDone || null;
+      sc.classList.toggle("open", to > 0);
+      if (!raf) { last = performance.now(); raf = requestAnimationFrame(frame); }
+      draw();
+    }
+    function jump(to) {
+      if (raf) cancelAnimationFrame(raf);
+      raf = 0; st.x = st.to = to; st.v = 0; done = null;
+      sc.classList.toggle("open", to > 0);
+      draw();
+    }
+    // A phone sheet follows the finger from where it is; a flick counts by where it would come to rest.
+    var head = $("sheetHead"), drag = null;
+    head.addEventListener("pointerdown", function (e) {
+      if (wide() || drag || !S.sheet || (e.target.closest && e.target.closest("button"))) return;
+      if (raf) { cancelAnimationFrame(raf); raf = 0; }
+      var H = travel();
+      drag = { y0: e.clientY, H: H, start: (1 - st.x) * H, hist: [{ y: e.clientY, t: performance.now() }] };
+      try { head.setPointerCapture(e.pointerId); } catch (x) {}
+    });
+    head.addEventListener("pointermove", function (e) {
+      if (!drag) return;
+      var y = drag.start + e.clientY - drag.y0;
+      if (y < 0) y = -band(-y, drag.H);
+      st.x = 1 - y / drag.H; st.v = 0;
+      draw();
+      var t = performance.now();
+      drag.hist.push({ y: e.clientY, t: t });
+      while (drag.hist.length > 2 && t - drag.hist[0].t > 100) drag.hist.shift();
+    });
+    function end() {
+      if (!drag) return;
+      var g = drag, f = g.hist[0], l = g.hist[g.hist.length - 1];
+      drag = null;
+      var vy = l.t > f.t && performance.now() - l.t < 80 ? (l.y - f.y) / (l.t - f.t) : 0; // px per ms, down is positive
+      var y = (1 - st.x) * g.H, rest = y + vy * 499; // where a flick at this speed would come to rest
+      var vel = -vy * 1000 / g.H;
+      if (rest > g.H / 2) closeSheet(false, vel);
+      else go(1, vel, Math.abs(vy) > 0.1);
+    }
+    head.addEventListener("pointerup", end);
+    head.addEventListener("pointercancel", end);
+    return { go: go, jump: jump, draw: draw, open: function () { return st.to > 0; }, busy: function () { return !!raf; } };
+  })();
+
+  /* ================= Chrome: header, dock, sheet ================= */
+  var S = { d: null, m: null, json: null, board: null, sel: null, sheet: null, sheetSig: null, bad: false, needs: null, opener: null,
+    real: { kind: "none", state: "idle" }, sKey: null, bText: null, hudReady: false };
+
+  function hudInit() {
+    var h = $("hud");
+    S.hk = el("div", { "class": "k" });
+    S.ht = el("h1", { "class": "t" });
+    S.hs = el("div", { "class": "s" });
+    S.src = el("span", { "class": "src", hidden: "" }, [el("i", null, [el("b")]), el("span", { text: "Live" })]);
+    S.hcText = el("span");
+    S.hc = el("div", { "class": "c" }, [S.src, S.hcText]);
+    S.hb = el("div", { "class": "b", hidden: "", role: "status" });
+    [S.hk, S.ht, S.hs, S.hc, S.hb].forEach(function (n) { h.appendChild(n); });
+  }
+  function renderHud() {
+    var d = S.d;
+    S.hk.textContent = "";
+    if (d.example) S.hk.appendChild(el("span", { "class": "ex", text: "Example · " }));
+    S.hk.appendChild(document.createTextNode("Plan " + d.plan + " · " + (d.mode === "autonomous" ? "--autonomous" : "Default mode")));
+    S.ht.textContent = d.effort.name;
+    document.title = d.effort.name + " · orchestrate";
+  }
+  function liveNow() { return S.real.state === "live"; }
+  // Runs every second: the clock line, each running Ticket's elapsed time, and the warnings that follow from the clock.
+  function tick() {
+    if (!S.d) return;
+    var d = S.d, n = now(), checked = Date.parse(d.checkedAt), next = d.nextCheckAt ? Date.parse(d.nextCheckAt) : NaN;
+    var finished = d.state === "finished", stale = !finished && !isNaN(next) && n - next > GRACE_MS;
+    var c = { running: 0, landed: 0 };
+    d.tickets.forEach(function (t) { if (t.status in c) c[t.status]++; });
+    var word = stale ? "Not checking in" : ({ running: "Running", paused: "Paused", finished: "Plan finished" })[d.state] || d.state;
+    var dot = stale ? "var(--red-fill)" : ({ running: "var(--blue-fill)", paused: "var(--text-3)", finished: "var(--green-fill)" })[d.state] || "var(--text-3)";
+    var sKey = word + "|" + c.running + "|" + c.landed + "|" + d.maxBatch;
+    if (S.sKey !== sKey) {
+      S.sKey = sKey;
+      S.hs.textContent = "";
+      S.hs.appendChild(el("i", { style: "background:" + dot, "aria-hidden": "true" }));
+      S.hs.appendChild(el("b", { text: word }));
+      var runs = finished && !c.running ? "" : c.running + (d.maxBatch ? " of " + d.maxBatch : "") + (c.running === 1 && !d.maxBatch ? " run" : " runs") + " · ";
+      S.hs.appendChild(document.createTextNode("· " + runs + c.landed + " landed"));
+    }
+    // Once check-ins stop, "Live" would mislead: the connection works, but nothing new is arriving.
+    var live = liveNow() && !stale, lost = !liveNow() && S.real.state === "lost";
+    S.src.hidden = !(live || lost);
+    S.src.classList.toggle("lost", lost);
+    S.src.lastChild.textContent = lost ? "Live updates stopped" : "Live";
+    var txt = live ? "checked " + ago(n - checked) + " ago" : lost ? "as of " + time(d.checkedAt) : "As of " + time(d.checkedAt) + " · " + ago(n - checked) + " ago";
+    if (!finished && !stale && !isNaN(next)) txt += " · next ~" + time(d.nextCheckAt);
+    txt = (S.src.hidden ? "" : "· ") + txt;
+    if (S.hcText.textContent !== txt) S.hcText.textContent = txt;
+    var b = "", cls = "";
+    if (S.bad) { b = "The latest update could not be read. This shows the last good one."; cls = "stop"; }
+    else if (stale) { b = "No check-in since " + time(d.checkedAt) + "; the next was due " + time(d.nextCheckAt) + ". Runs already started keep going."; cls = "stop"; }
+    else if (S.m && S.m.paused) { b = "Paused from the front item. Nothing new starts; runs already started finish."; cls = "idle"; }
+    if (b !== S.bText) {
+      S.bText = b;
+      S.hb.hidden = !b;
+      S.hb.className = "b " + cls;
+      S.hb.textContent = b;
+      if (b && S.hudReady && S.hb.animate) S.hb.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 220, easing: CURVE.out });
+    }
+    document.querySelectorAll(".el[data-since]").forEach(function (e) {
+      var t = (e.getAttribute("data-pre") || "") + stopwatch(n - Number(e.getAttribute("data-since")));
+      if (e.textContent !== t) e.textContent = t;
+    });
+  }
+  // One quiet ring on the Live dot when a check-in changed something.
+  function pulseLive() {
+    if (S.src.hidden || !S.src.animate) return;
+    var i = S.src.querySelector("i"), ring = S.src.querySelector("b");
+    if (reduced) i.animate([{ opacity: 0.4 }, { opacity: 1 }], { duration: 300, easing: CURVE.out });
+    else ring.animate([{ transform: "scale(1)", opacity: 0.55 }, { transform: "scale(2.6)", opacity: 0 }], { duration: 600, easing: CURVE.out });
+  }
+  // The count rolls when a check-in changes it.
+  function renderNeeds(anim) {
+    var n = S.d.needsYou.length, nb = $("needsBtn"), lbl = nb.querySelector(".lbl"), cnt = nb.querySelector(".count"), prev = S.needs;
+    S.needs = n;
+    nb.classList.toggle("quiet", !n);
+    lbl.textContent = n ? "Needs you" : "Nothing needs you";
+    nb.setAttribute("aria-label", n ? (n === 1 ? "1 thing needs you" : n + " things need you") : "Nothing needs you");
+    if (!n) { cnt.hidden = true; cnt.textContent = ""; return; }
+    cnt.hidden = false;
+    var old = cnt.lastElementChild;
+    if (!old || !anim || prev == null || prev === n || !cnt.animate) {
+      if (!old || old.textContent !== String(n)) { cnt.textContent = ""; cnt.appendChild(el("span", { text: String(n) })); }
+      return;
+    }
+    while (cnt.firstElementChild !== old) cnt.removeChild(cnt.firstElementChild);
+    var sp = el("span", { text: String(n) }), up = n > prev;
+    cnt.appendChild(sp);
+    var out = reduced ? [{ opacity: 1 }, { opacity: 0 }] : [{ transform: "translateY(0)", opacity: 1 }, { transform: "translateY(" + (up ? -70 : 70) + "%)", opacity: 0 }];
+    var inn = reduced ? [{ opacity: 0 }, { opacity: 1 }] : [{ transform: "translateY(" + (up ? 70 : -70) + "%)", opacity: 0 }, { transform: "translateY(0)", opacity: 1 }];
+    old.animate(out, { duration: reduced ? 120 : MS.fadeOut, easing: CURVE.out, fill: "forwards" }).onfinish = function () { if (old.parentNode) old.remove(); };
+    sp.animate(inn, { duration: reduced ? 160 : MS.fadeIn, easing: CURVE.out });
+  }
+
+  function sheetSig() {
+    var m = S.m;
+    if (!m || !S.sheet) return null;
+    if (S.sheet === "needs") return "needs|" + JSON.stringify(m.d.needsYou) + "|" + m.d.needsYou.map(function (a) { return a.ticket && m.byId[a.ticket] ? m.byId[a.ticket].status : ""; }).join();
+    var t = m.byId[S.sel];
+    if (!t) return null;
+    var rel = m.edgesOf(t).map(function (e) { return e[0] + m.byId[e[0]].status; }).concat((m.kids[t.id] || []).map(function (k) { return k + m.byId[k].status; }));
+    return "d|" + JSON.stringify(t) + "|" + JSON.stringify(m.ask[t.id] || null) + "|" + rel.join() + "|" + m.paused;
+  }
+  function setSheetTone(tn) {
+    var sh = $("sheet");
+    TONES.forEach(function (c) { sh.classList.remove(c); });
+    if (tn) sh.classList.add("tone-" + tn);
+  }
+  // A phone sheet covers the page and dims it, so it is modal: the rest leaves the keyboard and the screen reader
+  // until it closes. The wide panel leaves the graph usable beside it.
+  function syncModal() {
+    var modal = !!S.sheet && innerWidth < WIDE, sh = $("sheet");
+    if (modal) sh.setAttribute("aria-modal", "true"); else sh.removeAttribute("aria-modal");
+    ["stage", "hud", "dock"].forEach(function (id) { $(id).toggleAttribute("inert", modal); });
+    if (modal && !sh.contains(document.activeElement)) $("sheetDone").focus({ preventScroll: true });
+  }
+  function openSheet(kind, id, refresh, instant) {
+    var m = S.m, body = $("sheetBody"), kick = $("sheetKick"), keep = refresh ? body.scrollTop : 0;
+    if (!refresh && !S.sheet) {
+      var a = document.activeElement;
+      S.opener = a && a !== document.body && !$("sheet").contains(a) ? a : null;
+    }
+    S.sheet = kind;
+    if (kind === "detail") S.sel = id;
+    body.textContent = "";
+    if (kind === "needs") {
+      setSheetTone(null);
+      kick.textContent = "Needs you · costliest wait first";
+      var list = el("div", { "class": "list" });
+      m.d.needsYou.forEach(function (a, i) {
+        var t = a.ticket && m.byId[a.ticket], red = t && (t.status === "escalated" || t.status === "failed");
+        var text = el("div", null, [el("div", { "class": "w", text: (t ? t.id + "  " : "") + a.ask }), el("div", { "class": "y", text: t ? a.cost || "" : [a.detail, a.cost].filter(Boolean).join(" · ") })]);
+        if (a.startLine) text.appendChild(copyLine(a.startLine));
+        var row;
+        if (t) {
+          row = el("button", { type: "button", "class": "row" }, [el("span", { "class": "n" + (red ? " red" : ""), text: String(i + 1) }), text, el("span", { "class": "chev", "aria-hidden": "true", text: "›" })]);
+          row.addEventListener("click", function (e) { choose(t.id, e.detail === 0); });
+        } else row = el("div", { "class": "row" }, [el("span", { "class": "n", text: String(i + 1) }), text, el("span")]);
+        list.appendChild(row);
+      });
+      if (!m.d.needsYou.length) list.appendChild(el("p", { "class": "row", text: "Nothing needs you right now." }));
+      body.appendChild(list);
+    } else {
+      var t = m.byId[id];
+      setSheetTone(tone(t));
+      kick.textContent = statusText(m, t);
+      body.appendChild(el("h2", { text: t.title }));
+      var meta = [link(t.url, t.id)];
+      if (t.kind) meta.push(t.kind === "debt" ? " · Debt Ticket" : " · Refactor proposal");
+      if (t.status === "running" && !isNaN(Date.parse(t.at))) meta.push(el("span", { "class": "el", "data-since": Date.parse(t.at), "data-pre": " · running ", text: " · running " + stopwatch(now() - Date.parse(t.at)) }));
+      body.appendChild(el("div", { "class": "meta" }, meta));
+      if (t.status === "running" || t.status === "escalated" || t.status === "held") {
+        var pi = t.status === "held" ? 4 : phaseIndex(t.phase);
+        body.appendChild(el("div", { "class": "track", role: "img", "aria-label": "Step " + (pi + 1) + " of " + PHASES.length + ": " + PHASES[pi][1] },
+          PHASES.map(function (p, i) { return el("span", { "class": i < pi ? "done" : i === pi ? "now" : "", "aria-hidden": "true", text: p[1] }); })));
+      }
+      var ask = m.ask[id];
+      if (ask) body.appendChild(el("div", { "class": "ask" + (tone(t) === "stop" ? " red" : "") }, [el("p", { text: ask.a.ask }), ask.a.detail ? el("p", { text: ask.a.detail }) : null]));
+      var facts = [];
+      if (t.note) facts.push(el("li", { text: t.note }));
+      m.edgesOf(t).forEach(function (e) {
+        var p = e[0];
+        if (e[1] === "dep") facts.push(el("li", null, ["Depends on ", el("b", { text: p }), " · " + lowerFirst(statusText(m, m.byId[p]))]));
+        if (e[1] === "after") facts.push(el("li", null, ["Runs after ", el("b", { text: p }), ": both touch the same code"]));
+        if (e[1] === "from") facts.push(el("li", null, ["Written from the debt ", el("b", { text: p }), " left"]));
+      });
+      (m.kids[id] || []).forEach(function (k) {
+        var e = m.edgesOf(m.byId[k]).filter(function (x) { return x[0] === id; })[0];
+        if (e[1] === "dep") facts.push(el("li", null, [el("b", { text: k }), " depends on this"]));
+        if (e[1] === "after") facts.push(el("li", null, [el("b", { text: k }), " runs after this"]));
+        if (e[1] === "from") facts.push(el("li", null, [el("b", { text: k }), " was written from its debt"]));
+      });
+      if (t.grant === "never") facts.push(el("li", { text: "Never Auto: its direction is your call." }));
+      else if ("grant" in t) facts.push(el("li", { text: t.grant ? "Auto, granted by " + t.grant + ". Withdraw it on the Ticket; it is re-read before launch." : "No Auto grant yet." }));
+      if (t.auto === false) facts.push(el("li", { text: "No Auto: it runs until it needs your judgment, and lands only after your look." }));
+      if (facts.length) body.appendChild(el("ul", { "class": "facts" }, facts));
+      var actions = [];
+      if (t.pr) actions.push(link(t.pr.url, "Open PR " + t.pr.id, "btn primary"));
+      actions.push(link(t.url, "Open Ticket", "btn"));
+      body.appendChild(el("div", { "class": "actions" }, actions));
+    }
+    S.sheetSig = sheetSig();
+    if (refresh) { body.scrollTop = keep; return; }
+    body.scrollTop = 0;
+    if (instant) { Sheet.jump(1); $("sheetDone").focus({ preventScroll: true }); }
+    else Sheet.go(1, null, false);
+    syncModal();
+  }
+  function refreshSheet() {
+    if (!S.sheet) return;
+    if (S.sheet === "detail" && !S.m.byId[S.sel]) { closeSheet(); return; }
+    if (sheetSig() !== S.sheetSig) openSheet(S.sheet, S.sel, true);
+  }
+  function closeSheet(instant, vel) {
+    if (!S.sheet) return;
+    var had = $("sheet").contains(document.activeElement), opener = S.opener;
+    S.sheet = null; S.sel = null; S.sheetSig = null; S.opener = null;
+    syncModal();
+    if (instant) Sheet.jump(0); else Sheet.go(0, vel == null ? null : vel, false);
+    markSelected();
+    if (had && opener && document.contains(opener)) opener.focus({ preventScroll: true });
+    else if (had) document.activeElement.blur(); // never leave focus on a sheet that is gone
+  }
+  function markSelected() {
+    var B = S.board;
+    if (!B) return;
+    B.nodes.forEach(function (o, id) { o.g.classList.toggle("sel", id === S.sel); });
+    B.edges.forEach(function (e) {
+      var hi = !!S.sel && (e.spec.a === S.sel || e.spec.b === S.sel);
+      e.el.classList.toggle("hi", hi);
+      if (e.spec.marker) e.el.setAttribute("marker-end", "url(#ar-" + (hi ? "hi" : "n") + ")");
+    });
+  }
+  function choose(id, viaKey) {
+    if (!id) { closeSheet(); return; }
+    if (!S.m.byId[id]) return;
+    S.sel = id;
+    markSelected();
+    openSheet("detail", id, false, viaKey);
+    var p = S.board && S.board.spec && S.board.spec.center(id);
+    if (p) requestAnimationFrame(function () { S.board.reveal(p, !viaKey); });
+  }
+  function copyLine(text) {
+    var b = el("button", { type: "button", "class": "btn", text: "Copy" });
+    b.addEventListener("click", function () {
+      var ok = function () { b.textContent = "Copied"; setTimeout(function () { b.textContent = "Copy"; }, 1400); };
+      try { navigator.clipboard.writeText(text).then(ok, function () { b.textContent = "Select it"; }); } catch (e) { b.textContent = "Select it"; }
+    });
+    return el("div", { "class": "copyline" }, [el("code", { text: text }), b]);
+  }
+  $("needsBtn").addEventListener("click", function (e) {
+    if (!S.m || !S.d.needsYou.length) return;
+    S.sel = null; markSelected();
+    openSheet("needs", null, false, e.detail === 0);
+  });
+  $("fitBtn").addEventListener("click", function (e) { if (S.board) S.board.fit("all", e.detail !== 0); });
+  $("sheetDone").addEventListener("click", function (e) { closeSheet(e.detail === 0); });
+  // Only a press that starts on the scrim closes the sheet: the click a phone sends after the tap that opened it
+  // lands on the scrim too, and must not close it again.
+  var scrimDown = false;
+  $("scrim").addEventListener("pointerdown", function () { scrimDown = true; });
+  // The mouse press a phone sends after a tap lands on the scrim and would pull focus out of the sheet just opened.
+  $("scrim").addEventListener("mousedown", function (e) { e.preventDefault(); });
+  $("scrim").addEventListener("click", function () { if (scrimDown) closeSheet(); scrimDown = false; });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && S.sheet) closeSheet(true); });
+  window.addEventListener("resize", function () { Sheet.draw(); syncModal(); if (S.board) S.board.contain(); });
+
+  /* ================= The one path every snapshot takes ================= */
+  function strings(a) { return a == null || (Array.isArray(a) && a.every(function (x) { return typeof x === "string"; })); }
+  function optStr(v) { return v == null || typeof v === "string"; }
+  function oneOf(v, list) { return list.indexOf(v) >= 0; }
+  var MODES = ["default", "autonomous"], STATES = ["running", "paused", "finished"], KINDS = ["debt", "refactor"];
+  var PHASE_IDS = PHASES.map(function (p) { return p[0]; });
+  // Data is untyped input, so it is checked here, where it enters; a bad snapshot keeps the last good view.
+  function valid(d) {
+    if (!d || typeof d !== "object" || d.schema !== 1 || !Array.isArray(d.tickets) || !Array.isArray(d.needsYou)) return false;
+    if (!d.effort || typeof d.effort.name !== "string" || !optStr(d.effort.destination)) return false;
+    if (!oneOf(d.mode, MODES) || !oneOf(d.state, STATES) || isNaN(Date.parse(d.checkedAt))) return false;
+    if (typeof d.plan !== "number" || !isFinite(d.plan)) return false;
+    if (d.nextCheckAt != null && isNaN(Date.parse(d.nextCheckAt))) return false;
+    if (d.maxBatch != null && typeof d.maxBatch !== "number") return false;
+    var ids = {};
+    var ticketsOk = d.tickets.every(function (t) {
+      if (!t || typeof t.id !== "string" || ids[t.id] || t.id === "goal" || typeof t.title !== "string" || typeof t.status !== "string" || !Object.prototype.hasOwnProperty.call(TONE, t.status)) return false;
+      ids[t.id] = 1;
+      if (!optStr(t.url) || !optStr(t.at) || !optStr(t.note) || !optStr(t.grant)) return false;
+      if ((t.phase != null && !oneOf(t.phase, PHASE_IDS)) || (t.kind != null && !oneOf(t.kind, KINDS)) || (t.auto != null && t.auto !== false)) return false;
+      if (t.pr != null && (typeof t.pr !== "object" || typeof t.pr.id !== "string" || !optStr(t.pr.url))) return false;
+      return strings(t.dependsOn) && strings(t.after) && strings(t.from);
+    });
+    return ticketsOk && d.needsYou.every(function (a) {
+      return a && typeof a.ask === "string" && optStr(a.ticket) && optStr(a.detail) && optStr(a.cost) && optStr(a.startLine);
+    });
+  }
+  function apply(d, via, opts) {
+    opts = opts || {};
+    if (!valid(d)) { S.bad = true; console.warn("orchestrate-status: ignored a snapshot that does not match schema 1 (from " + via + ")"); tick(); return false; }
+    S.bad = false;
+    setClock(d);
+    var json = JSON.stringify(d);
+    if (json === S.json) { tick(); return true; }
+    var first = !S.m, anim = !first && !opts.instant;
+    S.json = json; S.d = d; S.m = model(d);
+    renderHud(); tick(); renderNeeds(anim);
+    render(S.board, flow(S.m), anim);
+    if (first) {
+      S.board.fit("load", false);
+      if (S.board.svg.animate) S.board.svg.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 320, easing: CURVE.out });
+    }
+    markSelected();
+    refreshSheet();
+    if (anim) pulseLive();
+    S.hudReady = true;
+    return true;
+  }
+
+  /* ================= Data sources: the inline block first, then whatever live source the host offers ================= */
+  function loadStatus() {
+    return new Promise(function (resolve, reject) {
+      try { resolve(JSON.parse($("orchestrate-status").textContent)); } catch (e) { reject(e); }
+    });
+  }
+  function fetchSibling() {
+    return fetch(new URL("orchestrate-status.json", location.href).href, { cache: "no-store" }).then(function (r) {
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    });
+  }
+  // A file: page cannot fetch, so a sibling script sets window.ORCHESTRATE_STATUS and is re-read on each poll.
+  var injected = null;
+  function injectSibling() {
+    return new Promise(function (resolve, reject) {
+      if (injected) injected.remove();
+      window.ORCHESTRATE_STATUS = undefined;
+      var sc = document.createElement("script");
+      sc.src = "orchestrate-status.js?t=" + Date.now();
+      sc.onload = function () { var d = window.ORCHESTRATE_STATUS; if (d) resolve(d); else reject(new Error("orchestrate-status.js set no data")); };
+      sc.onerror = function () { reject(new Error("orchestrate-status.js did not load")); };
+      injected = sc;
+      document.head.appendChild(sc);
+    });
+  }
+  function poll(kind, get, onData, onState) {
+    var had = false;
+    function once() {
+      get().then(function (d) { had = true; onData(d, kind); setTimeout(once, POLL_MS); }, function (err) {
+        if (!had) { onState("none", "idle"); return; } // no sibling file: the page shows the inline data only
+        console.warn("orchestrate-status: live " + kind + " source failed: " + err.message);
+        onState(kind, "lost");
+        setTimeout(once, POLL_MS);
+      });
+    }
+    once();
+  }
+  function siblings(onData, onState, example) {
+    // The example data has no sibling to read.
+    if (example) { onState("none", "idle"); return; }
+    if (/^https?:$/.test(location.protocol)) poll("http", fetchSibling, onData, onState);
+    else if (location.protocol === "file:") poll("file", injectSibling, onData, onState);
+    else onState("none", "idle");
+  }
+  function subscribe(onData, onState, example) {
+    var use = null;
+    try { if (window.claude && window.claude.use) use = Promise.resolve(window.claude.use("db")); } catch (e) { use = null; }
+    if (!use) { siblings(onData, onState, example); return; }
+    var timeout = new Promise(function (r) { setTimeout(function () { r(null); }, 10000); });
+    Promise.race([use, timeout]).then(function (db) {
+      if (!db) { siblings(onData, onState, example); return; }
+      var retried = 0;
+      function listen() {
+        try {
+          // Read-only: the orchestrator writes this document; the page never does.
+          db.doc("status/current").onSnapshot(function (snap) { retried = 0; if (snap && snap.exists) onData(snap.data(), "db"); }, function (err) {
+            var code = err && err.code;
+            console.warn("orchestrate-status: live db source stopped: " + (err && err.message));
+            onState("db", "lost");
+            // A stalled bridge recovers only by subscribing again; a withdrawn grant does not recover.
+            if (code === "unavailable" && retried < 5) { retried++; setTimeout(listen, 5000 * retried); }
+          });
+          onState("db", S.real.kind === "db" && S.real.state === "live" ? "live" : "idle");
+        } catch (e) { console.warn("orchestrate-status: could not read the live db source: " + e.message); onState("db", "lost"); }
+      }
+      listen();
+    }, function () { siblings(onData, onState, example); });
+  }
+  function onData(d, kind) { S.real = { kind: kind, state: apply(d, kind) ? "live" : "bad" }; tick(); }
+  function onState(kind, state) { S.real = { kind: kind, state: state }; tick(); }
+
+  /* ================= Start ================= */
+  hudInit();
+  S.board = makeBoard($("stage"), { label: "The effort's Tickets, ordered by what each waits on", onTap: choose });
+  Sheet.draw();
+  function loop() { tick(); setTimeout(loop, 1000 - (Date.now() % 1000) + 5); }
+  loadStatus().then(function (d) {
+    if (!apply(d, "inline")) { S.hk.textContent = "The status data on this page does not have the expected shape."; return; }
+    subscribe(onData, onState, !!d.example);
+    loop();
+    // Hooks for automated checks of this page; nothing on the page depends on them.
+    window.__orchestrateStatus = {
+      apply: function (x) { return apply(x, "check"); }, board: function () { return S.board; }, state: function () { return S; },
+      skew: function (ms) { CLOCK.skew = ms; tick(); }, busy: function () { return Motion.busy() || Sheet.busy(); }
+    };
+  }, function (e) { S.hk.textContent = "The status data on this page could not be read: " + e.message; });
+})();
+</script>
+</body>
+</html>

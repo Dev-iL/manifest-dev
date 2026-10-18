@@ -208,7 +208,7 @@ higher level can make the details unnecessary.
 ## The project
 
 ### Autonomy Ladder
-<!-- context: 3e2e5fbcff89 -->
+<!-- context: 466d92751053 -->
 The Autonomy Ladder is the set of levels at which you can use manifest-dev. Each level is useful
 without the levels above it, and without other people on your team. The levels are:
 
@@ -216,7 +216,8 @@ without the levels above it, and without other people on your team. The levels a
 2. One piece of work that you understand, define and verify with a Manifest.
 3. Project Surfaces in the repository, which each run reads and keeps current.
 4. A shared Ticket Store, from which people and agents take the next work.
-5. Unattended runs that take Auto Tickets, do them, and write Tickets for new work that they find.
+5. The queue runs: `/orchestrate` does Auto Tickets from start to end, and other Tickets until
+   their pull request is ready. It writes Tickets for the debt that it finds.
 
 At the top level, a person acts only for a blocker, a judgment, a taste or an authority. You select
 how high you go. The ladder exists so that you can start small inside a team that does not use
@@ -302,15 +303,16 @@ the `/setup-project` setup the project has. When the number is older than the ne
 ## Verification
 
 ### Verification Harness
-<!-- context: 66b62e2201b2 -->
+<!-- context: 2a0e6dfdb86f -->
 The Verification Harness is the one command in a project that agents and people use to find if the
 work still does its job. Its `--help` says all about it. It reads one Recipe for each feature,
 skill, document walk or eval suite. It also reads one Recipe for the checks that run on all of the
 project, such as lint, types and tests. Thus each check that the project keeps is in one place.
 
 While you work, you can run a check command directly. The Evidence that a change works comes from
-the harness. It calculates each status from Evidence in the repository, not
-from a list that a person keeps. It can also start, observe, reset and stop what it examines.
+the harness. The harness writes its Evidence on your computer, in a directory that git ignores, so
+the repository keeps no Evidence. To find what a change must run, it reads the change. It can also
+start, observe, reset and stop what it examines.
 
 It exists because without it each session must find again how to test the project, and a test that
 nobody runs becomes stale.
@@ -330,11 +332,10 @@ recipe.
 
 The shape that `/setup-project` ships is a default, and you can change it to fit
 your project. Each harness must give one place to learn how to examine the project. Each harness
-must also give statuses from Evidence, an ask-first mark that follows cost, and the Fit to Trust
-jobs.
+must also give an ask-first mark that follows cost, and the Fit to Trust jobs.
 
 ### Recipe
-<!-- context: bb7b3ec98333 -->
+<!-- context: c40275c62de6 -->
 A Recipe is one Markdown file in the Verification Harness. It says what one part is, how a user
 reaches it, the Scenarios that exercise it, and its traps. Recipes exist so that each part of the
 project has one place that says how to examine it. A change then finds the recipes that it touches.
@@ -345,26 +346,31 @@ the project, such as lint and tests. Each of its Scenarios calls the command tha
 already has.
 
 ### Scenario
-<!-- context: 010d556fdb11 -->
+<!-- context: 39c884d2c5f3 -->
 A Scenario is one exercise in a Recipe: an exact command and what it proves. The Verification
-Harness runs it, keeps its Evidence and calculates its status. It exists so that each claim of a
+Harness runs it, writes its Evidence and tells you if it passed. It exists so that each claim of a
 Recipe has an exact command that anyone can run again.
 
 ### Evidence
-<!-- context: dc99ab79b2a8 -->
-Evidence is what a gate result or a Scenario status rests on. It can be the output of a command, a
-summary of a Scenario run in the repository, or a quoted part of a file. A summary claim is not
+<!-- context: 85ba87b53562 -->
+Evidence is what a gate result or the result of a Scenario rests on. It can be the output of a
+command, the summary that a Scenario run writes on your computer, or a quoted part of a file. A pull
+request shows its Evidence in its description. A summary claim is not
 evidence. In a North Star, "evidence" is also a state, with the same sense: something observed, not
 only said.
 
 ### Time Line
-<!-- context: 8e51ac0fc472 -->
+<!-- context: 789424b3ebff -->
 A Time Line is the run time that a Scenario with a fixed workload must stay under. The line stops a
 slow increase of test time that nobody sees.
 
-The first passed run sets the line, with some headroom. A faster run lowers it. Only a raise with a
-reason increases it. A freeze that names a debt Ticket keeps it at its value. A Scenario is over its
-line after it crosses the line on two runs in a row.
+The line is in the Recipe, for one kind of computer. A passed run sets it, with some headroom. Only
+the change that changes the check moves its line. It lowers the line when it makes the check faster.
+It raises the line only with a reason that it writes beside the line. A freeze that names a debt
+Ticket keeps the line at its value.
+
+A run on a different kind of computer shows its time and compares nothing. When a run crosses the
+line, the harness runs the Scenario again. The crossing counts only when the second run crosses too.
 
 ### Ask-first
 <!-- context: dcbbcddc356f -->
@@ -400,12 +406,13 @@ through. It has a declared scope. When it finds existing violations that the run
 run reports them as Debt.
 
 ### Debt
-<!-- context: b6fe5e7cd832 -->
+<!-- context: a4cc9cb5c9ce -->
 Debt is what a run found and did not fix. Examples are existing violations of a Lock, a comment
 about a workaround, and a new suppression. A product regression that the harness found is also Debt.
 
 A run names its Debt in its report, in a "Debt left" section of each pull request, and on its
-Ticket. A later run that changes the same code offers to fix it. Thus nobody forgets the Debt.
+Ticket. A later run that changes the same code offers to fix it. `/orchestrate` also writes the Debt of
+the runs that it lands as new Tickets. Thus nobody forgets the Debt.
 
 ## Tickets
 
@@ -429,19 +436,23 @@ answer with evidence, and that answer is recorded. It exists when a question mus
 owner, priority or closure.
 
 ### Auto
-<!-- context: bcf25cb92b89 -->
-Auto is a grant on a Ticket that lets unattended automation do it from start to end. The author
-gives it when they write the Ticket. Without Auto, automation does not touch the Ticket. The author
-gives it only when the work needs no knowledge, taste or authority of a person. The same must be
+<!-- context: a8ffdbab18de -->
+Auto is a grant on a Ticket that lets unattended automation do it from start to end, and merge
+it. Give it only when the work needs no knowledge, taste or authority of a person. The same must be
 true of the decision that the work is done.
 
-An agent never gives Auto to a Ticket that it writes. A follow-up gets Auto only when a person
-gives it. Thus the queue grows only on work that a person thinks is worth doing.
+A person gives Auto when they write or review the Ticket. `/orchestrate --autonomous` can also give
+it to a Ticket that an agent wrote, when the work agrees with that rule. The run that found the work
+never gives it. Each grant names who gave it, so that you can remove a grant that you do not want.
+
+Without Auto, automation can do the Ticket until its pull request is ready, but a person merges it.
+This occurs only when the author can write to the repository and no person is assigned to the
+Ticket.
 
 ### Ticket Type
-<!-- context: 162eaa73bbc9 -->
+<!-- context: fc28de71e25e -->
 A Ticket Type is an optional name for the main kind of a Ticket. An operator uses it to select which
-granted Tickets automation does now. A Ticket with no type never matches a type query.
+Tickets automation does now. A Ticket with no type never matches a type query.
 
 ### Effort
 <!-- context: 441c3358d642 -->
@@ -467,22 +478,32 @@ finished Manifest, a direct request, an open question or a follow-up. A Manifest
 Ticket by default. It becomes one Ticket for each Deliverable only when you ask for that.
 
 ### Run Ticket
-<!-- context: 103b8f85ec96 -->
-Run Ticket is the step that takes one exact Ticket, claims it and does it with `/auto`. Then it
-completes the delivery that the project requires, for example a merge, and records DONE or ESCALATED
-on that Ticket. The `/run-ticket` skill does it. It does not select work from the store.
+<!-- context: c44e6129f57b -->
+Run Ticket is the step that takes one exact Ticket, claims it and does it with `/auto`. It stops
+when the pull request is ready. It merges only when you tell it to. It leaves a completion record or
+an escalation record on that Ticket. The `/run-ticket` skill does it. It does not select work from the store.
+
+Run Ticket keeps a record on the Ticket: the branch, the progress and the Manifest. Thus a later run
+can continue the work.
 
 ### Escalation Mark
-<!-- context: e5bcb093a8c0 -->
+<!-- context: d0bcb771f760 -->
 An Escalation Mark is the record on a Ticket that says that a person must act. Unattended automation
-does not take a Ticket with this mark. A person can still take it. The next step of that person
-removes the mark.
+does not take a Ticket with this mark. A person can still take it. When the person answers, they
+remove the mark, or `/orchestrate` records the answer and removes it.
 
-### Ticket Sweep
-<!-- context: 4bc4a7a01945 -->
-A Ticket Sweep is a scheduled step that handles one Ticket and then stops. First, it continues an
-interrupted Ticket of the automation. When there is none, it selects one ready Auto Ticket and gives
-it to Run Ticket. The `/sweep-tickets` skill does it.
+### Orchestrate
+<!-- context: 84eaa3e4c71b -->
+Orchestrate is the step that does the ready Tickets of an effort, or of all the store, at the same
+time. Each Ticket goes to Run Ticket in a session of its own. Orchestrate merges finished work, one
+Ticket at a time. It writes Tickets for the debt that runs find. It keeps a status page and one list
+of what waits for you. The `/orchestrate` skill does it.
+
+By default, it shows you a plan and waits until you approve it. With `--autonomous`, it does not
+wait. It keeps no state of its own: it reads all of it from the Tickets and from git.
+
+Some work still waits for you. You merge a Ticket without Auto and answer escalations. You plan
+large work. You approve a Ticket whose author cannot write to the repository.
 
 ## Pull requests
 

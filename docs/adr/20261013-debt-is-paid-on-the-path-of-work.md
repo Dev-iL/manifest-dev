@@ -1,7 +1,7 @@
 # ADR: Debt is paid on the path of work, so a codebase converges through normal runs
 
 ## Status
-Accepted
+Accepted — amended by 20261018-orchestrate-tickets-up-debt-and-grants-auto-where-the-criterion-holds: `orchestrate` tickets up the debt left by the runs it lands, so debt off the path of later work no longer waits only for a change to reach it
 
 ## Area
 define / do
@@ -41,7 +41,10 @@ Each change keeps to one concern, which keeps a fix from turning into a bundle o
 - Whether a codebase actually converges is not measured yet; the signals are debt per run in an area falling, verified verification entries rising, and the share of review findings a check could have prevented falling.
 
 ## Enforced by
-partly — eval cases `44-debt-on-the-path` and `d20-preparatory-slice` measure it once run; whether an item lies on the path of the work stays judgment.
+partly — eval cases `44-debt-on-the-path` and `d20-preparatory-slice` measure it once run;
+`test_orchestrate_tickets_up_debt_and_grants_only_where_it_may` in `tests/test_ticket_automation_prompts.py` fails if `orchestrate`
+stops gathering the debt of the runs it lands into Tickets; whether an item lies on the path of the
+work stays judgment.
 
 ## Source
 - Session: figure-out investigation of steering agents toward maintainable first versions.

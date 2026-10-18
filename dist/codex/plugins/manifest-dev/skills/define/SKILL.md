@@ -33,6 +33,16 @@ calls — invariant versus guidance, what a gate ranges over, where it binds, it
 kind. Surface the load-bearing ones with a recommended answer; auto-decide the
 rest and mark them `(auto)` with a matching `ASM-*`.
 
+Where the host offers a question-selection capability — a way to put a question
+to the user as options to pick from, with room to answer in their own words —
+ask through it by default, with your recommended answer as each ask's first
+option. Key calls are mostly independent of each other, so batch them there into
+as few turns as they allow; a call whose answer would change another's goes
+first, and the other waits for it. Without that capability, or once the user has
+asked you to ask in prose, write the ask in plain text, one ask per turn. An
+unattended caller is asked nothing: decide each call within its delegation and
+record it as below.
+
 An amendment from an unattended executor is unattended: self-answer within the
 caller's delegation, ask no questions, and wait for no approval. Validate a
 delegated Appetite revision before applying it: the broader work serves the
@@ -120,7 +130,7 @@ That gives a floor that isn't ceremony:
     fit to trust, cut building or repairing it, scoped to what the change touches, as the first Deliverable, ahead of
     any preparatory slice; unattended runs build it too. A Manifest that touches anything a recipe
     covers, or a path one should cover but does not, carries a gate that each touched recipe is
-    added or updated and run, its evidence committed. A recipe marked ask-first is run only where
+    added or updated and run, and what it found reported. A recipe marked ask-first is run only where
     the project's setting or the user allows — a user who approves a Manifest whose gate runs it has
     agreed; otherwise its gate holds that the recipe is updated and that the run it still owes is
     named in the report.
@@ -230,7 +240,7 @@ figure-out's own probe files are a separate set this skill never reads, and any
 | Bug | Defects, errors, regressions, "broken" | `BUG.md` |
 | Refactor | Restructuring, cleanup, pattern changes | `REFACTOR.md` |
 | UI | Anything a person sees and judges rather than calls — screens, decks, rendered documents, emails, games | `UI.md` |
-| PR lifecycle | Shipping a change through CI, review, approvals | `PR_LIFECYCLE.md` |
+| PR lifecycle | Shipping a change through a GitHub pull request — its proof, CI, review, approvals | `PR_LIFECYCLE.md` |
 | Prompting | LLM prompts, skills, agents, system instructions | `PROMPTING.md` |
 | Prose floor | Any prose deliverable — the rules holding in both registers (base) | `PROSE_FLOOR.md` |
 | Writing | Human-voice register: prose, articles, copy, social, creative | `WRITING.md` |

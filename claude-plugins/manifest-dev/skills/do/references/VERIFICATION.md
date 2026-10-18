@@ -15,7 +15,8 @@ its own `--help`.
   tree, for the project's lint, types or test suite, never counts as covering such a path, and
   where one exists `affected` lists no uncovered path, so check each changed path a user reaches
   against the other recipes' `covers`. Update each touched
-  recipe to match the change, run it, and commit its evidence. A recipe marked ask-first runs
+  recipe to match the change and run it; what the run found goes in the report, and its evidence
+  stays where the harness keeps it, uncommitted. A recipe marked ask-first runs
   only with the agreement `../../setup-project/references/VERIFICATION_HARNESS.md` → *Ask first*
   describes; otherwise update it, leave it unrun, and name the run it owes in the report. A
   change to a prompt that leaves its measured eval cases unrun marks them `stale`; unmeasured
@@ -27,6 +28,10 @@ its own `--help`.
 - **Unfit harness:** when the harness is not fit to trust for what the work touches
   (`../../setup-project/references/VERIFICATION_HARNESS.md` → *Fit to trust*), repair it within
   scope, and report the rest as debt.
+- **Time lines:** a line is written into its recipe only by the change that changes that check.
+  A fixed-workload scenario the change adds gets its first line from a passing run (`verify
+  line`), and a change that made a check faster keeps the gain the same way; no other run moves a
+  line.
 - **Over its line:** when a check the work touches is over its time line, find where the time
   went from the runner's own timings. Pay it down before the run is done when growth did not earn
   the time — it came from what the change added, such as a slow new test or a sleep — or when the

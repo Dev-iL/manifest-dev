@@ -1,7 +1,7 @@
 # ADR: Trigger adapters enforce single-flight per Ticket
 
 ## Status
-Accepted
+Superseded by 20261018-an-orchestrating-skill-runs-the-queue-and-replaces-the-sweep
 
 ## Area
 Ticketing
@@ -44,7 +44,10 @@ The trigger adapter owns this serialization because the host knows which executi
 - A queued trigger may start only to discover that the earlier run already completed or escalated the Ticket.
 
 ## Enforced by
-partly — `tests/test_ticket_automation_prompts.py` — `test_trigger_adapter_contract_stays_thin_and_recoverable` checks that the adapter contract names per-Ticket single-flight; what single-flight requires is judgment.
+none — retired with the event-trigger guidance: `test_trigger_adapter_contract_stays_thin_and_recoverable`
+was removed, and `test_the_sweep_and_the_event_trigger_guidance_are_gone` in `tests/test_ticket_automation_prompts.py` fails if that
+guidance returns. One live run per Ticket is now held by the run facts, under
+20261018-the-tickets-attempt-record-carries-its-manifest-progress-and-run-facts.
 
 ## Source
 

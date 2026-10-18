@@ -25,13 +25,14 @@ The kind is declared on the ticket, so the picker knows which tool to bring.
 
 ## The Auto grant
 
-A ticket of either kind may carry **Auto** — an opt-in grant, declared when the ticket is written,
+A ticket of either kind may carry **Auto** — an opt-in grant, given by its grantor as *Who grants* below says,
 that unattended automation may take it end to end: do the work, judge it done, and complete any
 required landing, with nobody watching. For repository work, end to end includes merging through
 the repository's normal protections before the Ticket closes.
 
-- **Granting.** Grant only when neither doing the work nor judging it done needs any human's knowledge, taste, or authority — no done-judgment resting on someone's unstated criteria, no approval, no access an unattended worker won't have, no irreversible act that requires separate human authority beyond the Auto grant, no decision deferred to mid-flight input. Ordinary landing through the repository's declared protections is within Auto; a repository policy that requires human approval is not. That bar is necessary but never sufficient: the author still chooses, and withheld trust alone is reason enough to withhold. When in doubt, don't grant.
-- **Absence is the fence.** A ticket without the grant is not touched by automation at all — no partial work, no prepping half the job. Nothing is ever marked "not auto"; silence already says it, which is also what keeps automation off items in a shared venue that were never tickets. A person may still hand an ungranted ticket to an agent and watch — that is the person working the ticket, outside the grant's jurisdiction.
+- **Granting.** Grant only when neither doing the work nor judging it done needs any human's knowledge, taste, or authority — no done-judgment resting on someone's unstated criteria, no approval, no access an unattended worker won't have, no irreversible act that requires separate human authority beyond the Auto grant, no decision deferred to mid-flight input. Ordinary landing through the repository's declared protections is within Auto; a repository policy that requires human approval is not. That bar is necessary but never sufficient: whoever grants still chooses, and withheld trust alone is reason enough to withhold. When in doubt, don't grant.
+- **Who grants.** A person grants: the ticket's author, or someone reviewing it, at the `ticket-up` boundary. `orchestrate --autonomous` also grants, to a ticket an agent wrote, wherever the bar above holds. The run that found the work never grants it. Every grant names its grantor on the ticket, so a person can tell an `orchestrate` grant from their own and withdraw it.
+- **Absence means a person finishes it.** A ticket without the grant may still be worked by automation, but never completed or landed by it. Unattended work takes it up only when its author has write access to the repository and no person is assigned to it; the run asks for the person's judgment through the escalation mark wherever it needs it, and stops at a ready pull request — or, for a question ticket, with its answer drafted — for a person to land or accept. A ticket whose author lacks write access is never worked unattended, until a person with write access grants it Auto or approves a plan that includes it. Items in a shared venue that were never tickets stay untouched. Nothing is ever marked "not auto" to keep automation off; silence already says it. A person may also hand an ungranted ticket to an agent and watch — that is the person working the ticket.
 - **Surprises don't revoke.** A granted ticket's worker can still hit an unexpected blocker; it stops and surfaces rather than deciding what only a person can. That is the exception path working, not evidence the grant was wrong — only a step known at write time to need a person keeps the grant off.
 
 Auto is durable authority, not mutable queue state. Claiming, retrying, completing, or escalating
@@ -39,7 +40,7 @@ an attempt does not remove and reapply it. Open state, claim ownership, and depe
 whether a granted Ticket is runnable. A person directly invoking `run-ticket` on an ungranted
 Ticket supplies authority for that supervised run; that does not grant later unattended work.
 
-A follow-up receives Auto only when a person grants it at its own `ticket-up` boundary — directly authoring it, or explicitly reviewing and authorizing Auto there — after it passes the granting test above. Without that grant it carries no Auto, whatever its source carries: an agent never grants Auto to work it found, so unattended execution cannot widen its own authority or grow the queue on work no person chose. A person merely invoking `run-ticket` on a source is not that grant. The person still chooses whether to grant; Shaped never implies Auto.
+A follow-up — separate work a run found — receives Auto only through a grant at its own `ticket-up` boundary, after it passes the granting test above: a person's, or `orchestrate --autonomous`'s. Without that grant it carries no Auto, whatever its source carries, and the run that found the work never grants it. A person merely invoking `run-ticket` on a source is not that grant. Whoever grants still chooses; Shaped never implies Auto.
 
 ## Type
 
@@ -64,7 +65,7 @@ A shaped ticket carries, in plain language:
 - **Suggested approach** *(optional)* — a starting direction, marked as advice the picker may discard.
 - **Definition of done** — checks a stranger can judge for themselves, in prose.
 - **Depends on** — ticket IDs this one needs finished first. Structural needs only.
-- **Auto** *(when granted)* — the grant above, declared by the author; a ticket that doesn't carry it is ungranted, and nothing marks the negative.
+- **Auto** *(when granted)* — the grant above, naming its grantor; a ticket that doesn't carry it is ungranted. A recorded withhold or withdrawal fences nothing: it only tells `orchestrate --autonomous` the ticket was already judged.
 - **Type** *(when one fits)* — one of the types above, naming what kind of work this is; omitted when none of them describes it.
 - **Status / Claimed by** — see lifecycle.
 
@@ -81,32 +82,31 @@ Each effort's store carries one small front file (in a file store, a README besi
 - **Destination** — what reaching the end of this effort looks like, in a line or two. Pickers use it to judge what project value is delayed when a Ticket waits.
 - **Priority rule override**, when the effort ranks differently than the default below.
 - **Context pointers** — the key decision records, and where the effort's reads or logs live, so a cold picker gets effort-level orientation before opening a ticket.
+- **Standing automation settings**, when set — a pause line that stops unattended work from starting anything new in the effort, and the link to its status page. `orchestrate` reads and writes them.
 
 Never put derivable state here: no ticket lists, statuses, or ready/next — anything a close would stale belongs to the tickets themselves, where it can't rot. Where a tracker groups its items natively, that grouping is the tracker's to keep current rather than a list anyone edits.
 
 ## Lifecycle
 
 - **Status**: `open` → `done`. Done tickets roll off **by location**: in a file store, closing moves the ticket into a `done/` subfolder beside the open ones; in a tracker, closing the item removes it from open queries. Reading the open set never scales with closed history — the archive is the `done/` folder, the tracker's closed items, and git.
-- **Claiming**: mark a ticket claimed (a `Claimed by:` line, an assignee, the venue's equivalent) when you pick it, not when you get around to starting it — the gap between the two is where somebody else picks the same one. Open and unclaimed means takeable; a human claim pauses automation. A claim held by the store's stable automation identity represents work in progress or an interrupted attempt the scheduled recovery path may resume after the host's single-flight guard admits it.
-- **Ready**: a ticket is ready when it is open, unclaimed, and every ticket it depends on is done. Blocked is derived from unmet dependencies, never stored as a status. Readiness is the same question for everyone; unattended execution narrows it further with the grant and the escalation mark, per *Automated execution* below.
+- **Claiming**: mark a ticket claimed (a `Claimed by:` line, an assignee, the venue's equivalent) when you pick it, not when you get around to starting it — the gap between the two is where somebody else picks the same one. Open and unclaimed means takeable; a human claim pauses automation. A claim held by the store's stable automation identity represents work in progress, work waiting to land, or an interrupted attempt; whether a run still holds the ticket is read from the run facts its attempt record carries, never from the claim (`AUTOMATED_EXECUTION.md`).
+- **Ready**: a ticket is ready when it is open, unclaimed, and every ticket it depends on is done. Blocked is derived from unmet dependencies, never stored as a status. Readiness is the same question for everyone; unattended execution narrows it further with the escalation mark and with the grant or its author's write access, per *Automated execution* below.
 - **Closing**: record the outcome on the Ticket (the merged or otherwise landed work, or the question's recorded answer), mark it done and roll it off (move it to `done/`, or close the item), and check what the close changed: Tickets it made ready, and outcomes that need interpreting. A branch or mergeable pull request is not a landed repository outcome. Create a Question Ticket for interpretation only when that question needs an independently managed lifecycle; otherwise record or answer it with the current outcome.
-- **Escalating an attempt**: record the blocker, attempts, evidence, preserved-work references, and the human input needed on the same Ticket, as a handoff record carrying a mark automation can recognize. Leave it open, retain Auto when present, and release the claim. The mark, not a claim, is what holds automation off: unattended dispatch skips a marked Ticket, while the Ticket stays open and unclaimed so a picker ranks it against everything else and the person named in the handoff can take it. A venue reference maps how the mark renders — a label where the venue has them, and otherwise the marker the handoff record itself carries, which any venue can hold. After resolving the blocker, that person records the continuation context and clears the mark, which returns the Ticket to unattended eligibility. Escalation ends an execution attempt, not the Ticket's work, and never makes dependents ready.
+- **Escalating an attempt**: record the blocker, attempts, evidence, preserved-work references, and the human input needed on the same Ticket, as a handoff record carrying a mark automation can recognize. Leave it open, retain Auto when present, and release the claim. The mark, not a claim, is what holds automation off: unattended dispatch skips a marked Ticket, while the Ticket stays open and unclaimed so a picker ranks it against everything else and the person named in the handoff can take it. A venue reference maps how the mark renders — a label where the venue has them, and otherwise the marker the handoff record itself carries, which any venue can hold. After resolving the blocker, that person records the continuation context and clears the mark — or answers in `orchestrate`'s conversation, which records it and clears the mark for them — and that returns the Ticket to unattended eligibility. Escalation ends an execution attempt, not the Ticket's work, and never makes dependents ready.
 
 ## Automated execution
 
-Issue events are a fast path for ready Auto Tickets. A scheduled `sweep-tickets` invocation is the
-correctness path: it resumes one interrupted automation-owned Ticket, or otherwise selects one
-ready Auto Ticket, invokes `run-ticket`, and stops.
+`orchestrate` is the unattended dispatch path. It runs ready Tickets, each through `run-ticket` in
+its own session, recovers interrupted attempts from the run facts on each Ticket, and lands
+finished work one Ticket at a time. A person may still run `run-ticket` by hand on any Ticket.
 
-Neither path touches a Ticket carrying the escalation mark, and each tests for it where it decides
-rather than trusting the other to have done so — releasing the claim is itself an event a dispatcher
-acts on, so a skipped test restarts the attempt the escalation ended. Closing one Ticket naturally makes a dependent
-Ticket eligible for a later sweep; no ready label or label pulse is needed.
+Unattended dispatch never touches a Ticket carrying the escalation mark, and tests for it where it
+decides: releasing the claim leaves an escalated Ticket looking like ordinary ready work, so a
+skipped test restarts the attempt the escalation ended. Closing one Ticket makes a dependent ready
+for the next check-in; no ready label or label pulse is needed.
 
-Both paths use one trigger adapter contract: stable automation identity, canonical per-Ticket
-single-flight, finite provider retries, and one terminal infrastructure-failure handoff to a
-configured person. Those are runner responsibilities, not Ticket fields. See
-`AUTOMATED_EXECUTION.md` for the integration boundary.
+The attempt record, the completion record and the one landing procedure are in
+`AUTOMATED_EXECUTION.md`. They live on the Ticket, not in Ticket fields a person edits.
 
 ## Priority
 

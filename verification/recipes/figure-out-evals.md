@@ -13,21 +13,22 @@ suite and does not redefine them.
 
 ## How a user reaches it
 
-- `claude-plugins/manifest-dev/evals/README.md` → *Scope and statuses*, *Cases* and *Recording a
-  baseline*; on macOS, `scripts/evals/run_eval.sh` runs the same command in the eval container.
+- `claude-plugins/manifest-dev/evals/README.md` → *Scope and statuses*, *Cases*, *Running a
+  suite* and *Recording a baseline*; `scripts/evals/run_eval.sh` starts every run, locally or in
+  a cloud session.
 - `claude-plugins/manifest-dev/evals/README.md` → *Hill-climbing a prompt against a suite*, with
   the scripts under `scripts/evals/`.
 
 ## Scenarios
 
 ### with-without
-Run: `cd claude-plugins/manifest-dev && claude plugin eval . --tag figure-out --ablation with-without --judge-model sonnet --allow-tools Write Bash --scaffold -j 8 --max-cost-usd 120`
+Run: `scripts/evals/run_eval.sh --wait figure-out-with-without evals/results/figure-out-with-without/aggregate-result.json --tag figure-out --ablation with-without --judge-model sonnet --scaffold --max-cost-usd 120`
 Proves: the suite ran both arms; the Δ it reports, read against the noise section of the suite README, is the measurement, and the README's results section records it.
 Check: read
 Workload: varies
 
 ### plugin-only
-Run: `cd claude-plugins/manifest-dev && claude plugin eval . --tag figure-out-plugin-only --ablation none --judge-model sonnet --allow-tools Write Bash --scaffold -j 8 --max-cost-usd 15`
+Run: `scripts/evals/run_eval.sh --wait figure-out-plugin-only evals/results/figure-out-plugin-only/aggregate-result.json --tag figure-out-plugin-only --ablation none --judge-model sonnet --scaffold --max-cost-usd 15`
 Proves: the cases that test behavior existing only with the plugin pass on the plugin arm.
 Check: read
 Workload: varies
@@ -35,8 +36,8 @@ Workload: varies
 ## Gotchas
 
 - Read the suite README's noise section before using a Δ to justify a prompt change; a case both arms pass teaches nothing and is removed.
-- `--allow-tools Write Bash` and `--scaffold` are required; without them file graders fail in both arms and scaffolded cases run against an empty directory.
+- `--scaffold` is required, and `run_eval.sh` always passes `--allow-tools Write Bash`; without them file graders fail in both arms and scaffolded cases run against an empty directory.
 - Judge with `sonnet` at one run per arm, as the suite README says, and read a result as its *Reading a result at this depth* says; numbers judged by different models do not compare.
 - `--max-cost-usd` is a hard stop at the suite README's cost estimate; a run it cuts short exits 2 with a partial result, which is rerun, never scored.
-- On macOS run it inside the container (`scripts/evals/run_eval.sh`), or every eval child raises a keychain dialog.
+- On macOS each eval child may raise a keychain dialog; run suites in a cloud session where you can.
 - `tests/test_eval_cases.py` fails when a case directory and the README's case table disagree.

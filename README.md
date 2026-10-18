@@ -6,19 +6,11 @@
 
 # manifest-dev
 
-**[See it explained →](https://doodledood.github.io/manifest-dev/)** One request, run with a plain agent and then with manifest-dev.
+Hand your agent a task. Get back work you can trust.
 
-Skills for agentic coding CLIs. They keep three things in your project instead of in your head: what it's becoming, what's worth doing next, and what done means here. The agent reads them, works against them, and checks the result before reporting it finished.
+manifest-dev is a set of free, open-source skills for coding agents. With it, your agent works out what you mean, writes down what done means, and calls nothing finished until every check passes. Use one skill, or climb five levels to a queue of work that runs on its own while you make the calls only you can make.
 
-Agents can write almost anything. What they can't do is tell you whether it was worth writing. So a project drifts: every session re-derives the direction from scratch, and speed produces more work than anyone can evaluate. Writing those three things down where the agent reads them is the whole idea.
-
-Start with one command, in any repository:
-
-```text
-/figure-out why do half my background jobs silently stall?
-```
-
-It reads your code first, then comes back with the question that decides the work. Nothing gets built until you both know what "right" means here.
+**[See it explained →](https://doodledood.github.io/manifest-dev/)** — the five levels, one scene at a time.
 
 ## Install
 
@@ -29,95 +21,74 @@ Claude Code is the primary target. Inside a Claude Code session, run:
 /plugin install manifest-dev@manifest-dev
 ```
 
-Then start a session in the repository you want to work on and type `/figure-out <topic>`. When a term, a step or a file the workflow leaves behind is unclear, ask `/manifest-dev-help`: it answers any question about manifest-dev in plain, simple English, with the reason behind each part.
+Codex, Pi, and OpenCode install it too ([other CLIs](#other-clis)). Every skill also works on its own: `npx skills add doodledood/manifest-dev --skill figure-out` installs just one.
 
-Every skill also works on its own. If you only want the one from the top of this page:
+## Start with one real question
 
-```bash
-npx skills add doodledood/manifest-dev --skill figure-out
+In the repository you want to work on:
+
+```text
+/figure-out why do half my background jobs silently stall?
 ```
 
-[Other CLIs](#other-clis) are below.
+Ask about the bug you keep putting off. When a term or a step is unclear, ask `/manifest-dev-help`: it answers any question about manifest-dev in plain, simple English, with the reason behind each part.
 
 ## One piece of work
 
-Three skills, run in order, though each is useful alone:
+**First, it works out what you mean.** `/figure-out` reads your code, finds the question that decides the work, and asks you only what the code can't answer, with its recommended answer first.
 
-```bash
-/figure-out <topic>          # understand the problem before touching anything
-/define <what you want>      # write down what you'd accept
-/do <manifest-path>          # build it, then verify every criterion
-```
+**Then you agree what done means.** `/define` writes a Manifest: the pieces of work (Deliverables), a check each one must pass (Acceptance Criteria), and rules that hold across all of them (Global Invariants).
 
-`/figure-out` carries the investigation forward until it needs your knowledge, judgment, or authority, or can give a supported conclusion.
+**It builds until every check passes.** `/do` builds against the Manifest. A failed check sends that piece back to be fixed, and done means every check passed on fresh evidence. `/do` assumes you are away: it decides without asking, reports the decisions it made for you, and raises a blocker as soon as it finds one.
 
-`/define` turns understanding into a Manifest: the deliverables, the criteria each one has to meet, and the rules that hold across all of them. It calls `/figure-out` first if the conversation hasn't reached understanding yet.
+`/auto` runs all three steps in one go.
 
-`/do` implements against that Manifest and can't report completion until every criterion has evidence behind it, so "it's done" is a finding rather than a claim.
+**What you review: a pull request that shows the change working.** When the work ships as a pull request, its top reads in about a minute. It says what changed and why, shows the change working with screenshots or command output, and lists the decisions it made for you and the debt it left — what it found and didn't fix.
 
-```mermaid
-flowchart TD
-    A["/define"] --> B["Manifest — what you'd accept"]
-    B --> C["/do"]
-    C --> D["Implement"]
-    D --> E["Verify every criterion"]
-    E -->|any fail| F["Fix, re-verify"]
-    F --> E
-    E -->|all pass| G["Done, with evidence"]
-    E -->|blocked and no independent work| H["Escalate"]
-    classDef gate fill:#15803D,stroke:#0F172A,color:#FFFFFF;
-    classDef done fill:#0F172A,stroke:#15803D,color:#FFFFFF;
-    classDef stop fill:#B45309,stroke:#0F172A,color:#FFFFFF;
-    class E gate;
-    class G done;
-    class H stop;
-```
+## A project that remembers
 
-`/auto` chains all three without stopping for approval between them.
+`/setup-project`, run once, gives your project a **North Star**: one file that says what the project is becoming, who it's for, what winning means, and what it never does. Every session reads it before it decides what's worth doing.
 
-`/do` assumes you are away. It decides without asking follow-up questions, reports its material choices afterward, surfaces a blocker as soon as it finds one, and keeps on with work that does not depend on the answer before it escalates. It may grow the planned change when that serves your outcome better in the long run; your explicit exclusions and binding requirements stay fixed. Before it implements, it sets the host's goal-setting or continuation capability on the Manifest, or prints the same completion contract for you to apply where the host has neither, so an interrupted run resumes against the same file.
+It also keeps the project's words, decisions, and checks: a glossary of its terms, a record of each decision and why it was made, and one command that checks the project still works. That command is recommended, not required: a project that already verifies its own way keeps doing so. Every run keeps these current where its work touches them. It also turns a mistake someone caught into a check that catches it next time, and offers the debt it left to the next change through that code.
 
-## Beyond one run: three things the project keeps
+## A shared queue
 
-Each one makes the next decidable: you can't judge what's worth doing without knowing what the project is for, and you can't judge a diff without knowing what done means.
+**Work waits as Tickets anyone can pick up.** A Ticket carries all a person or an agent needs to do one piece of work and know it's done. `/ticket-up` writes them, into GitHub Issues, files in the repository, or a tracker you describe; `/next-ticket` picks the one whose wait costs most.
 
-| What it answers | Where it lives | Lifetime |
-|-----------------|----------------|----------|
-| What is this project becoming? | A North Star, in the repo | Stands until you change it |
-| What's worth doing next? | A Ticket, in your tracker or in files | As long as that piece of work |
-| What does done mean here? | A Manifest, written per run | Resets every run |
+**Auto** is the mark that says a Ticket needs no one's judgment to finish and land.
 
-`/setup-project` sets up the first of these, along with a glossary, decision-record conventions, and a way to verify the project between runs, seeding them from the project's own history where there is any. `/ticket-up` writes the second. `/define` writes the third, and `/do` executes against it.
+**New work is planned with you.** An effort is one goal and its own Tickets. You think it through together with `/figure-out`, and `/ticket-up` turns what you settled into the effort's Tickets.
 
-## The codebase gets easier to change, run by run
+## The queue runs
 
-An agent copies the nearest example and takes the easiest path that passes its checks. So the workflow works on the path itself, inside the same commands, with nothing extra to run:
+**Many Tickets at once, each after the work it depends on.** `/orchestrate` proposes a plan and runs it after you approve: each Ticket in its own session, landed one at a time. Auto Tickets land on their own; the rest stop at a ready pull request for you to land. The debt they leave becomes new Tickets. One status page shows what is running and what waits on you.
 
-- **Design before code.** `/figure-out` sketches the shape of a change — its data, where outside data enters, who owns each piece of state — compares a second shape, and checks both for patterns the next agent would copy. `/define` carries the same check into runs nobody is watching, and puts a behavior-preserving restructuring first when the area resists the change.
-- **Corrections become checks.** When `/do` fixes something a review or a person caught, it adds the type, lint, or test that would have caught it, scoped so it flags real problems, and the decision record names that check.
-- **Debt stays visible.** What a run finds and does not fix is listed when it finishes and in a "Debt left" section of every pull request it opens. The next change that passes through that code is offered the fix first.
-- **One way to check the project works.** A project can keep one command that can start, drive and check what runs change, with a recipe for each feature or document and its results kept as evidence. `/setup-project` installs it by default because it is recommended; a project that already verifies its own way can opt out, and runs then use its own tests and scripts and never add one. Where it is kept, runs extend it and repair it when it drifts. A check that costs money, quota or effects outside the repository asks first; every other check runs as often as it helps.
-- **Earlier work is not lost.** A session starts from what earlier sessions on the repository ruled and found, and running `/setup-project` again on a set-up project audits it and offers each gap.
+**With `--autonomous`, it keeps going on its own.** A scheduler you already run starts `/orchestrate --autonomous`. It starts a new run whenever one finishes, up to the number it may run at once, until no ready work remains. It gives Auto to Tickets that agents wrote, wherever no one's judgment is needed.
 
-## How far to take it
+The loop keeps turning, and you step in where it needs you — for judgment, taste, or authority:
 
-Each level works without the ones above it, and nobody else on your team has to use any of it. What it adds to a shared repository is plain files and plain instructions; a colleague who doesn't use manifest-dev works as before.
+| Runs without you | Waits for you |
+|---|---|
+| Auto Tickets, end to end, including the ones `--autonomous` grants | Landing a Ticket without Auto |
+| Tickets without Auto, up to a ready pull request | Escalations: a question only you can answer |
+| | Tickets from people without write access |
+| | Planning a new effort, and each plan in the default mode |
 
-1. **One skill** on its own, such as `/figure-out` on a question.
-2. **One piece of work** understood, defined and verified: `/figure-out`, `/define` and `/do`, or `/auto`.
-3. **A project that remembers**: `/setup-project` once, and every session starts from its direction, vocabulary, decisions and checks.
-4. **A shared queue**: `/ticket-up` writes work into a Ticket store and `/next-ticket` picks what to do now.
-5. **Unattended runs**: a scheduler or orchestrator you already run starts `/sweep-tickets` or `/run-ticket` on Tickets a person granted Auto. The project moves forward on its own, and asks you only when it is blocked or needs your judgment, taste or authority.
+## What to run at each level
 
-Only a person grants Auto. When an unattended run finds more work, it writes a Ticket that waits for someone to grant it, so the queue grows only on work a person judged worth doing.
+Each level works without the ones above it, and without anyone else on your team using manifest-dev. What it adds to a shared repository is plain files and plain instructions. Run these to reach each level:
 
-## What it costs, and who it is for
+1. **One skill** — install the plugin, then `/figure-out` with a question.
+2. **One piece of work** — `/auto` with a task (or `/figure-out`, `/define`, `/do` one step at a time).
+3. **A project that remembers** — `/setup-project`, once.
+4. **A shared queue** — `/ticket-up` writes work as Tickets; `/next-ticket` picks the next one.
+5. **The queue runs** — `/orchestrate`, then approve its plan; or `/orchestrate --autonomous` from a scheduler you already run. Mark a Ticket Auto when it needs no one's judgment.
 
-More tokens and more work up front than prompting directly. What you get back is a first pass that lands closer to done and a result you can check rather than take on trust. Writing acceptance criteria also keeps you engaged with your own code, which matters more the more of it the agent writes.
+That is everything to remember. The skills handle the rest themselves, and the [plugin README](claude-plugins/manifest-dev/README.md) explains each one.
 
-It's for experienced developers who already work with a coding agent and would rather put the effort in before building than review afterwards, on a project of their own or inside a team of any size. If shipping fastest is all that matters, a plain agent fits better.
+## What it costs
 
-Resist jumping in mid-`/do`. It won't get everything first try — that's what the verify loop is for.
+More effort up front, less checking after. manifest-dev is free and open source (MIT). It spends more tokens and time before building than prompting an agent directly, and unattended runs spend them on work you may still turn down. It's built for experienced developers who would rather put the effort in before building than review afterwards. If shipping fastest is all that matters, a plain agent fits better.
 
 ## What's in it
 
@@ -126,7 +97,7 @@ Two plugins ship from this repository:
 | Plugin | What it covers |
 |--------|----------------|
 | [`manifest-dev`](claude-plugins/manifest-dev) | The workflow itself, project setup, ticket authoring and execution, first-principles design with composable guides and optional measurement tools (`/design`), artifact review, and the review skills the criteria call on |
-| [`manifest-dev-tools`](claude-plugins/manifest-dev-tools) | Pull-request collaboration, prompt work, standalone goals from Manifests (`/manifest-to-goal`, at most 4,000 characters), teaching, explaining, and handoff between sessions — plus `review-pr-thread-verify`, `review-pr-holistic`, and `review-pr-judgment`, called by `/review-pr` rather than invoked by hand |
+| [`manifest-dev-tools`](claude-plugins/manifest-dev-tools) | Pull-request collaboration, prompt work, standalone goals from Manifests (`/manifest-to-goal`), teaching, explaining, and handoff between sessions |
 
 Each plugin's README lists what it ships.
 
