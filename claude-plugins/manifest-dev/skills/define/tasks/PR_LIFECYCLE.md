@@ -70,7 +70,7 @@ Done when the pull request's description shows the change working:
 PR: https://github.com/<owner>/<repo>/pull/<N>
 Branch: <branch-name>
 
-Subject: the pull request's description, its comments and its attached media, read fresh from
+Subject: the pull request's description, its comments and its attached or linked media, read fresh from
 GitHub on every evaluation, rather than the branch diff `/do` supplies by default.
 
 Judgment gate.

@@ -47,8 +47,9 @@ request's description or comments with `--attach`, through the same upload the w
   credentials, and release assets fill the project's release list with screenshots.
 - **Upload through a browser session**: relies on undocumented endpoints and session cookies.
 - **Commit images on the change's own branch**: puts binaries into the target branch's history.
-- **One orphan evidence branch**: works wherever git does, but every clone downloads every pull
-  request's images, and the branch sits in the branch list for good.
+- **One orphan evidence branch as the first way**: works wherever git does, but every clone
+  downloads every pull request's images, and the branch sits in the branch list for good — costs
+  worth paying only where the upload is unavailable.
 - **One evidence branch per pull request, deleted at close**: keeps clones clean, but nothing
   deletes it on its own, so every landing path and every evidence push carries a cleanup step,
   and deleting it breaks the images in the closed pull request. The fallback keeps the branch
