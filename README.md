@@ -118,6 +118,9 @@ Decisions behind the multi-CLI design are indexed in [`docs/adr/`](docs/adr/READ
 
 ## Development
 
+Setup needs Python 3.10+ and Node 22.18+, and Java 11+ only for the ticket protocol model
+(`scripts/verify drive ticket-protocol-model`).
+
 ```bash
 ./scripts/setup.sh
 source .venv/bin/activate

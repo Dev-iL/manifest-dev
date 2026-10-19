@@ -60,3 +60,6 @@ settings.local.json
 .gemini/
 .codex/
 .opencode/
+
+# Tools scripts/setup.sh downloads (the pinned TLA+ tools)
+.tools/

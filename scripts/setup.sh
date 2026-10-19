@@ -73,6 +73,30 @@ else
     error "Node 22.18 or later (23.6 or later on Node 23) is required for scripts/verify. Install it, then re-run this script."
 fi
 
+# The TLA+ tools run the ticket protocol model (verification/recipes/ticket-protocol-model.md).
+# The download is pinned to one version and checked against its checksum before it is kept.
+PIN="verification/models/tla2tools.pin"
+TLA_URL="$(sed -n 's/^url=//p' "$PIN")"
+TLA_SHA="$(sed -n 's/^sha256=//p' "$PIN")"
+TLA_JAR=".tools/tla2tools.jar"
+sha256_of() { (sha256sum "$1" 2>/dev/null || shasum -a 256 "$1") | cut -d' ' -f1; }
+info "Checking the TLA+ tools ($(sed -n 's/^version=//p' "$PIN"))..."
+if [ -f "$TLA_JAR" ] && [ "$(sha256_of "$TLA_JAR")" = "$TLA_SHA" ]; then
+    info "Found the pinned TLA+ tools"
+else
+    mkdir -p .tools
+    curl -fsSL -o "$TLA_JAR.download" "$TLA_URL" || error "Could not download $TLA_URL"
+    if [ "$(sha256_of "$TLA_JAR.download")" != "$TLA_SHA" ]; then
+        rm -f "$TLA_JAR.download"
+        error "The TLA+ tools downloaded from $TLA_URL do not match the checksum in $PIN; nothing was kept."
+    fi
+    mv "$TLA_JAR.download" "$TLA_JAR"
+    info "Installed the pinned TLA+ tools at $TLA_JAR"
+fi
+if ! command -v java &> /dev/null; then
+    warn "No Java runtime found. Only the ticket protocol model needs it: install Java 11 or newer to run that recipe."
+fi
+
 # Verify installations
 info "Verifying installations..."
 .venv/bin/ruff --version
