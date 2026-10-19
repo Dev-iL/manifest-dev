@@ -187,7 +187,7 @@ figure-out's task files and define's task files are decoupled, so a red-flag lis
 - `figure-out/tasks/DOCUMENT.md` (*One mode*, *A fact restated*, *The same fact twice*) ↔ `define/tasks/DOCUMENT.md` Defaults (*One mode per document*, *Generate or link what code owns*, *One copy of each fact*).
 - `figure-out/tasks/DOCUMENT.md` and `WRITING.md` (*Sources in hand*) ↔ `define/tasks/PROSE_FLOOR.md` *Accuracy* gate; `figure-out/tasks/WRITING.md` (*The author's own point*) ↔ `define/tasks/WRITING.md` gates.
 - `figure-out/tasks/UI.md` (*Every state*, *Who and where*, *Honest figures*) ↔ `define/tasks/UI.md`'s design gate, whose `review-design` standards cover functional states, access, medium and figure fidelity.
-- `figure-out/tasks/PROMPTING.md` (*A rule in two files*, including a contradicted one; *An instruction where a check belongs*) ↔ `define/tasks/PROMPTING.md` Default (*One rule, one place*).
+- `figure-out/tasks/PROMPTING.md` (*A protocol on shared state*; *A rule in two files*, including a contradicted one; *An instruction where a check belongs*) ↔ `define/tasks/PROMPTING.md` Defaults (*Model a shared protocol before shipping it*, *One rule, one place*).
 - `figure-out/tasks/PERF.md` ↔ `define/tasks/PERF.md` (limiter, noise floor, fair comparison, harness first, unlike scenarios, bounded gain).
 
 ## Slicing Discipline Ownership

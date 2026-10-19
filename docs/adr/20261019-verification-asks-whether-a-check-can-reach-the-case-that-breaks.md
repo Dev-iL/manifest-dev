@@ -25,18 +25,25 @@ the review had missed. The question was how much of that to bring into the shipp
   and a proof only where no bound is enough. That check becomes a recipe or a test like any other.
 - A design whose correctness depends on the order of events is modeled in scratch and the model
   checked before the design is built; what the model finds becomes design decisions and gates.
-- The shipped prompts name the question and the kind of check, never a tool or a specification
-  language.
-- The changes go into the existing task files' probes and Defaults, in figure-out and define
-  alike, as their mirror pairs require. No skill is added, and nothing model-checks a Manifest's
-  own text.
+  The model is throwaway by default and kept as a check only where the design will keep changing.
+- Rules that several runs, agents or people follow on the same state get the same question when
+  they are written as prompt text rather than code, since a protocol in prose breaks the same way.
+- Modeling is a default with a trigger, never a must: the run decides whether the risk warrants a
+  model and how deep it goes. What binds is what a model finds, once it becomes a gate.
+- The shipped prompts name the question and the kind of check, with a tool or two as examples —
+  such as TLA+ or Alloy for a design, Kani for Rust code — never as the required one.
+- The changes go into the existing task files' probes and Defaults, coding and prompting, in
+  figure-out and define alike, as their mirror pairs require. No skill is added, and nothing
+  model-checks a Manifest's own text.
 
 ## Alternatives Considered
 - **A formal-verification skill**: a new skill a person must know to reach for,
   against the North Star's "nothing to memorize"; the question in the probe reaches every coding
   task instead.
-- **Name the tools (TLA+, Kani, property-testing libraries)**: concrete, but fits one stack each
-  and dates quickly, where the question fits every stack.
+- **Name no tool**: fits every stack, but leaves a run without a concrete place to start.
+- **Require a named tool**: concrete, but fits one stack each and dates quickly.
+- **Require a model for every order-dependent design**: models written to satisfy the rule rather
+  than to find a defect, at a cost the North Star binds.
 - **Translate a Manifest's gates into a formal language and check them**: the translation of prose
   into logic is the unreliable step, and a proof over a wrong translation looks like strong
   evidence while proving nothing.
@@ -51,8 +58,9 @@ the review had missed. The question was how much of that to bring into the shipp
 - Which check is cheapest stays the run's judgment.
 
 ## Enforced by
-partly — eval case `56-order-dependent-design` measures figure-out's half once run; that no
-shipped line names a verification tool or specification language stays judgment.
+partly — eval cases `56-order-dependent-design` (a design in code) and `60-protocol-in-prompts`
+(a protocol in prompt text) measure figure-out's half once run; that a named tool stays an example
+stays judgment.
 
 ## Source
 - Session: figure-out and define reviewing manifest-dev's verification practice, and a model of

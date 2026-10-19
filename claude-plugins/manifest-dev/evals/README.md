@@ -220,6 +220,7 @@ from a discipline `SKILL.md` explicitly states.
 | `57-legitimate-state-before-a-guard` | autonomous | Ask whether the state that crashed is legitimate before proposing a guard against it | unmeasured |
 | `58-gain-beyond-its-share` | autonomous | Bound a claimed speedup by what the changed piece could save, and treat the rest as unexplained | unmeasured |
 | `59-reverted-fix` | autonomous, repository | Find the earlier fix for the same failure that was reverted, and why, before proposing a fix | unmeasured |
+| `60-protocol-in-prompts` | autonomous | Model a protocol that several agents follow in prompt text, across the orders their claims and takeovers can interleave, before the skill ships | unmeasured |
 
 Cases `30` to `46` were written on 2026-10-13 and `48` on 2026-10-14; none has been run. Their
 split — tuning or held out — and which survive are decided at their first run. The setup-update
@@ -329,6 +330,7 @@ being declared a guard. `tests/test_eval_cases.py` fails when a case has no row 
 | `57` | first run decides | New on 2026-10-19: the only case for guarding a crash; the base model likely adds the null check |
 | `58` | first run decides | New on 2026-10-19: the only bounded-gain case; the arithmetic is in plain sight, so both arms may pass, and then it retires |
 | `59` | first run decides | New on 2026-10-19: recall from the repository's own history, which `43` (logs) does not cover |
+| `60` | first run decides | New on 2026-10-19: the order-dependent case where the protocol is prompt text rather than code, which `56` does not cover |
 
 Retired on 2026-10-15: `12` (floored in both arms, not a declared guard), `47` and `49` (each a
 second older-version case beside `53`, which the version rule now forbids; their straight-to-newest
