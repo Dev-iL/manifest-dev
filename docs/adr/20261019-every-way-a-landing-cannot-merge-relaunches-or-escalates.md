@@ -28,17 +28,26 @@ each base move also meant a busy base could relaunch a ready Ticket again and ag
   deterministic gates re-run, through the repository's required checks where it has them, and the
   judgment gates' earlier verdicts stand. Otherwise every gate re-runs.
 - A head that is not the recorded one, or a required check that fails, relaunches the run to
-  repair it; `run-ticket` treats an attempt as having nothing to redo only when the head is the
-  recorded one and the base has not moved. A protection that needs what no run can give, or a pull
-  request closed without merging, gets an escalation record. No Ticket keeps a landing turn while
-  nothing works toward its landing.
+  repair it, and only commits after the recorded head are new work; `run-ticket` treats an attempt
+  as having nothing to redo only when the head is the recorded one and the base has not moved. A
+  relaunched run starts from an earlier run's ready mark. A required check still pending leaves
+  the merge for a later turn, and one pending past the run timeout counts as failing. A merge that
+  waits only on a required review holds the pull request on the person's list without an
+  escalation mark, so their approval alone lets it land. Another protection that needs what no run
+  can give, or a pull request closed without merging, gets an escalation record. No Ticket keeps a
+  landing turn while nothing works toward its landing.
+- Relaunches at landing count in the launch count; one that would take it past three hands the
+  Ticket to a person, so a check that keeps failing or a base that keeps moving cannot relaunch a
+  Ticket without end.
 - A merged pull request counts as the landing only when the Ticket was not reopened after that
-  merge; a reopened Ticket is new work.
+  merge; a reopened Ticket is new work, sorted for a launch rather than a landing turn.
+- *To land* holds only Tickets marked ready by the orchestrator's own run; one left by an
+  orchestrator that stopped is taken over and relaunched.
 - `orchestrate` checks in while a Ticket in scope waits for a landing turn, not only while a run is
   live, and sorts each Ticket into the first category whose conditions hold, so a Ticket holding a
   drafted answer is never launched again.
 - An escalation that ends before its run releases the claim still reaches the person; clearing the
-  mark clears any automation claim and resets the launch count.
+  mark clears any automation claim, and the next launch starts its count again.
 
 ## Alternatives Considered
 - **Re-run every gate after every base move**: the standing rule. On a busy base it can relaunch a
@@ -47,6 +56,8 @@ each base move also meant a busy base could relaunch a ready Ticket again and ag
 - **Re-run only the gates whose paths the base change touched**: needs a map from gates to paths
   that gates do not carry.
 - **Escalate every landing failure**: simple, but sends a person work a relaunch repairs.
+- **Escalate a missing required review**: a person would then both approve and clear the mark, two
+  actions where one says the same.
 
 ## Consequences
 

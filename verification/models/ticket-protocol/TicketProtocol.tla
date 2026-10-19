@@ -9,20 +9,21 @@
 
    Scope: one Ticket; the orchestrators in Orchs, sharing one automation identity, each able to
    launch, take over and land; one run per launch; a person who can push to the pull request's
-   branch, claim, close or reopen the Ticket, close the pull request, and answer an escalation;
+   branch, claim, close or reopen the Ticket, close or approve the pull request, apply the
+   escalation mark, and answer an escalation;
    a base branch that moves at most once; each world event at most once. Liveness holds within
    that bound. The three-failed-launches escalation is outside it: one crash at most.
 
-   PreFix = TRUE switches two behaviors back to the protocol as it stood before this model: the
+   PreFix = TRUE switches three behaviors back to the protocol as it stood before this model: the
    landing check stops with nothing relaunched or escalated when the head, a check or a
-   protection fails, and a launcher decides from its earlier read whether to create the attempt
-   record. The `prefix` scenario of verification/recipes/ticket-protocol-model.md expects TLC to
-   report both. *)
-EXTENDS Integers, Sequences, FiniteSets
+   protection fails; a launcher decides from its earlier read whether to create the attempt
+   record; and the lander does not look for the escalation mark. The `prefix` scenario of
+   verification/recipes/ticket-protocol-model.md expects TLC to report all three. *)
+EXTENDS Integers, Sequences
 
 CONSTANTS Orchs,     \* the orchestrators sharing the automation identity
           Env,       \* the world events this configuration allows, each at most once
-          PreFix,    \* TRUE restores the two old behaviors described above
+          PreFix,    \* TRUE restores the three old behaviors described above
           MaxRuns    \* launches per orchestrator, a bound for TLC; no run reaches it
 
 None == <<"", 0>>                       \* no run
@@ -35,7 +36,7 @@ VARIABLES
   autoClosed,  \* automation closed it
   landedNow,   \* a landing was observed since the Ticket was last opened
   mark,        \* the escalation mark
-  prOpen, merged, red, review, \* the pull request: open, merged, a required check red, a review required
+  prOpen, merged, red, review, \* the pull request: open, merged, a required check red, a review still owed
   branch,      \* head commit of the Ticket's stable branch, which is the pull request's head
   base,        \* the target branch's commit
   nextC,       \* the next fresh commit
@@ -59,7 +60,8 @@ LiveRun(o) == rpc[o] \in Live
 Named(o) == HasRec /\ TheRec.run = RunOf(o)
 NamedLive == \E o \in Orchs : Named(o) /\ LiveRun(o)
 Owner(o) == HasRec /\ TheRec.run[1] = o
-\* Quote ticket-up/references/AUTOMATED_EXECUTION.md: "The ready mark and the drafted answer name the run that wrote them, and count only while the run facts name that run."
+Reopened == merged /\ ~landedNow     \* reopened after its pull request merged
+\* Quote ticket-up/references/AUTOMATED_EXECUTION.md: "The ready mark and the drafted answer name the run that wrote them, and count only while the run facts name that run"
 ReadyValid == HasRec /\ TheRec.ready # None /\ TheRec.ready = TheRec.run
 
 Init ==
@@ -76,16 +78,17 @@ Init ==
 
 \* Quote orchestrate/SKILL.md: "*Ready*: open, unclaimed, every dependency closed, no escalation mark"
 \* Quote orchestrate/SKILL.md: "*To recover*: the automation identity holds its claim, no run is live"
+\* Quote orchestrate/SKILL.md: "or marked ready a pull request that merged before the Ticket was reopened"
 \* Quote orchestrate/SKILL.md: "A run that is not yours belongs to another orchestrator until its timeout has passed, live or not; leave its Ticket alone until then."
 Takeable(o) ==
   /\ ~closed /\ ~mark /\ claim # "person" /\ ~NamedLive /\ n[o] < MaxRuns
   /\ \/ claim = "none"
      \/ claim = "auto" /\ ~HasRec
-     \/ claim = "auto" /\ HasRec /\ Owner(o) /\ ~ReadyValid
+     \/ claim = "auto" /\ HasRec /\ Owner(o) /\ (~ReadyValid \/ Reopened)
      \/ claim = "auto" /\ HasRec /\ ~Owner(o) /\ TheRec.timedOut
 
-\* Quote orchestrate/SKILL.md: "*To land*: its record is marked ready to land and no run is live."
-ToLand(o) == ~closed /\ claim = "auto" /\ ~mark /\ ReadyValid /\ Owner(o) /\ ~NamedLive
+\* Quote orchestrate/SKILL.md: "*To land*: its record is marked ready to land by a run of yours and no run is live, and the Ticket was not reopened after its pull request merged."
+ToLand(o) == ~closed /\ claim = "auto" /\ ~mark /\ ReadyValid /\ Owner(o) /\ ~NamedLive /\ ~Reopened
 
 \* Quote orchestrate/SKILL.md: "Read every Ticket in scope whole"
 ORead(o) ==
@@ -153,16 +156,16 @@ Relaunch(o) ==   \* launch the run again, which writes fresh run facts
 \* Quote ticket-up/references/AUTOMATED_EXECUTION.md: "A merged pull request counts as the Ticket's landing only when the Ticket was not reopened after that merge"
 \* Quote ticket-up/references/AUTOMATED_EXECUTION.md: "When the base has moved since the base commit the record names, the run merges the base in"
 \* Quote ticket-up/references/AUTOMATED_EXECUTION.md: "When the head is not the one the record names, or a required check fails, `orchestrate` relaunches the run to repair it"
-\* Quote ticket-up/references/AUTOMATED_EXECUTION.md: "When a protection needs what no run can give, or the pull request was closed without merging, the lander writes the escalation record"
+\* Quote ticket-up/references/AUTOMATED_EXECUTION.md: "A Ticket reopened after its merge is new work: the lander stops"
+\* Quote ticket-up/references/AUTOMATED_EXECUTION.md: "When the merge waits only on a review the repository requires, the Ticket waits on the person's list as a held pull request, with no escalation mark"
+\* Quote ticket-up/references/AUTOMATED_EXECUTION.md: "When another protection needs what no run can give, or the pull request was closed without merging, the lander writes the escalation record"
 \* Quote orchestrate/SKILL.md: "it keeps the turn meanwhile"
 OLand(o) ==
   /\ opc[o] = "land"
-  /\ IF closed \/ claim = "person" \/ (mark /\ ~PreFix) \/ ~ReadyValid \/ ~Owner(o)
+  \* Pre-fix: the lander does not look for the escalation mark.
+  /\ IF closed \/ claim = "person" \/ (mark /\ ~PreFix) \/ ~ReadyValid \/ ~Owner(o) \/ Reopened
      THEN opc' = [opc EXCEPT ![o] = "read"] /\ UNCHANGED <<recs, claim, mark, saw, n, closed, autoClosed, landedNow>>
      ELSE IF merged /\ landedNow   \* a person merged it since the Ticket was opened
-     THEN /\ closed' = TRUE /\ autoClosed' = TRUE /\ opc' = [opc EXCEPT ![o] = "read"]
-          /\ UNCHANGED <<recs, claim, mark, saw, n, landedNow>>
-     ELSE IF merged /\ PreFix      \* Pre-fix: an old merge counts as the landing of a reopened Ticket
      THEN /\ closed' = TRUE /\ autoClosed' = TRUE /\ opc' = [opc EXCEPT ![o] = "read"]
           /\ UNCHANGED <<recs, claim, mark, saw, n, landedNow>>
      ELSE IF ~PreFix /\ TheRec.base # base
@@ -171,10 +174,12 @@ OLand(o) ==
      \* Pre-fix: the protections refuse a branch behind the base, and the lander "reports the
      \* current state and stops" for that and every other failure; nothing is relaunched.
      THEN opc' = [opc EXCEPT ![o] = "read"] /\ UNCHANGED <<recs, claim, mark, saw, n, closed, autoClosed, landedNow>>
-     ELSE IF merged \/ branch # TheRec.head \/ red
+     ELSE IF branch # TheRec.head \/ red
      THEN Relaunch(o) /\ UNCHANGED <<closed, autoClosed, landedNow>>
-     ELSE IF review \/ ~prOpen
+     ELSE IF ~prOpen
      THEN Escalate(o) /\ UNCHANGED <<closed, autoClosed, landedNow>>
+     ELSE IF review      \* held for the person's approval; the turn passes
+     THEN opc' = [opc EXCEPT ![o] = "read"] /\ UNCHANGED <<recs, claim, mark, saw, n, closed, autoClosed, landedNow>>
      ELSE /\ opc' = [opc EXCEPT ![o] = "merge"]
           /\ UNCHANGED <<recs, claim, mark, saw, n, closed, autoClosed, landedNow>>
   /\ lview' = [lview EXCEPT ![o] = IF HasRec THEN TheRec.head ELSE 0]
@@ -185,7 +190,7 @@ OLand(o) ==
 OMerge(o) ==
   /\ opc[o] = "merge"
   /\ IF branch = lview[o] /\ prOpen /\ ~merged /\ HasRec /\ TheRec.base = base
-        /\ ~closed /\ claim # "person" /\ (~mark \/ PreFix)
+        /\ ~closed /\ claim # "person" /\ (~mark \/ PreFix)   \* Pre-fix: the mark is not looked for
      THEN /\ merged' = TRUE /\ landedNow' = TRUE /\ closed' = TRUE /\ autoClosed' = TRUE
           /\ bad' = (bad \/ mark) /\ opc' = [opc EXCEPT ![o] = "read"]
      ELSE /\ opc' = [opc EXCEPT ![o] = "land"] /\ UNCHANGED <<merged, landedNow, closed, autoClosed, bad>>
@@ -195,9 +200,9 @@ OMerge(o) ==
 ---------------------------------------------------------------------------------------------
 (* The current run of orchestrator o, whose run ID is RunOf(o) *)
 
-\* Quote run-ticket/SKILL.md: "stops when a person is assigned, when the Ticket is closed, or — on an unattended run — when the escalation mark is on"
+\* Quote run-ticket/SKILL.md: "stops when a person other than the identity it writes as is assigned, when the Ticket is closed, or — on an unattended run — when the escalation mark is on"
 \* Quote ticket-up/references/AUTOMATED_EXECUTION.md: "stops without writing when the run ID there is not its own"
-Stops(o) == ~Named(o) \/ closed \/ claim = "person" \/ (mark /\ ~PreFix)
+Stops(o) == ~Named(o) \/ closed \/ claim = "person" \/ mark
 
 \* Quote run-ticket/SKILL.md: "there is nothing to redo only when the pull request's head is the head the record names and the base has not moved"
 RStart(o) ==
@@ -235,7 +240,7 @@ RPush(o) ==
   /\ IF branch = rbase[o]
      THEN /\ branch' = rlocal[o] /\ rpc' = [rpc EXCEPT ![o] = "prewrite"]
           /\ prOpen' = TRUE /\ merged' = FALSE /\ red' = FALSE /\ UNCHANGED rbase
-     ELSE IF Named(o) /\ ~PreFix
+     ELSE IF Named(o)
      THEN /\ rbase' = [rbase EXCEPT ![o] = branch] /\ rpc' = [rpc EXCEPT ![o] = "work"]
           /\ UNCHANGED <<branch, prOpen, merged, red>>
      ELSE /\ rpc' = [rpc EXCEPT ![o] = "stopped"] /\ UNCHANGED <<branch, prOpen, merged, red, rbase>>
@@ -260,8 +265,6 @@ RWriteReady(o) ==
 (* The world: each event at most once, when its configuration allows it *)
 
 Event(e) == e \in Env /\ e \notin used /\ used' = used \cup {e}
-Keep == <<recs, claim, closed, autoClosed, landedNow, mark, prOpen, merged, red, review, branch,
-          base, nextC, opc, saw, lview, n, rpc, rbase, rlocal, rmerged, bad>>
 
 \* World: a person, GitHub's "Update branch" or a bot adds a commit to the pull request's branch.
 WPush == /\ Event("push") /\ ~closed /\ prOpen /\ ~merged
@@ -276,10 +279,18 @@ WBase == /\ Event("base") /\ base' = base + 1
 WRed == /\ Event("red") /\ ~merged /\ red' = TRUE
         /\ UNCHANGED <<recs, claim, closed, autoClosed, landedNow, mark, prOpen, merged, review, branch,
                        base, nextC, opc, saw, lview, n, rpc, rbase, rlocal, rmerged, bad>>
-\* World: a protection starts requiring a review no run can give.
+\* World: a protection starts requiring a review only a person can give.
 WReview == /\ Event("review") /\ ~merged /\ review' = TRUE
            /\ UNCHANGED <<recs, claim, closed, autoClosed, landedNow, mark, prOpen, merged, red, branch,
                           base, nextC, opc, saw, lview, n, rpc, rbase, rlocal, rmerged, bad>>
+\* World: someone with write access approves the pull request.
+WApprove == /\ Event("approve") /\ review /\ review' = FALSE
+            /\ UNCHANGED <<recs, claim, closed, autoClosed, landedNow, mark, prOpen, merged, red, branch,
+                           base, nextC, opc, saw, lview, n, rpc, rbase, rlocal, rmerged, bad>>
+\* World: a person applies the escalation mark to hold automation off.
+WMark == /\ Event("mark") /\ ~closed /\ mark' = TRUE
+         /\ UNCHANGED <<recs, claim, closed, autoClosed, landedNow, prOpen, merged, red, review, branch,
+                        base, nextC, opc, saw, lview, n, rpc, rbase, rlocal, rmerged, bad>>
 \* World: a person closes the pull request without merging it.
 WPrClose == /\ Event("prclose") /\ prOpen /\ ~merged /\ prOpen' = FALSE
             /\ UNCHANGED <<recs, claim, closed, autoClosed, landedNow, mark, merged, red, review, branch,
@@ -312,18 +323,17 @@ WTimeout == /\ Event("timeout") /\ HasRec
             /\ UNCHANGED <<claim, closed, autoClosed, landedNow, mark, prOpen, merged, red, review,
                            branch, base, nextC, opc, saw, lview, n, rbase, rlocal, rmerged, bad>>
 
-\* Quote orchestrate/SKILL.md: "clearing the mark also clears any automation claim and resets the launch count"
+\* Quote orchestrate/SKILL.md: "clearing the mark also clears any automation claim"
 \* Quote ticket-up/references/GITHUB_STORE.md: "removes the `escalated` label and any automation assignee"
-WAnswer == /\ mark /\ mark' = FALSE /\ review' = FALSE /\ prOpen' = (prOpen \/ ~merged)
-           \* Pre-fix: clearing the mark left the automation claim in place.
-           /\ claim' = IF PreFix THEN claim ELSE "none"
-           /\ UNCHANGED <<recs, closed, autoClosed, landedNow, merged, red, branch, base, nextC, used,
-                          opc, saw, lview, n, rpc, rbase, rlocal, rmerged, bad>>
+WAnswer == /\ mark /\ mark' = FALSE /\ prOpen' = (prOpen \/ ~merged) /\ claim' = "none"
+           /\ UNCHANGED <<recs, closed, autoClosed, landedNow, merged, red, review, branch, base, nextC,
+                          used, opc, saw, lview, n, rpc, rbase, rlocal, rmerged, bad>>
 
 Next ==
   \/ \E o \in Orchs : ORead(o) \/ OClaim(o) \/ OVerify(o) \/ OLaunch(o) \/ OWait(o) \/ OLand(o) \/ OMerge(o)
   \/ \E o \in Orchs : RStart(o) \/ RWork(o) \/ RPrePush(o) \/ RPush(o) \/ RWriteReady(o)
-  \/ WPush \/ WBase \/ WRed \/ WReview \/ WPrClose \/ WMerge \/ WClaim \/ WClose \/ WReopen \/ WCrash
+  \/ WPush \/ WBase \/ WRed \/ WReview \/ WApprove \/ WMark \/ WPrClose \/ WMerge \/ WClaim \/ WClose
+  \/ WReopen \/ WCrash
   \/ WTimeout \/ WAnswer
 
 Fair == \A o \in Orchs :
@@ -360,7 +370,8 @@ ClosedOnlyWhenLanded == autoClosed => landedNow
 NoLandWhileEscalated == ~bad
 
 \* Property: every Ticket marked ready to land is landed, handed to a person through an
-\* escalation record, or taken by a person (claimed or closed), within the model's bound.
+\* escalation record, taken by a person (claimed or closed), or held for a review only a person
+\* gives, within the model's bound.
 \* Quote ticket-up/references/AUTOMATED_EXECUTION.md: "No Ticket keeps a landing turn while nothing works toward its landing."
-ReadyResolves == [](ReadyValid /\ ~closed => <>(closed \/ mark \/ claim = "person"))
+ReadyResolves == [](ReadyValid /\ ~closed => <>(closed \/ mark \/ claim = "person" \/ review))
 =============================================================================

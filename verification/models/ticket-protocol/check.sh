@@ -48,7 +48,7 @@ if [ "$expect" = 0 ]; then
 fi
 
 # One property per expect-violation config, so a reported violation is that property's.
-props="$(sed -n 's/^\(INVARIANTS\|PROPERTIES\) *//p' "$cfg.cfg" | tr -s ' \n' ' ' | sed 's/ *$//')"
+props="$(sed -nE 's/^(INVARIANTS|PROPERTIES) *//p' "$cfg.cfg" | tr -s ' \n' ' ' | sed 's/ *$//')"
 case "$props" in *" "*|"") echo "FAIL: $cfg must check exactly one property, not '$props'." >&2; exit 1;; esac
 if grep -q "Invariant $props is violated" tlc.out || grep -q "Action property $props is violated" tlc.out \
    || { grep -q "Temporal properties were violated" tlc.out && grep -q "^PROPERTIES $props *$" "$cfg.cfg"; }; then

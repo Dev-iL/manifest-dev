@@ -85,13 +85,16 @@ if [ -f "$TLA_JAR" ] && [ "$(sha256_of "$TLA_JAR")" = "$TLA_SHA" ]; then
     info "Found the pinned TLA+ tools"
 else
     mkdir -p .tools
-    curl -fsSL -o "$TLA_JAR.download" "$TLA_URL" || error "Could not download $TLA_URL"
-    if [ "$(sha256_of "$TLA_JAR.download")" != "$TLA_SHA" ]; then
+    if ! curl -fsSL -o "$TLA_JAR.download" "$TLA_URL"; then
+        rm -f "$TLA_JAR.download"
+        warn "Could not download $TLA_URL. Only the ticket protocol model needs it; that recipe reports unreachable until it is here."
+    elif [ "$(sha256_of "$TLA_JAR.download")" != "$TLA_SHA" ]; then
         rm -f "$TLA_JAR.download"
         error "The TLA+ tools downloaded from $TLA_URL do not match the checksum in $PIN; nothing was kept."
+    else
+        mv "$TLA_JAR.download" "$TLA_JAR"
+        info "Installed the pinned TLA+ tools at $TLA_JAR"
     fi
-    mv "$TLA_JAR.download" "$TLA_JAR"
-    info "Installed the pinned TLA+ tools at $TLA_JAR"
 fi
 if ! command -v java &> /dev/null; then
     warn "No Java runtime found. Only the ticket protocol model needs it: install Java 11 or newer to run that recipe."

@@ -17,16 +17,23 @@ then escalates or tries to repair its own Ticket, and the person gets one item p
 problem, or runs spend quota repairing what is not theirs.
 
 ## Decision
-- When two or more live runs fail on one cause outside their Tickets, `orchestrate` pauses the
-  effort instead: it writes a `Paused:` line naming the cause and its own ID, and raises one item
-  naming the cause on the list of what waits on the person.
-- Once the cause is fixed it removes only the `Paused:` line it wrote, never one a person wrote.
+- When two or more Tickets in an effort fail on one cause outside them, whether a live run records
+  it or a landing finds it, `orchestrate` pauses the effort instead: it writes a `Paused:` line
+  naming the cause and its own ID, and raises one item naming the cause on the list of what waits
+  on the person. A run whose required check fails the same way on the base names that cause and
+  finishes rather than repairing or escalating, so the cause reaches `orchestrate` while the runs
+  are still its to pause.
+- A `Paused:` line naming an orchestrator keeps the check-ins going, and once its cause is fixed
+  any orchestrator removes it, since the session that wrote it may have ended. None removes a line
+  a person wrote.
   A status-page write re-reads the front item just before its edit and changes nothing else, so a
   person's `Paused:` line is never erased.
 
 ## Alternatives Considered
 - **Escalate each Ticket**: the standing behavior; one cause becomes many items.
 - **Retry until the cause clears**: spends quota on a failure no run can fix, with no one told.
+- **Only the writing orchestrator lifts its pause**: a pause would outlive a session that ended,
+  and the effort would stay stopped until a person found the line.
 
 ## Consequences
 

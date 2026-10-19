@@ -40,25 +40,28 @@ adds a second one. It holds:
 | Part | Contents | Written by, and when |
 |---|---|---|
 | Branch | The canonical Ticket, its one stable branch, and the recovery purpose | The run, before substantial work |
-| Run facts | The run ID; the session that runs it, where the host names one; when it started; the launch count, counting launches in a row whose run ended without an outcome | The launcher — `orchestrate`, or `run-ticket` itself on a hand run — just before the run starts. Where the host names the session only once the run has started, the run records its own session on its first write instead |
+| Run facts | The run ID; the session that runs it, where the host names one; when it started; the launch count, counting launches in a row whose run ended without an outcome or that repaired a landing | The launcher — `orchestrate`, or `run-ticket` itself on a hand run — just before the run starts. Where the host names the session only once the run has started, the run records its own session on its first write instead |
 | | The base commit the run's gates last passed against; whether it is ready to land, naming the head commit and the run ID that marked it, or the drafted answer for a Question Ticket, naming the same | The run, at each pushed checkpoint and when it finishes |
 | Progress | The step the run is at — `understand`, `define`, `build`, `verify` or `ready` — the gates passed and at which commit, what remains, the decisions taken, the dead ends | The run, when its step changes and at each pushed checkpoint |
 | Manifest | The run's full Manifest, refreshed when it is amended | The run, as soon as define reports it |
 
 Each fact has one writer. The ready mark and the drafted answer name the run that wrote them, and
-count only while the run facts name that run. A launcher writes only while no live run holds the
-Ticket, and re-reads the Ticket after writing. A run re-reads the record before each write and each
-push, and stops without writing when the run ID there is not its own. A comment edit replaces the
-whole comment, so the last writer wins: a re-read narrows a race to the one write after it and
-cannot close it. git rejects a push that does not build on the branch's head, so a stale run's push
-fails rather than discarding commits. A Manifest too long for the venue's comment limit continues in
-a second comment carrying `<!-- manifest-dev-run-ticket-manifest -->`, and in a third with the same
-marker should it need one. The Manifest is not committed to the repository unless the user asks for
-it.
+count only while the run facts name that run; a mark that names no run, written before marks named
+their run, names the run the run facts name. That binding decides sorting and landing: a relaunched
+run reads an earlier run's mark as where the work stands. A launcher writes only while no live run
+holds the Ticket, and re-reads the Ticket after writing. A run re-reads the record before each write
+and each push, and stops without writing when the run ID there is not its own. A comment edit
+replaces the whole comment, so the last writer wins: a re-read narrows a race to the one write after
+it and cannot close it. git rejects a push that does not build on the branch's head, so a stale
+run's push fails rather than discarding commits. A Manifest too long for the venue's comment limit
+continues in a second comment carrying `<!-- manifest-dev-run-ticket-manifest -->`, and in a third
+with the same marker should it need one. The Manifest is not committed to the repository unless the
+user asks for it.
 
 Where two comments on a Ticket carry the same marker, the comment the venue created first decides,
 and every reader takes it as the one record. A writer whose comment is not the first removes its own
-and stands down: a launcher skips the Ticket, and a run stops. This holds for every marker the
+and stands down, taking back anything it applied with it, such as a grant's label: a launcher skips
+the Ticket, and a run stops. This holds for every marker the
 records here and the venue references use — the attempt, completion and escalation records and the
 grant-decision comment — except the Manifest's continuation comments, which are parts of one record,
 read in the order they were created.
@@ -100,7 +103,7 @@ follows it only when its prompt says to land. The lander:
    landing `run-ticket`, itself); or when the record is not marked ready to land by the run its run
    facts name. A merged pull request counts as the Ticket's landing only when the Ticket was not
    reopened after that merge: the lander then goes to step 6. A Ticket reopened after its merge is
-   new work, and its next launch clears the ready mark.
+   new work: the lander stops, and the Ticket's next launch starts that work.
 2. **Checks authority.** An unattended landing needs Auto still present. A Ticket without Auto is
    never landed by automation: only a person lands it. A person who runs `run-ticket` by hand and
    tells it to land supplies the authority for that run.
@@ -118,11 +121,15 @@ follows it only when its prompt says to land. The lander:
    must pass, and the repository's protections must permit the merge; it never merges older state.
    When the head is not the one the record names, or a required check fails, `orchestrate`
    relaunches the run to repair it, and a landing `run-ticket` repairs it in place; the run treats
-   commits it did not make as new work and re-runs every gate. When a protection needs what no run
-   can give, or the pull request was closed without merging, the lander writes the escalation
-   record, naming what a person must give or decide, and applies the escalation mark before it
-   releases the claim; the Ticket then waits on the person's list. Either way the landing turn
-   passes to the next Ticket. No Ticket keeps a landing turn while nothing works toward its landing.
+   commits after the head the record names as new work and re-runs every gate. A required check
+   still pending leaves the merge for a later turn, and one pending past the run timeout counts as
+   failing. When the merge waits only on a review the repository requires, the Ticket waits on the
+   person's list as a held pull request, with no escalation mark; an approval from someone with
+   write access lets a later landing turn merge it. When another protection needs what no run can
+   give, or the pull request was closed without merging, the lander writes the escalation record,
+   naming what a person must give or decide, and applies the escalation mark before it releases the
+   claim; the Ticket then waits on the person's list. In each case the landing turn passes to the
+   next Ticket. No Ticket keeps a landing turn while nothing works toward its landing.
 5. **Merges with the head pinned**, through the venue's normal protected mechanism, and observes
    the merged state. It never force-pushes a shared branch, bypasses protection, or merges work
    the Ticket does not authorize. A non-repository Ticket's landing is observed at its durable
@@ -146,9 +153,8 @@ boundary.
 
 ## Gotchas
 
-- A claim is not a lock between two runs that write as one identity, and neither are the run facts.
-  The re-read before each write narrows a race to one write, the comment created first settles two
-  records, and git rejects a stale run's push.
+- A claim is not a lock between two runs that write as one identity, and neither are the run facts
+  (*The attempt record* says what settles a race).
 - Auto is durable authority, not a launch pulse. Removing and reapplying it to retry erases the
   difference between authority and delivery.
 - A run that ends without an outcome is a failed launch, not a Ticket outcome. Only the escalation record says a person is needed.

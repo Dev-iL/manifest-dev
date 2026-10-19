@@ -32,8 +32,8 @@ its own `--help`.
   A fixed-workload scenario the change adds gets its first line from a passing run (`verify
   line`), and a change that made a check faster keeps the gain the same way; no other run moves a
   line. Before a lower line is written, compare the work the check did — tests collected, cases
-  run — with the run the old line came from: a speedup that comes from doing less work keeps the
-  old line, and the lost work is a finding.
+  run — with a run of the same check at the base commit: a speedup that comes from doing less work
+  keeps the old line, and the lost work is a finding.
 - **Over its line:** when a check the work touches is over its time line, find where the time
   went from the runner's own timings. Pay it down before the run is done when growth did not earn
   the time — it came from what the change added, such as a slow new test or a sleep — or when the

@@ -70,14 +70,14 @@ Reconcile the farthest durable state first:
   mark, and work it on the same branch through a new pull request.
   If the merge exists without a completion record, re-verify the Ticket's definition of done, as
   *Execute* says, before recording it and closing.
-- A record marked ready to land is finished work, and there is nothing to redo only when the pull
-  request's head is the head the record names and the base has not moved. When the base has moved
-  since the base commit it names, take landing step 3 in
+- A record marked ready to land, by this run or an earlier one, is finished work, and there is
+  nothing to redo only when the pull request's head is the head the record names and the base has
+  not moved. When the base has moved since the base commit it names, take landing step 3 in
   `../ticket-up/references/AUTOMATED_EXECUTION.md` → *Landing*: merge the base in, check cross-cuts
   both ways, re-run the gates that step names, and mark it ready again. When the head holds commits
-  this run did not make, or a required check fails, they are new work: re-run every gate on them
-  before marking it ready. Either way, the ready mark names this run. Otherwise go to *Finish at a
-  ready pull request*.
+  after the head the record names, or a required check fails, they are new work: re-run every gate
+  on them before marking it ready. Either way, the ready mark names this run. Otherwise go to
+  *Finish at a ready pull request*.
 - A record holding a drafted answer waits for a person to accept it: tell whoever started the run
   — the person on a hand run, the launcher otherwise — that the answer waits on them and where it
   is recorded, then stop.
@@ -111,10 +111,10 @@ Before each checkpoint, merge the target base in when it has moved, so conflicts
 merge alone re-runs no gates. With each pushed checkpoint, refresh the attempt record's progress,
 its run facts, and its Manifest where define amended it. Re-read the record and the Ticket before
 each write and each push, and stop when the run ID there is not this run's. The run also stops when
-a person is assigned, when the Ticket is closed, or — on an unattended run — when the escalation
-mark is on. A push can still be rejected: a rejected push from a stale run stops it, and the run the
-record names merges what is there and pushes again. Uncommitted work and commits not pushed to the
-stable branch may be lost after a runner failure.
+a person other than the identity it writes as is assigned, when the Ticket is closed, or — on an
+unattended run — when the escalation mark is on. A push can still be rejected: a rejected push from
+a stale run stops it, and the run the record names merges what is there and pushes again.
+Uncommitted work and commits not pushed to the stable branch may be lost after a runner failure.
 
 Only `/done` or `/escalate` from the autonomous chain can advance toward a terminal Ticket outcome.
 An ordinary assistant response, partial implementation, waiting check, runner failure, or process
@@ -149,7 +149,10 @@ one pull request — its description listing the run's material decisions, the u
 and a "Debt left" section carrying the debt `/done` named, one line each — and drive that pull
 request through the repository's normal checks. Activate the `check-pr` skill for the current pull request
 and head. Address agent-resolvable failures and re-check rather than handing routine repair to a
-person; what may remain is only what a person gives, such as a required review.
+person; what may remain is only what a person gives, such as a required review. A required check
+that fails the same way on the target base is not this Ticket's to repair or escalate: name that
+cause in the attempt record's progress and finish, so `orchestrate` can pause the effort on it
+once rather than each run escalating.
 
 Then write the completion record and set the run facts: ready to land at the verified head commit,
 against the base commit the gates passed against, naming this run's ID. This is the durable
@@ -205,10 +208,11 @@ and it does both; clearing the mark also clears any automation claim, which make
 eligible for unattended execution again. Escalation ends this attempt, not the work. Never close the
 source or create a replacement Ticket for its unfinished obligation.
 
-A runner that disappears before writing an outcome
-(`../ticket-up/references/AUTOMATED_EXECUTION.md` → *The attempt record*) is a failed launch, not
-an outcome: its launcher counts it and starts the Ticket again. `run-ticket` does not invent a
-Ticket outcome for a process that is no longer running.
+A runner that disappears before writing an outcome (`../ticket-up/references/AUTOMATED_EXECUTION.md`
+→ *The attempt record*) is a failed launch, not an outcome: its launcher counts it and starts the
+Ticket again. On a hand run nothing restarts it: the person runs this skill again, or an
+orchestrator recovers it once its timeout passes. `run-ticket` does not invent a Ticket outcome for
+a process that is no longer running.
 
 ## Gotchas
 

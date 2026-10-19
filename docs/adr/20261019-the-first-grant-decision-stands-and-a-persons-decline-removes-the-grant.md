@@ -20,10 +20,12 @@ so a grant made in the meantime stayed and the Ticket landed unattended.
 ## Decision
 - An orchestrator gathers debt only for Tickets whose landing it recorded, plus Tickets whose
   landing reference is older than the run timeout with no gathered line.
-- A grant decision is a grant, a recorded withhold, or a record that a person was asked. Where a
-  Ticket carries two, the one created first decides.
-- A propose-mode orchestrator records that it asked the person before it asks, which leaves the
-  decision to that person.
+- A grant decision is a grant or a recorded withhold. Where a Ticket carries two, the one created
+  first decides, and the writer of the other takes it back with any label it applied, so a grant
+  that lost a race leaves no `auto` label behind.
+- A propose-mode orchestrator records a withhold naming the person as asked before it asks, which
+  leaves the decision to that person and reads as decided to any orchestrator, whatever version it
+  runs. Each venue reference renders it, the file store's included.
 - A person's decline or withdrawal records the withhold and removes the grant itself, as the venue
   renders it, so no unattended run lands that Ticket.
 

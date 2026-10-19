@@ -77,6 +77,28 @@ def test_the_model_quotes_the_prose_it_models() -> None:
     assert len(quotes) >= 20, "the Quote comments in TicketProtocol.tla were not found"
 
 
+def test_every_quote_mark_carries_a_whole_quoted_sentence() -> None:
+    """A Quote mark the quote pattern cannot read would count as marked yet check nothing."""
+    unreadable = [
+        f"TicketProtocol.tla:{number}: {line.strip()}"
+        for number, line in enumerate(_model_lines(), start=1)
+        if re.match(r"^\s*\\\* Quote ", line) and not QUOTE.match(line)
+    ]
+    assert not unreadable, "\n".join(unreadable)
+
+
+def test_the_recipe_covers_every_file_the_model_quotes() -> None:
+    """`verify affected` selects the recipe only for paths its `covers:` line names."""
+    recipe = (ROOT / "verification" / "recipes" / "ticket-protocol-model.md").read_text(
+        encoding="utf-8"
+    )
+    covers_line = re.search(r"^covers: (?P<paths>.+)$", recipe, re.MULTILINE)
+    assert covers_line, "ticket-protocol-model.md has no covers: line"
+    covers = {path.strip() for path in covers_line["paths"].split(",")}
+    quoted = {f"claude-plugins/manifest-dev/skills/{path}" for _, path, _ in _quotes()}
+    assert not quoted - covers, f"covers: misses {sorted(quoted - covers)}"
+
+
 def test_every_quoted_sentence_still_stands_in_its_file() -> None:
     missing = []
     for number, path, text in _quotes():
@@ -85,7 +107,9 @@ def test_every_quoted_sentence_still_stands_in_its_file() -> None:
             missing.append(f"TicketProtocol.tla:{number}: {path} does not exist")
             continue
         if _normalize(text) not in _normalize(source.read_text(encoding="utf-8")):
-            missing.append(f'TicketProtocol.tla:{number}: {path} no longer says "{text}"')
+            missing.append(
+                f'TicketProtocol.tla:{number}: {path} no longer says "{text}"'
+            )
     assert not missing, (
         "The protocol prose changed under the model. Update the model's action and its quote "
         "in the same change, then run `scripts/verify drive ticket-protocol-model`:\n"
@@ -100,11 +124,17 @@ def test_every_action_and_checked_property_says_what_it_models() -> None:
         if name not in definitions:
             unmarked.append(f"{name}: not defined in TicketProtocol.tla")
         elif not any(MARK.match(line) for line in definitions[name]):
-            unmarked.append(f"{name}: no Quote, World: or Pre-fix: comment directly above it")
+            unmarked.append(
+                f"{name}: no Quote, World: or Pre-fix: comment directly above it"
+            )
     assert not unmarked, "\n".join(unmarked)
 
 
 def test_the_marks_check_the_model_rather_than_nothing() -> None:
     actions = _next_actions()
     assert {"OClaim", "OLand", "RPush", "WTimeout", "WAnswer"} <= actions
-    assert {"OneAttemptRecord", "ReadyResolves"} <= _checked_properties()
+    assert {
+        "OneAttemptRecord",
+        "ReadyResolves",
+        "NoLandWhileEscalated",
+    } <= _checked_properties()

@@ -198,6 +198,8 @@ def test_a_waiting_item_without_its_recommendation_risk_or_evidence_is_still_val
 ) -> None:
     # The fields help the person decide; an orchestrator that has none to give still shows the item.
     snapshot = sample()
-    assert field in snapshot["needsYou"][0], f"the sample's first waiting item lost `{field}`"
+    assert (
+        field in snapshot["needsYou"][0]
+    ), f"the sample's first waiting item lost `{field}`"
     del snapshot["needsYou"][0][field]
     assert validate(snapshot)

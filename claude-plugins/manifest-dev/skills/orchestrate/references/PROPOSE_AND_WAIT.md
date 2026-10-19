@@ -9,8 +9,8 @@ Show the plan, and ask in the same message for every decision that would change 
 - **Grants.** For each Ticket an agent wrote that no grant decision covers yet — the debt
   Tickets this orchestrator wrote and the follow-ups runs wrote — say whether it meets the
   convention's grant criterion, and recommend a grant or not. Before asking, record on the Ticket
-  that the person was asked, as its grant decision, so an autonomous orchestrator leaves the grant
-  to them. Never grant on your own in this mode.
+  a withhold naming the person as asked, as the venue renders one, so an autonomous orchestrator
+  leaves the grant to them. Never grant on your own in this mode.
 - **Tickets left alone because their author lacks write access.** The person may include one in
   the plan; it then runs to a ready pull request and waits on them.
 - **Planning start lines and refactor proposals** waiting on the person.
