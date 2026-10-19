@@ -1,7 +1,7 @@
 # ADR: Runs keep the harness fit to trust for speed, control and diagnosis, through one list
 
 ## Status
-Accepted
+Accepted — amended by 20261019-a-check-counts-only-after-it-was-seen-to-fail: *Fit to trust* gains a job, that the check was seen to fail on a scratch break of what it proves
 
 ## Area
 define / do
