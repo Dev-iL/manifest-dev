@@ -23,7 +23,7 @@ The user
 
 ## Alternatives Considered
 - **Keep the feature map as its own concept beside the harness**: two places to look and two things to keep current; the map's useful content — reach, drive steps, proof, traps — is exactly a recipe's.
-- **A skill as the unit, the way pstack's verification skill holds its map and helper scripts**: works only on hosts that load skills, and an agent outside the workflow never finds it.
+- **A skill as the unit, holding the map and its helper scripts**: works only on hosts that load skills, and an agent outside the workflow never finds it.
 - **Recipes as code inside the tool**: stronger per-recipe checks, but harder for an agent to add one and nothing to read outside the code; the tool already turns a recipe's command and proof into evidence.
 - **A form per artifact, as before**: three ways to verify, and a reader has to learn which applies first.
 - **The tool in standard-library Python**: runs wherever Python does, with no type checking unless a project adds it. TypeScript is easier to maintain: the compiler checks every change in strict mode, and Node runs the file directly, with no build step.

@@ -4,6 +4,8 @@ Verify that tests for the changed code are both PRESENT (coverage) and VALIDATIN
 
 **The question for every test: "Would this test fail on a contradictory implementation?"** If not, it's tautological — the scenario is uncovered even if the test runs.
 
+**Then the second imagined edit: change the internals without changing the behavior.** Rename a private helper, reorder calls the contract leaves unordered, inline a step. A test that fails on that edit is pinned to the implementation: it will break on a sound refactor and teach the next editor to update tests rather than trust them. The contract decides what counts as behavior. An outbound payload, a call another system relies on, or a side effect the caller depends on is behavior, and asserting it is right; an assertion that something is never called is valid where not calling it is the contract (no charge on a failed validation). Report the pinned test with the edit that would break it and the behavior it should assert instead.
+
 ## Test-only diffs
 
 When the diff modifies only test files (no source changes), audit those tests directly for tautology — don't skip. Pure test refactors and AI-generated test additions are valid review surfaces. Forward-derivation of new scenarios may not apply (no source changes), but tautology detection still does.

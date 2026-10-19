@@ -233,7 +233,10 @@ before the interview, so the dialogue carries the encoding forward; a Default
 whose violation would be unsafe or irreversible routes to a Global Invariant
 instead. A rule the user has stated — in the session or in a context file — or a
 convention the project states or documents overrides a conflicting Default: omit or adjust the
-Default and record which and why in an `ASM-*`. The context file's outcome rules —
+Default. Every Default of a loaded file ends up carried, adjusted or omitted — carrying one
+changed in a `PG-*` is adjusting it — and each adjusted or omitted one is named in an `ASM-*`
+with why: the rule that overrides it, or what makes it clearly inapplicable. A reader can then
+tell a Default set aside on purpose from one lost. The context file's outcome rules —
 naming, structure, architecture — also constrain the shape the Manifest specifies,
 not only which Defaults it drops. Taste entries stay weighed per call, as above. Per-repo for
 multi-repo manifests. These carry encoder data only —

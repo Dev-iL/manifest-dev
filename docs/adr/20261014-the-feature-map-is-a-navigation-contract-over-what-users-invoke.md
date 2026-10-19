@@ -10,7 +10,7 @@ define / do
 The user
 
 ## Context
-20261013-runs-build-and-maintain-a-project-verification-surface gave a feature map only to runnable products, described its entries in four loose bullets, and let setup hand over a map nobody had driven. The map's main job is to let a run go straight to the right place — place a vague report, then reach and drive the feature — and that job exists for any artifact people invoke, a plugin's skills included. Loose entries came out in a different shape each time, and an undriven map reads as proof it is not. pstack's create-verification-skill (`github.com/cursor/plugins`, `pstack/skills/create-verification-skill/`) shows a working shape: an index carrying preconditions, conventions and proof rules, one file per feature with fixed sections, a worked example, and one end-to-end run before handover.
+20261013-runs-build-and-maintain-a-project-verification-surface gave a feature map only to runnable products, described its entries in four loose bullets, and let setup hand over a map nobody had driven. The map's main job is to let a run go straight to the right place — place a vague report, then reach and drive the feature — and that job exists for any artifact people invoke, a plugin's skills included. Loose entries came out in a different shape each time, and an undriven map reads as proof it is not. A working shape is an index carrying preconditions, conventions and proof rules, one file per feature with fixed sections, a worked example, and one end-to-end run before handover.
 
 ## Decision
 - A project whose artifact people invoke — routes, commands, public calls, skills — keeps one feature map over it, beside whichever verification forms it keeps. The forms check; the map navigates, and each entry names the check that holds it.
@@ -22,7 +22,7 @@ The user
 ## Alternatives Considered
 - **A map only for runnable products**: leaves a skills plugin with nowhere to place a report, though its users invoke it the same way.
 - **One map file with a section per feature**: harder to point a run at one feature, and harder for a check to keep each entry's shape.
-- **Seed only the top few features, as pstack does**: the map could not place a report about a feature no run has touched; breadth is why the first build catalogs everything.
+- **Seed only the top few features**: the map could not place a report about a feature no run has touched; breadth is why the first build catalogs everything.
 - **Code locations in each entry**: the first thing to go stale.
 
 ## Consequences
@@ -39,6 +39,6 @@ The user
 retargeted — the map's checks moved with it to `tests/test_verify.py` (`test_every_user_invocable_skill_has_a_recipe`, `test_every_recipe_parses_and_names_only_existing_paths`), which now holds 20261014-one-verification-harness-per-project; `tests/test_feature_map.py` was removed. Before that: partly — `tests/test_feature_map.py` held this repository's map: every user-invocable skill had an entry, each entry had the shape and a status, and every path it named existed. `tests/test_setup_project_versions.py` (`test_latest_version_matches_what_setup_project_emits`) failed when the emitted surface README changed without a new surfaces version. Whether an entry carried more than its description, and whether a project's map covered what users invoke, stayed judgment.
 
 ## Source
-- Session: investigation of setup-project's update behavior and of pstack's feature map.
+- Session: investigation of setup-project's update behavior and of how a feature map is shaped.
 - Narrows: 20261013-runs-build-and-maintain-a-project-verification-surface
 - Related: 20261014-setup-project-audits-the-whole-setup-when-run

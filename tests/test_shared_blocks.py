@@ -8,6 +8,8 @@ here once; this check fails when a file that states it no longer carries it verb
 Changing a block means changing it here and in every listed file in the same edit.
 """
 
+# Holds in part docs/adr/20261015-do-states-the-goal-and-its-conventions-and-leaves-method-to-the-run.md:
+# the conventions `/do` keeps.
 from __future__ import annotations
 
 from pathlib import Path

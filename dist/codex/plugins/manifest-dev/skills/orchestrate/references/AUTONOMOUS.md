@@ -20,12 +20,17 @@ For each Ticket an agent wrote that no grant decision covers yet — the debt Ti
 orchestrator wrote and the follow-ups runs wrote — apply the convention's grant criterion. Where it
 holds, grant Auto through `ticket-up`, naming `orchestrate --autonomous` as the grantor. Where it
 does not, record that Auto was withheld and why, and list the Ticket as awaiting a person's grant.
-Each Ticket is judged once: a grant a person withdrew stays withdrawn. The run that found the work
+Each Ticket is judged once: a grant a person withdrew stays withdrawn, and a withhold naming a
+person who was asked leaves the grant to that person: list the Ticket as awaiting their grant.
+Re-read the Ticket after granting: where two grant decisions now stand,
+`../ticket-up/references/AUTOMATED_EXECUTION.md` → *The attempt record* says which decides and how
+the other is taken back. The run that found the work
 never grants it, and a refactor proposal never receives a grant here. A Ticket granted here joins
 the ready work at once.
 
 ## Stop
 
-Stop when no ready work is left in scope, nothing waits for a landing turn, and no run is live.
+Stop when no ready work is left in scope, nothing waits for a landing turn but a pull request held
+for a person's review, and no run is live.
 Check in a last time, then report what landed, what waits on the person in its order, and the
 page's link.

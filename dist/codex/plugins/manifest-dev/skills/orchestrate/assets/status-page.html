@@ -262,15 +262,24 @@ code { font-family: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, mo
 .list { margin: 6px -18px 0; }
 .row { display: grid; grid-template-columns: 24px minmax(0, 1fr) 14px; gap: 0 12px; align-items: start; padding: 12px 16px; position: relative; width: 100%; border: 0; background: transparent; text-align: left; }
 .row + .row::before { content: ""; position: absolute; top: 0; left: 52px; right: 0; border-top: .5px solid var(--sep); }
-button.row { cursor: pointer; }
-button.row:active { background: var(--fill); }
-@media (hover: hover) and (pointer: fine) { button.row:hover { background: color-mix(in srgb, var(--fill) 55%, transparent); } }
+/* A Ticket row opens through its ask alone, so the button's name is the ask; a layer stretched over
+   the row keeps the whole row clickable, and the fields above that layer stay selectable. */
+.row .open { display: block; width: 100%; padding: 0; border: 0; background: transparent; font: inherit; color: inherit; text-align: left; cursor: pointer; }
+.row .open::after { content: ""; position: absolute; inset: 0; }
+.row:has(.open):active { background: var(--fill); }
+@media (hover: hover) and (pointer: fine) { .row:has(.open):hover { background: color-mix(in srgb, var(--fill) 55%, transparent); } }
 .row .n { width: 24px; height: 24px; border-radius: 12px; background: var(--orange-fill); color: var(--on-orange); font-size: 12.5px; font-weight: 700; line-height: 24px; text-align: center; }
 .row .n.red { background: var(--solid-red); color: #fff; }
 .row .w { font-weight: 600; line-height: 1.35; }
 .row .y { font-size: 13px; color: var(--text-2); margin-top: 2px; }
+/* Labels run in at the start of their value, since the values are long and the sheet is narrow. */
+.why { margin: 6px 0 0; font-size: 13px; line-height: 1.4; position: relative; z-index: 1; }
+.why dt { display: inline; margin-right: 6px; color: var(--text-2); font-weight: 600; }
+.why dd { display: inline; margin: 0; color: var(--text); overflow-wrap: anywhere; }
+.why dd::after { content: ""; display: block; margin-bottom: 4px; }
+.why dd.pick { font-weight: 600; }
 .row .chev { color: var(--text-3); font-size: 20px; line-height: 1; }
-.copyline { display: flex; gap: 8px; margin-top: 10px; }
+.copyline { display: flex; gap: 8px; margin-top: 10px; position: relative; z-index: 1; }
 .copyline code { flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap; background: var(--fill); border-radius: 9px; padding: 8px 10px; }
 
 @media (min-width: 760px) {
@@ -345,9 +354,11 @@ button.row:active { background: var(--fill); }
     { "id": "#141", "title": "Show saved cards first at checkout", "url": "https://example.com/acme/shop/issues/141", "status": "waiting", "dependsOn": ["#133"], "auto": false },
     { "id": "#146", "title": "Remember the last card used", "url": "https://example.com/acme/shop/issues/146", "status": "waiting", "dependsOn": ["#141"] },
     { "id": "#153", "title": "Refund to the original card", "url": "https://example.com/acme/shop/issues/153", "status": "waiting", "dependsOn": ["#138"] },
-    { "id": "#148", "title": "Show a clear message when a card expires", "url": "https://example.com/acme/shop/issues/148", "status": "waiting", "after": ["#147"], "note": "#147 changes how every payment state is recorded, and this adds a new one." }
+    { "id": "#148", "title": "Show a clear message when a card expires", "url": "https://example.com/acme/shop/issues/148", "status": "waiting", "after": ["#147"], "note": "#147 changes how every payment state is recorded, and this adds a new one." },
+    { "id": "#151", "title": "Hide card numbers in payment logs", "url": "https://example.com/acme/shop/issues/151", "status": "held", "pr": { "id": "#212", "url": "https://example.com/acme/shop/pull/212" }, "auto": false, "note": "No Auto: a person lands it." }
   ],
   "needsYou": [
+    { "ticket": "#151", "ask": "Merge #212, which masks card numbers in payment logs?", "pick": "Merge it.", "risk": "Support loses the last four digits in the logs; the change keeps them in the receipt view.", "evidence": "All 14 gates passed at the head, including a test that scans a day of sample logs for full card numbers. Not checked: logs older services write.", "cost": "Nothing waits on it" },
     { "ask": "Plan in depth: how should failed charges be retried?", "detail": "This needs its own session with you. Its Tickets appear here at the next check-in.", "startLine": "/figure-out How should failed charges be retried? Then ticket-up the read into effort \"Checkout v2\"", "cost": "3 Tickets wait on the answer" }
   ]
 }
@@ -1405,12 +1416,15 @@ button.row:active { background: var(--fill); }
       var list = el("div", { "class": "list" });
       m.d.needsYou.forEach(function (a, i) {
         var t = a.ticket && m.byId[a.ticket], red = t && (t.status === "escalated" || t.status === "failed");
-        var text = el("div", null, [el("div", { "class": "w", text: (t ? t.id + "  " : "") + a.ask }), el("div", { "class": "y", text: t ? a.cost || "" : [a.detail, a.cost].filter(Boolean).join(" · ") })]);
+        var ask = t ? el("button", { type: "button", "class": "w open", text: t.id + "  " + a.ask }) : el("div", { "class": "w", text: a.ask });
+        var text = el("div", null, [ask, el("div", { "class": "y", text: t ? a.cost || "" : [a.detail, a.cost].filter(Boolean).join(" · ") })]);
+        var why = reasons(a);
+        if (why) text.appendChild(why);
         if (a.startLine) text.appendChild(copyLine(a.startLine));
         var row;
         if (t) {
-          row = el("button", { type: "button", "class": "row" }, [el("span", { "class": "n" + (red ? " red" : ""), text: String(i + 1) }), text, el("span", { "class": "chev", "aria-hidden": "true", text: "›" })]);
-          row.addEventListener("click", function (e) { choose(t.id, e.detail === 0); });
+          row = el("div", { "class": "row" }, [el("span", { "class": "n" + (red ? " red" : ""), text: String(i + 1) }), text, el("span", { "class": "chev", "aria-hidden": "true", text: "›" })]);
+          ask.addEventListener("click", function (e) { choose(t.id, e.detail === 0); });
         } else row = el("div", { "class": "row" }, [el("span", { "class": "n", text: String(i + 1) }), text, el("span")]);
         list.appendChild(row);
       });
@@ -1431,7 +1445,7 @@ button.row:active { background: var(--fill); }
           PHASES.map(function (p, i) { return el("span", { "class": i < pi ? "done" : i === pi ? "now" : "", "aria-hidden": "true", text: p[1] }); })));
       }
       var ask = m.ask[id];
-      if (ask) body.appendChild(el("div", { "class": "ask" + (tone(t) === "stop" ? " red" : "") }, [el("p", { text: ask.a.ask }), ask.a.detail ? el("p", { text: ask.a.detail }) : null]));
+      if (ask) body.appendChild(el("div", { "class": "ask" + (tone(t) === "stop" ? " red" : "") }, [el("p", { text: ask.a.ask }), ask.a.detail ? el("p", { text: ask.a.detail }) : null, reasons(ask.a)]));
       var facts = [];
       if (t.note) facts.push(el("li", { text: t.note }));
       m.edgesOf(t).forEach(function (e) {
@@ -1496,6 +1510,13 @@ button.row:active { background: var(--fill); }
     var p = S.board && S.board.spec && S.board.spec.center(id);
     if (p) requestAnimationFrame(function () { S.board.reveal(p, !viaKey); });
   }
+  // What the person needs to decide an item without opening it: the answer recommended, the risk
+  // of taking it, and the evidence it rests on. Each is optional, so older snapshots still show.
+  function reasons(a) {
+    var rows = [["Recommended", a.pick], ["Risk", a.risk], ["Evidence", a.evidence]].filter(function (r) { return r[1]; });
+    if (!rows.length) return null;
+    return el("dl", { "class": "why" }, rows.reduce(function (out, r) { return out.concat([el("dt", { text: r[0] }), el("dd", r[0] === "Recommended" ? { "class": "pick", text: r[1] } : { text: r[1] })]); }, []));
+  }
   function copyLine(text) {
     var b = el("button", { type: "button", "class": "btn", text: "Copy" });
     b.addEventListener("click", function () {
@@ -1545,7 +1566,8 @@ button.row:active { background: var(--fill); }
       return strings(t.dependsOn) && strings(t.after) && strings(t.from);
     });
     return ticketsOk && d.needsYou.every(function (a) {
-      return a && typeof a.ask === "string" && optStr(a.ticket) && optStr(a.detail) && optStr(a.cost) && optStr(a.startLine);
+      return a && typeof a.ask === "string" && optStr(a.ticket) && optStr(a.detail) && optStr(a.cost) && optStr(a.startLine)
+        && optStr(a.pick) && optStr(a.risk) && optStr(a.evidence);
     });
   }
   function apply(d, via, opts) {

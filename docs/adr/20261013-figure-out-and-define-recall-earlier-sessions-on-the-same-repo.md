@@ -1,7 +1,7 @@
 # ADR: figure-out and define recall earlier sessions on the same repository and topic
 
 ## Status
-Accepted
+Accepted — amended by 20261019-recall-reads-reverted-fixes-and-review-corrections: recall also reads review comments that asked for changes and lists reverting commits on the topic's paths
 
 ## Area
 define / figure-out

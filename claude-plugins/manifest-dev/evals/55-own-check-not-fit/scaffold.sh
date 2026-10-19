@@ -9,9 +9,9 @@ cat > README.md <<'EOF'
 Command-line tool that tracks books a reading club has borrowed. A loan is overdue 21 days after
 checkout.
 
-    python -m shelfnote checkout --member ana --book "Middlemarch"
-    python -m shelfnote return --book "Middlemarch"
-    python -m shelfnote overdue
+    python3 src/shelfnote.py checkout --member ana --book "Middlemarch"
+    python3 src/shelfnote.py return --book "Middlemarch"
+    python3 src/shelfnote.py overdue
 
 Run `python -m pytest` before a release.
 EOF

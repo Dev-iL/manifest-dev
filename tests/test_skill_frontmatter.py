@@ -18,6 +18,8 @@ structure rather than text, or ` #`, which it reads as a comment and truncates a
 exercised on known-bad input below.
 """
 
+# Holds in part docs/adr/20261018-define-reviews-each-new-manifest-in-a-fresh-context.md: the review's
+# wording stays host-neutral.
 from __future__ import annotations
 
 import json

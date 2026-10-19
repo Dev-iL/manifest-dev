@@ -1,7 +1,7 @@
 # ADR: The Ticket's attempt record carries its Manifest, its progress and its run facts
 
 ## Status
-Accepted
+Accepted — amended by 20261019-the-comment-the-venue-created-first-decides-each-ticket-fact: where two comments carry one marker the first created decides, a record counts only when the automation identity created and last edited it, and each run fact has one writer
 
 ## Area
 Ticketing

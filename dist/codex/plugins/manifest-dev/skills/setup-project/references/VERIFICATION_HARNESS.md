@@ -222,6 +222,9 @@ check by the jobs it has to do there, never by how this file would have built it
   through the harness or the project's own scripts, each run on its own.
 - **A failure explains itself** — failed evidence carries what locates the cause: the instance's
   logs or traces from that run, or where they are.
+- **It was seen to fail** — the check failed on a scratch break of what it proves, a change that
+  makes the checked behavior wrong, and the break was then dropped. A check never seen failing may
+  pass on anything.
 
 For a behavior case, the cold proof run is one case run against the prompt as shipped and
 graded; for a document walk, one task walked by a fresh reader given only the document, whose

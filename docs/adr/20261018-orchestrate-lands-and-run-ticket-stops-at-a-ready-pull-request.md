@@ -1,7 +1,7 @@
 # ADR: orchestrate lands pull requests, and run-ticket stops at a ready one
 
 ## Status
-Accepted
+Accepted — amended by 20261019-every-way-a-landing-cannot-merge-relaunches-or-escalates: the base is checked before the head, a moved base re-runs only the deterministic gates when the patch is unchanged and no cross-cut overlaps, and every other landing failure relaunches the run or escalates instead of stopping
 
 ## Area
 Ticketing

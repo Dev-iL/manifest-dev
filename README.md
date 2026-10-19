@@ -72,7 +72,11 @@ The loop keeps turning, and you step in where it needs you — for judgment, tas
 | Auto Tickets, end to end, including the ones `--autonomous` grants | Landing a Ticket without Auto |
 | Tickets without Auto, up to a ready pull request | Escalations: a question only you can answer |
 | | Tickets from people without write access |
+| | A review the repository requires from a person |
+| | A cause that paused an effort, such as a check failing on the base branch |
 | | Planning a new effort, and each plan in the default mode |
+
+Each item that waits for you comes with the answer it recommends, the risk of taking it, and the evidence behind it, so you can decide without opening the pull request.
 
 ## What to run at each level
 
@@ -117,6 +121,9 @@ Individual skills install into many other agents through `npx skills add doodled
 Decisions behind the multi-CLI design are indexed in [`docs/adr/`](docs/adr/README.md).
 
 ## Development
+
+Setup needs Python 3.10+ and Node 22.18+, and Java 11+ only for the ticket protocol model
+(`scripts/verify drive ticket-protocol-model`).
 
 ```bash
 ./scripts/setup.sh

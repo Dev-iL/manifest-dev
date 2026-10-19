@@ -39,6 +39,9 @@ Default investigation logging remains independent of this decision because the l
 - A topic whose project relationship is initially unclear may load project context later than an always-on policy would.
 - Mid-session activation adds a small mode transition that must preserve the normal bootstrap and capture rules.
 
+## Enforced by
+partly — `tests/test_projectless.py::test_each_skill_states_the_same_project_definition` pins the clause in `figure-out/SKILL.md` that a question which does not concern the session's folder gets no project surface; loading docs once relevance emerges later, and logging staying independent of project docs, stay judgment.
+
 ## Source
 
 - Grounding: cross-skill prompt audit of `figure-out`'s topic-general activation against default docs-mode bootstrap and write behavior.
