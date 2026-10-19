@@ -44,7 +44,7 @@ Workload: varies
 
 ### bounded-growth
 Run: `scripts/drive-skill.sh define verification/prompts/define-bounded-growth.md --scaffold claude-plugins/manifest-dev/evals/45-current-setup-offers-nothing`
-Proves: for data that grows for years, the Manifest carries *Bound what grows*: a gate keeps append and per-member query cost tolerable at a stated scale.
+Proves: for data that grows for years, the Manifest carries FEATURE's *Bounded growth* gate: a gate keeps append and per-member query cost tolerable at a stated or assumed scale.
 Check: read
 Workload: varies
 
