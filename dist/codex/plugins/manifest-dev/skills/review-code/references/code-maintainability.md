@@ -182,7 +182,7 @@ if (!userId || typeof userId !== 'string' || userId.length < 5) {
 ```
 **Impact**: Bug fixes or validation changes must be applied in multiple places; easy to miss one
 **Effort**: Quick win
-**Suggested Fix**: Extract to a shared validation module as `validateUserId(id: string): void`
+**Suggested Fix**: Parse the ID once where the request enters, as `parseUserId(raw: unknown): UserId`, returning a branded `UserId` or throwing `ValidationError`, and take `UserId` in both handlers, so a value that skipped the check cannot reach them
 ```
 
 ```

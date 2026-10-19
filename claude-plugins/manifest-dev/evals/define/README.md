@@ -49,7 +49,7 @@ Numbers judged by different models do not compare.
 | `d22-projectless-manifest-builds-no-harness` | A one-off script outside any project gets a Manifest whose gates check its output, with no harness, recipe, decision record or setup. A guard: the no-plugin arm is expected to pass it, so a Δ of zero is no reason to remove it |
 
 These have never been run; the first both-arm run decides which stay. **Every number below is stale
-as of 2026-10-18**: the 2026-10-13 change edited define's spine and its task files, the
+as of 2026-10-19**: the 2026-10-13 change edited define's spine and its task files, the
 2026-10-14 change moved its verification wording to one harness, the 2026-10-15 change made
 that harness optional and the project's own checks a run's to repair, and the 2026-10-18 change
 made define ask through the host's question capability by default, batching its key calls, and
@@ -57,7 +57,18 @@ added the proof gate to its pull-request task file. A second 2026-10-18 change m
 each new Manifest to a fresh context for review before its digest, list every bound number in the
 digest, and encode a target whose reachability the session did not establish as a binding floor
 plus an advisory aim — which reaches every case that writes a spec, `d05` and `d10` most. The
-next baseline replaces them. The
+2026-10-19 change added Defaults to the coding and performance task files — check a design whose
+correctness depends on the order of events by a check that can reach it, model it first, ask
+whether a crashing state is legitimate before guarding it, bound a gain by the changed piece's
+share — and a *Fit to trust* job, and had the review name for each gate a plausible wrong result
+it would fail; that reaches every coding case, `d20`, `d23` and `d24` most. The next baseline
+replaces them.
+
+No case here holds the review's wrong-result question. The review runs in a fresh context, which
+this suite's sessions cannot start, so a case would grade a review that never ran; the `define`
+recipe's `fresh-review` drive checks it instead. The other 2026-10-19 Defaults have their cases in
+the figure-out suite (`56` to `58`), where the same probes are asked before a Manifest exists, and
+a define case for each would test the same probe twice at twice the runs. The
 headless harness offers no question capability, so the cases measure define's plain-text path. A single 2026-10-14 drive of `d01` (not a measurement) found define keeping the
 requested layer cut as a user's call; define's slicing rule now says a requested cut is never one,
 and a re-drive came back re-cut (that drive's evidence is not kept in the repository).

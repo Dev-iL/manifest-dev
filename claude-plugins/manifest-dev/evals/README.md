@@ -215,7 +215,11 @@ from a discipline `SKILL.md` explicitly states.
 | `52-projectless-chat-offers-no-surfaces` | autonomous, not a project, plugin arm only | For a one-off script in a folder that is not a project, say how it behaves and how to check it, offering no setup, harness, decision record, glossary or North Star | unmeasured |
 | `53-update-offer-from-v6` | docs, repository, plugin arm only | Offer the setup update for a project on v6 — its time lines moved from committed evidence into its recipes, committed evidence removed and ignored, and the context-file lines that commit evidence rewritten — and nothing v1 to v6 already gave it | unmeasured |
 | `54-touched-recipe-not-fit` | autonomous, repository | A change touching a feature whose recipe cannot be relied on — started by hand on a fixed port, its last failure unexplained — makes repairing that recipe part of the work | unmeasured |
-| `55-own-check-not-fit` | autonomous, repository | With no harness, a touched test of the project's own that passes whatever the output is gets repaired in its own form as part of the work, and no harness is built | unmeasured |
+| `55-own-check-not-fit` | autonomous, repository | With no harness, a touched test of the project's own that passes whatever the output is gets repaired in its own form as part of the work, seen failing on a scratch break before it counts, and no harness is built | unmeasured |
+| `56-order-dependent-design` | autonomous | Model a design whose correctness depends on the order of events before building it, and pick a check that can reach the breaking interleaving | unmeasured |
+| `57-legitimate-state-before-a-guard` | autonomous | Ask whether the state that crashed is legitimate before proposing a guard against it | unmeasured |
+| `58-gain-beyond-its-share` | autonomous | Bound a claimed speedup by what the changed piece could save, and treat the rest as unexplained | unmeasured |
+| `59-reverted-fix` | autonomous, repository | Find the earlier fix for the same failure that was reverted, and why, before proposing a fix | unmeasured |
 
 Cases `30` to `46` were written on 2026-10-13 and `48` on 2026-10-14; none has been run. Their
 split — tuning or held out — and which survive are decided at their first run. The setup-update
@@ -230,13 +234,21 @@ on 2026-10-15, holds the *Fit to trust* jobs v5 added: a touched recipe that can
 observed and stopped per run, or whose failure explains nothing, is repaired as part of the work.
 `55`, added the same day, holds the other half of that rule for a project with no harness: a
 touched check of the project's own that cannot be relied on is repaired in its own form.
+`56` to `59`, added on 2026-10-19, hold the probes that change added to figure-out's coding, bug
+and performance task files and to its recall: modeling an order-dependent design first and
+choosing a check that can reach the case example tests miss (`56`, two graders), asking whether a
+crashing state is legitimate before guarding it (`57`), bounding a gain by the changed piece's
+share (`58`), and finding a reverted fix in the repository's history (`59`). The same change gave
+`55` a second grader for the *Fit to trust* job it added: a repaired check counts only after it
+was seen to fail.
 
-**Every recorded number in this file is stale as of 2026-10-18.** The 2026-10-13 change edited
+**Every recorded number in this file is stale as of 2026-10-19.** The 2026-10-13 change edited
 figure-out's spine, its docs-mode and autonomous references, and its task files, the
 2026-10-14 change moved its verification wording to one harness, the 2026-10-15 change made
-that harness optional and the project's own checks a run's to repair, and the 2026-10-18 change
-made the host's question capability the default way figure-out asks, so no earlier result
-measures the skill as it ships now. The next baseline replaces them.
+that harness optional and the project's own checks a run's to repair, the 2026-10-18 change
+made the host's question capability the default way figure-out asks, and the 2026-10-19 change
+added probes to the coding, bug and performance task files and to recall, which reach `10`, `21`,
+`40` and `43` most, so no earlier result measures the skill as it ships now. The next baseline replaces them.
 
 Headroom per case comes from the current baseline, not from this table. The 2026-09-14 numbers
 below describe an older skill and model, so no case is labelled with them here.
@@ -257,7 +269,7 @@ over-triggering is the first casualty of any "press harder" tuning.
 
 ## Classification
 
-Every case's standing as of 2026-10-15, under this file's selection rules: a case stays for
+Every case's standing as of 2026-10-19, under this file's selection rules: a case stays for
 measured uplift or as a declared guard (a floor, a mirror pair, a negative, a held-out witness);
 an unmeasured case stays until its first run decides; a case is retired when it duplicates a kept
 case's discipline, exercises a skill outside this suite's scope, or floored in both arms without
@@ -312,7 +324,11 @@ being declared a guard. `tests/test_eval_cases.py` fails when a case has no row 
 | `52` | first run decides | Plugin arm only; a declared guard: the no-plugin arm passes by construction |
 | `53` | keep | Plugin arm only; the one-behind branch, which the version test requires; moved to v5 on 2026-10-15 when v6 shipped, and to v6 on 2026-10-18 when v7 shipped |
 | `54` | first run decides | New on 2026-10-15: the *Fit to trust* jobs v5 added |
-| `55` | first run decides | New on 2026-10-15: repairing a project's own check in its own form, the rule every run owes with or without a harness; the base model likely writes a new test beside the broken one |
+| `55` | first run decides | New on 2026-10-15: repairing a project's own check in its own form, the rule every run owes with or without a harness; the base model likely writes a new test beside the broken one. Its second grader, added 2026-10-19, holds the seen-to-fail job |
+| `56` | first run decides | New on 2026-10-19: the only order-dependent design case; the base model likely goes from the design to example tests |
+| `57` | first run decides | New on 2026-10-19: the only case for guarding a crash; the base model likely adds the null check |
+| `58` | first run decides | New on 2026-10-19: the only bounded-gain case; the arithmetic is in plain sight, so both arms may pass, and then it retires |
+| `59` | first run decides | New on 2026-10-19: recall from the repository's own history, which `43` (logs) does not cover |
 
 Retired on 2026-10-15: `12` (floored in both arms, not a declared guard), `47` and `49` (each a
 second older-version case beside `53`, which the version rule now forbids; their straight-to-newest
@@ -334,34 +350,35 @@ totals below are upper bounds.
 
 | Order | Cases | Runs | Why here |
 |---|---|---|---|
-| 1 | `54`, `55` | 4 | Cover what this change shipped; the base model likely plans around the broken recipe and leaves the broken test |
-| 2 | `17` | 2 | Single turn; headroom likely |
-| 3 | `22` | 2 | Single turn; the base model tends to settle a look in prose |
-| 4 | `19` | 2 | The base model likely designs the display as asked |
-| 5 | `48` | 2 | Design probes with no other case |
-| 6 | `40` + `42` | 4 | Pair; `42` is the negative guard |
-| 7 | `41` | 2 | |
-| 8 | `44` | 2 | |
-| 9 | `18` | 2 | |
-| 10 | `21` | 2 | |
-| 11 | `23` + `24` | 4 | `24` is `23`'s held-out witness |
-| 12 | `25` + `26` | 4 | Pair |
-| 13 | `32` + `33` | 4 | Same prompt, with and without a harness |
-| 14 | `38` | 2 | |
-| 15 | `34`, `35` | 4 | |
-| 16 | `37` + `39` | 4 | Headroom likely low |
-| 17 | `20` | 2 | Both arms likely pass |
-| 18 | `29` | 2 | Likely a floor |
-| 19 | `31` | 2 | Likely a floor |
-| 20 | `30`, `53`, `45` (plugin arm) | 3 | The version path; `53` and `45` for status |
-| 21 | `43` + `46` (plugin arm) | 2 | Pair |
-| 22 | `27` + `28` (plugin arm) | 2 | Pair |
-| 23 | `36` (plugin arm) | 1 | |
-| 24 | `52` (plugin arm) | 1 | Guard; status only |
+| 1 | `54`, `55` | 4 | Cover what the 2026-10-15 change shipped; the base model likely plans around the broken recipe and leaves the broken test |
+| 2 | `56`, `57`, `58`, `59` | 8 | Cover what the 2026-10-19 change shipped; `55`'s new grader rides on row 1 |
+| 3 | `17` | 2 | Single turn; headroom likely |
+| 4 | `22` | 2 | Single turn; the base model tends to settle a look in prose |
+| 5 | `19` | 2 | The base model likely designs the display as asked |
+| 6 | `48` | 2 | Design probes with no other case |
+| 7 | `40` + `42` | 4 | Pair; `42` is the negative guard |
+| 8 | `41` | 2 | |
+| 9 | `44` | 2 | |
+| 10 | `18` | 2 | |
+| 11 | `21` | 2 | |
+| 12 | `23` + `24` | 4 | `24` is `23`'s held-out witness |
+| 13 | `25` + `26` | 4 | Pair |
+| 14 | `32` + `33` | 4 | Same prompt, with and without a harness |
+| 15 | `38` | 2 | |
+| 16 | `34`, `35` | 4 | |
+| 17 | `37` + `39` | 4 | Headroom likely low |
+| 18 | `20` | 2 | Both arms likely pass |
+| 19 | `29` | 2 | Likely a floor |
+| 20 | `31` | 2 | Likely a floor |
+| 21 | `30`, `53`, `45` (plugin arm) | 3 | The version path; `53` and `45` for status |
+| 22 | `43` + `46` (plugin arm) | 2 | Pair |
+| 23 | `27` + `28` (plugin arm) | 2 | Pair |
+| 24 | `36` (plugin arm) | 1 | |
+| 25 | `52` (plugin arm) | 1 | Guard; status only |
 
-All of it is 61 runs, under $95. A full baseline also re-measures the 13 kept both-arm cases
+All of it is 69 runs, under $110. A full baseline also re-measures the 13 kept both-arm cases
 (`01`–`16`), another 26 runs, under $40, since every recorded number is stale. **A smaller
-budget** runs rows 1 to 7 first: 18 runs, under $30. The three-run checks under *Reading a
+budget** runs rows 1 to 7 first: 24 runs, under $40. The three-run checks under *Reading a
 result at this depth* come on top, at 6 runs a case. What each result decides:
 
 - both arms pass every case grader, and the case is not a declared guard → re-run it with three

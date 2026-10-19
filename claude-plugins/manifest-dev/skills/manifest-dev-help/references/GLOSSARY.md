@@ -383,7 +383,7 @@ When nobody can agree, for example in an unattended run, the run leaves the reci
 the run that it owes in its report. The project can change this rule.
 
 ### Fit to Trust
-<!-- context: 7c88c9b6888b -->
+<!-- context: 5f2494aca4e7 -->
 Fit to Trust says if you can rely on a check for what a change touches. The check can be a recipe
 in a harness, or a test, a script or a checklist step of the project. The jobs that the check does
 decide it, not the parts that it has. The jobs are:
@@ -395,6 +395,8 @@ decide it, not the parts that it has. The jobs are:
 - The checks are fast enough, and none is over its Time Line without a reason.
 - You can control what the change touches through the harness or the scripts of the project.
 - A failure explains itself.
+- The check failed when you made the thing that it checks wrong on purpose, and then you removed
+  that change.
 
 When a check is not fit to trust, the run repairs it first.
 
@@ -487,10 +489,11 @@ Run Ticket keeps a record on the Ticket: the branch, the progress and the Manife
 can continue the work.
 
 ### Escalation Mark
-<!-- context: d0bcb771f760 -->
+<!-- context: 47eef5f47d48 -->
 An Escalation Mark is the record on a Ticket that says that a person must act. Unattended automation
 does not take a Ticket with this mark. A person can still take it. When the person answers, they
-remove the mark, or `/orchestrate` records the answer and removes it.
+remove the mark, or `/orchestrate` records the answer and removes it. When the mark goes, a claim
+that automation left on the Ticket goes too.
 
 ### Orchestrate
 <!-- context: 84eaa3e4c71b -->

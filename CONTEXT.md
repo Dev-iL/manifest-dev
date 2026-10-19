@@ -118,7 +118,7 @@ The mark on a Recipe whose run costs something a person should weigh — money o
 _Avoid_: Paid, model-session, slow.
 
 **Fit to Trust**:
-Whether a check a project keeps — a Verification Harness recipe, or a test, script or checklist step in the project's own form — can be relied on for what a change touches, judged by the jobs it does — a cold proof run of one scenario passes and leaves evidence that survives cleanup, health is checkable, runs are isolated, PASS means the real path, touched checks are fast enough (none over its time line without a reason), what the change touches is controllable through the harness or the project's own scripts, and a failure explains itself — never by whether it has every part or the shipped tooling. A touched check that fails a job is repaired within scope in its own form.
+Whether a check a project keeps — a Verification Harness recipe, or a test, script or checklist step in the project's own form — can be relied on for what a change touches, judged by the jobs it does — a cold proof run of one scenario passes and leaves evidence that survives cleanup, health is checkable, runs are isolated, PASS means the real path, touched checks are fast enough (none over its time line without a reason), what the change touches is controllable through the harness or the project's own scripts, a failure explains itself, and it was seen to fail on a scratch break of what it proves — never by whether it has every part or the shipped tooling. A touched check that fails a job is repaired within scope in its own form.
 _Avoid_: Complete, conformant, healthy.
 
 **Surfaces Version**:
@@ -280,7 +280,7 @@ The harness-neutral execution move that receives one exact Ticket, claims or rec
 _Avoid_: Auto picker, ticket trigger.
 
 **Escalation Mark**:
-The durable record an escalated attempt leaves on a Ticket saying a person is needed — the thing that holds unattended dispatch off, so the claim does not have to and the Ticket stays takeable; cleared once the person answers — by the person, or by `orchestrate` recording their explicit answer as the continuation — and rendered by each venue's own reference.
+The durable record an escalated attempt leaves on a Ticket saying a person is needed — the thing that holds unattended dispatch off, so the claim does not have to and the Ticket stays takeable; cleared once the person answers — by the person, or by `orchestrate` recording their explicit answer as the continuation, either way clearing any automation claim left on it — and rendered by each venue's own reference.
 _Avoid_: Blocked status, escalated state.
 
 **Orchestrate**:

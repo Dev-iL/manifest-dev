@@ -77,6 +77,15 @@ name the supported misuse, its concrete prevention boundary, and why a weaker re
 not justified. Speculative better architecture earns no finding. Where missing evidence
 prevents a verdict, return BLOCKED naming that evidence; do not invent a defect or PASS.
 
+## Lines the mechanism does not need
+
+A repair can also carry too much. A line the fix changes that the demonstrated mechanism does
+not need — a retry, a null check or a broadened catch added on a guess beside the line that
+removes the mechanism — is a finding: it hides the next failure of its own kind and tells a
+later reader that state is expected. Name the line, show that the mechanism is closed without
+it, and recommend removing it, or name the second mechanism it would need a demonstration of.
+Grade it Low unless it masks a failure the task cares about.
+
 ## Severity and report
 
 This is a defect-finder dimension: PASS requires no LOW-or-higher findings. Grade the

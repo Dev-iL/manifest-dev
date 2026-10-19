@@ -34,6 +34,18 @@ Proves: with a rule whose result is a Critical finding (logging a login body wit
 Check: read
 Workload: varies
 
+### test-quality-pinned
+Run: `scripts/drive-skill.sh review-code verification/prompts/review-code-test-quality-pinned.md`
+Proves: test-quality reports the test that asserts the order of `Invoice`'s private helper calls as pinned to the implementation — an edit to the internals that keeps the total would fail it — and names the behavior to assert instead, the total.
+Check: read
+Workload: varies
+
+### defect-class-extra-guard
+Run: `scripts/drive-skill.sh review-code verification/prompts/review-code-defect-class-extra-guard.md`
+Proves: defect-class passes the `not loan["returned"]` condition as the repair of the mechanism, and reports the added `None` checks as lines the mechanism does not need.
+Check: read
+Workload: varies
+
 ## Gotchas
 
 - Each prompt builds its own scratch repository state: a commit on a branch ahead of its default branch.

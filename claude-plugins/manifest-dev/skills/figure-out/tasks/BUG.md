@@ -4,6 +4,7 @@ Angles that are easy to under-weight when fixing a known defect. Considerations,
 
 ## Blind-spot probes
 - **Already being fixed** — Does an open pull request or commit already fix this? If so, verify it instead of writing another.
+- **Tried and undone** — Did a fix like this one ship before and get reverted, or did a reviewer already ask for a change like this one to be made differently? What undid it constrains this fix.
 - **Confirm before deploy** — What local check (log, test, code trace) proves the diagnosed cause is actually fixed *before* shipping, rather than shipping to see if it worked?
 - **Shared-caller fallout** — If the fix touches a callback, hook, or shared-state API, who else calls it and what do they assume about call order or freshness?
 - **Bad data left behind** — Does fixing the code leave corrupted state that still needs migration or cleanup?

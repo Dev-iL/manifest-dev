@@ -21,3 +21,4 @@ and the evidence the verdict cites.
 - **Compare fairly** — Tune both sides, run them alternately on the same inputs, and count errors and work done alongside time
 - **Prove the harness, then freeze it** — Show the measuring harness can tell a known-slow case from a known-fast one before trusting it, freeze it before the attempts start, and set a floor on attempts so an early lucky win cannot end the run
 - **No ratio across unlike scenarios** — Compare a number only with the same scenario measured the same way
+- **Bound the gain by the changed piece's share** — A change can save at most the share of the whole that the changed piece took before it; treat a claimed gain beyond that share as a measurement fault until something else that changed explains it
