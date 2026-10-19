@@ -1,7 +1,9 @@
 """The workflow skills share one definition of a project, restated in each because a shipped
 skill stands alone. These checks keep the copies from drifting apart.
 
-Holds the decision in docs/adr/20261014-project-surfaces-follow-the-context.md.
+Holds the decision in docs/adr/20261014-project-surfaces-follow-the-context.md, and in part
+docs/adr/20260709-gate-figure-out-project-docs-by-topic-relevance.md: the working directory alone
+does not make project docs relevant.
 """
 
 from __future__ import annotations
