@@ -1515,7 +1515,7 @@ code { font-family: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, mo
   function reasons(a) {
     var rows = [["Recommended", a.pick], ["Risk", a.risk], ["Evidence", a.evidence]].filter(function (r) { return r[1]; });
     if (!rows.length) return null;
-    return el("dl", { "class": "why" }, rows.reduce(function (out, r) { return out.concat([el("dt", { text: r[0] }), el("dd", { "class": r[0] === "Recommended" ? "pick" : null, text: r[1] })]); }, []));
+    return el("dl", { "class": "why" }, rows.reduce(function (out, r) { return out.concat([el("dt", { text: r[0] }), el("dd", r[0] === "Recommended" ? { "class": "pick", text: r[1] } : { text: r[1] })]); }, []));
   }
   function copyLine(text) {
     var b = el("button", { type: "button", "class": "btn", text: "Copy" });

@@ -17,8 +17,10 @@ then escalates or tries to repair its own Ticket, and the person gets one item p
 problem, or runs spend quota repairing what is not theirs.
 
 ## Decision
-- When two or more Tickets in an effort fail on one cause outside them, whether a live run records
-  it or a landing finds it, `orchestrate` pauses the effort instead: it writes a `Paused:` line
+- When Tickets in an effort fail on one cause outside them, whether a live run records it or a
+  landing finds it, `orchestrate` pauses the effort instead — on one Ticket when a required check
+  fails the same way on the base, which already proves the cause lies outside it, and on two or
+  more for another cause: it writes a `Paused:` line
   naming the cause and its own ID, and raises one item naming the cause on the list of what waits
   on the person. A run whose required check fails the same way on the base names that cause and
   finishes rather than repairing or escalating, so the cause reaches `orchestrate` while the runs

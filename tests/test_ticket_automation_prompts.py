@@ -850,7 +850,7 @@ def test_the_pause_line_is_never_erased_and_one_cause_pauses_once() -> None:
     orchestrate = flat(orchestrate_text(SOURCE_SKILLS))
     status_page = flat(orchestrate_text(SOURCE_SKILLS, "STATUS_PAGE.md"))
 
-    assert "When two or more Tickets in an effort fail on one cause outside them" in (
+    assert "one is enough for a required check that fails the same way on the base" in (
         orchestrate
     )
     # Any orchestrator lifts a pause an orchestrator wrote, so one that outlives its writer ends.

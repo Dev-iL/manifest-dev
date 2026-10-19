@@ -47,14 +47,14 @@ Run: `verification/models/ticket-protocol/check.sh person`
 Proves: a person's claim, close, reopen, merge or escalation mark, with a moved base, never leads
 automation to close a Ticket without a landing observed since it was last opened, or to land one
 the person marked; a Ticket reopened after its merge is launched again rather than landed.
-Line: 1.5 s on linux-x64-4cpu
+Line: 2.5 s on linux-x64-4cpu; raised: the person configuration explores a person applying the escalation mark
 
 ### prefix
 Run: `verification/models/ticket-protocol/check.sh --expect-violation prefix-record && verification/models/ticket-protocol/check.sh --expect-violation prefix-stall && verification/models/ticket-protocol/check.sh --expect-violation prefix-escalated`
 Proves: the check can fail. With the protocol switched back to its three old behaviors, TLC reports
 a second attempt record, a landing that stalls and a landing of a Ticket a person marked escalated,
 each with its trace; the scenario fails when any is not reported.
-Line: 2.3 s on linux-x64-4cpu
+Line: 3.4 s on linux-x64-4cpu; raised: a third configuration, prefix-escalated, shows NoLandWhileEscalated can fail
 
 ## Gotchas
 

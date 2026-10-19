@@ -143,15 +143,16 @@ check-in:
 
 1. **Re-read every Ticket in scope.** The Tickets are this orchestrator's only memory.
 2. **Honor the pause line.** While a front item carries a `Paused:` line, start nothing in that
-   effort — no launch, no landing turn — and let live runs finish. A line a person wrote holds
-   until a person removes it: once no run is live there, stop working the effort and say so. When
-   two or more Tickets in an effort fail on one cause outside them — a base branch red on the same
-   check, a CI or venue that is down — whether a live run records it or a landing finds it, pause
-   instead of escalating or repairing each Ticket on its own: write a `Paused:` line naming the
-   cause and this orchestrator's ID, and raise one item naming the cause on the list of what waits
-   on the person. A `Paused:` line naming an orchestrator's ID keeps the check-ins going: at each,
-   check its cause, and once the cause is fixed any orchestrator removes that line, never one a
-   person wrote. Re-read the front item just before each edit and change nothing else in it.
+   effort — no launch, no landing turn — and let live runs finish. A line a person wrote holds until
+   a person removes it: once no run is live there, stop working the effort and say so. When Tickets
+   in an effort fail on a cause outside them — one is enough for a required check that fails the
+   same way on the base, and two or more for another cause, such as a CI or venue that is down —
+   whether a live run records it or a landing finds it, pause instead of escalating or repairing
+   each Ticket on its own: write a `Paused:` line naming the cause and this orchestrator's ID, and
+   raise one item naming the cause on the list of what waits on the person. A `Paused:` line naming
+   an orchestrator's ID keeps the check-ins going: at each, check its cause, and once the cause is
+   fixed any orchestrator removes that line, never one a person wrote. Re-read the front item just
+   before each edit and change nothing else in it.
 3. **Give out one landing turn at a time** across the scope, to the Auto Ticket ready to land whose
    delay costs most. Follow `../ticket-up/references/AUTOMATED_EXECUTION.md` → *Landing*, re-reading
    the Ticket before each merge, close or mark change. When the base has moved, launch the run again
