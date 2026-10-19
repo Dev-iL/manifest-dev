@@ -20,7 +20,7 @@ Turns shared understanding into a Manifest — Problem, Appetite, Deliverables w
 
 ### new-manifest
 Run: `scripts/drive-skill.sh define claude-plugins/manifest-dev/evals/define/d01-layer-cut/prompt.md`
-Proves: the drive's summary lists `manifests/manifest-<timestamp>.md` among what the session wrote under `.manifest-dev`, and the reply ends with `Manifest complete: <path>`; the three-layer plan comes back re-cut into slices. Every gate in the Manifest ends with `Judgment gate.` or `Deterministic gate.` and the ceiling invariant is present verbatim.
+Proves: the drive's summary lists `manifest.md` among the files written in the scratch project, since the prompt asks for `./manifest.md`, and the reply hands it over with `Manifest complete: <path>`; the three-layer plan comes back re-cut into slices. Every gate in the Manifest ends with `Judgment gate.` or `Deterministic gate.` and the ceiling invariant is present verbatim.
 Check: read
 Workload: varies
 
@@ -56,7 +56,7 @@ Workload: varies
 
 ### fresh-review
 Run: `scripts/drive-skill.sh define claude-plugins/manifest-dev/evals/define/d25-vague-target/prompt.md`
-Proves: before the reply's digest, the session hands a fresh context `references/REVIEW.md` with the Manifest and the session record, and settles its findings in one pass — each fixed in the Manifest or named with its reason as rejected; the review names, for each gate, a plausible wrong result the gate would fail, and reports any gate that none fails; the digest lists every number a gate binds; the Manifest's speed gate binds a floor such as faster than the measured baseline, and any frame rate appears only as an aim or a recorded assumption.
+Proves: before the reply's digest, the session hands a fresh context `references/REVIEW.md` with the Manifest and the session record, and settles its findings in one pass — each fixed in the Manifest or named with its reason as rejected; the review reports as a finding any gate that no plausible wrong result fails, naming the wrong result it lets through; the digest lists every number a gate binds; the Manifest's speed gate binds a floor such as faster than the measured baseline, and any frame rate appears only as an aim or a recorded assumption.
 Check: read
 Workload: varies
 
