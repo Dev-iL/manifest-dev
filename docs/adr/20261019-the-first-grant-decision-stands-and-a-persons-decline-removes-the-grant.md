@@ -49,7 +49,7 @@ fails if debt gathering loses the lander rule, the first-created grant decision 
 asked-person record is dropped, or a decline stops removing the grant on the convention or a venue.
 
 ## Source
-- Session: figure-out and define comparing pstack 0.15.27 with manifest-dev, and a model of the
-  ticket protocol (2026-10-19).
+- Session: figure-out and define reviewing manifest-dev's verification practice, and a model of
+  the ticket protocol (2026-10-19).
 - Related: amends 20261018-orchestrate-tickets-up-debt-and-grants-auto-where-the-criterion-holds;
   see also 20261019-the-comment-the-venue-created-first-decides-each-ticket-fact

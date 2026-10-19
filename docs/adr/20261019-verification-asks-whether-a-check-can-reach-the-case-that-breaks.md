@@ -13,9 +13,9 @@ The user
 figure-out and define settle how a change will be verified before it is built, and both lean on
 example tests. Some correctness depends on the order of events — two writers, a retry, a crash
 halfway — or must hold for every input, and example tests rarely reach the case that breaks it.
-pstack 0.15.27 ships a skill that builds formal verification suites (TLA+ models, Kani proofs),
-and a model of manifest-dev's own ticket protocol found a stall and a duplicate record that the
-review had missed. The question was how much of that to bring into the shipped prompts.
+Formal methods reach those cases, since a model checker explores every order of events within a
+bound, and a model of manifest-dev's own ticket protocol found a stall and a duplicate record that
+the review had missed. The question was how much of that to bring into the shipped prompts.
 
 ## Decision
 - Where correctness depends on the order of events or holds for every input, verification design
@@ -32,7 +32,7 @@ review had missed. The question was how much of that to bring into the shipped p
   own text.
 
 ## Alternatives Considered
-- **A formal-verification skill, as pstack ships**: a new skill a person must know to reach for,
+- **A formal-verification skill**: a new skill a person must know to reach for,
   against the North Star's "nothing to memorize"; the question in the probe reaches every coding
   task instead.
 - **Name the tools (TLA+, Kani, property-testing libraries)**: concrete, but fits one stack each
@@ -55,7 +55,7 @@ partly — eval case `56-order-dependent-design` measures figure-out's half once
 shipped line names a verification tool or specification language stays judgment.
 
 ## Source
-- Session: figure-out and define comparing pstack 0.15.27 with manifest-dev, and a model of the
-  ticket protocol (2026-10-19).
+- Session: figure-out and define reviewing manifest-dev's verification practice, and a model of
+  the ticket protocol (2026-10-19).
 - Related: see also 20261019-a-model-checks-the-ticket-protocol-against-the-prose-it-quotes,
   20261019-a-check-counts-only-after-it-was-seen-to-fail

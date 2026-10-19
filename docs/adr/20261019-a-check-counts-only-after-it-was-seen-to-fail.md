@@ -14,9 +14,9 @@ The user
 health, isolated runs, PASS on the real path, speed, control, and failures that explain
 themselves (20261015-runs-keep-the-harness-fit-for-speed-control-and-diagnosis). A check that can
 never fail meets every one of those jobs: it runs from cold, passes quickly and leaves evidence.
-pstack 0.15.27's verification skills make a check fail on purpose before trusting it, and the
-ticket protocol model added in the same change showed why: its pre-fix scenario is what proves the
-model can catch the bugs it was built for.
+Making a check fail on purpose before trusting it closes that gap, and the ticket protocol model
+added in the same change showed why: its pre-fix scenario is what proves the model can catch the
+bugs it was built for.
 
 ## Decision
 - *Fit to trust* gains a job, **It was seen to fail**: the check failed on a scratch break of what
@@ -46,6 +46,6 @@ read; the `prefix` scenario of `verification/recipes/ticket-protocol-model.md` i
 repository's own instance.
 
 ## Source
-- Session: figure-out and define comparing pstack 0.15.27 with manifest-dev (2026-10-19).
+- Session: figure-out and define reviewing manifest-dev's verification practice (2026-10-19).
 - Related: amends 20261015-runs-keep-the-harness-fit-for-speed-control-and-diagnosis; see also
   20261019-a-model-checks-the-ticket-protocol-against-the-prose-it-quotes

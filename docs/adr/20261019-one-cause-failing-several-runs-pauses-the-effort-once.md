@@ -51,6 +51,6 @@ fails if the common-cause pause, its own-line-only removal or the re-read before
 write is dropped; deciding that failures share a cause stays judgment.
 
 ## Source
-- Session: figure-out and define comparing pstack 0.15.27 with manifest-dev (2026-10-19).
+- Session: figure-out and define reviewing manifest-dev's verification practice (2026-10-19).
 - Related: amends 20261018-an-orchestrating-skill-runs-the-queue-and-replaces-the-sweep; see also
   20261019-each-item-waiting-on-the-person-carries-its-recommendation-risk-and-evidence

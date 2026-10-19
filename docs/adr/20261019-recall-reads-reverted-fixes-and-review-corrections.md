@@ -14,8 +14,7 @@ The user
 read what earlier work left on a repository: logs and Manifests, open Tickets, and the "Debt left"
 sections of recent pull requests on the topic's paths. Two records of what was tried and undone
 stayed unread: a fix that shipped and was reverted, and a reviewer's request to do a change
-differently. A new fix for the same failure can then repeat what was undone, which pstack
-0.15.27's review flow guards against by reading earlier corrections.
+differently. A new fix for the same failure can then repeat what was undone.
 
 ## Decision
 - On the pull requests recall already lists, it also reads the review comments that asked for
@@ -42,5 +41,5 @@ differently. A new fix for the same failure can then repeat what was undone, whi
 partly — eval case `59-reverted-fix` measures it once run; how far back to read stays judgment.
 
 ## Source
-- Session: figure-out and define comparing pstack 0.15.27 with manifest-dev (2026-10-19).
+- Session: figure-out and define reviewing manifest-dev's verification practice (2026-10-19).
 - Related: amends 20261013-figure-out-and-define-recall-earlier-sessions-on-the-same-repo

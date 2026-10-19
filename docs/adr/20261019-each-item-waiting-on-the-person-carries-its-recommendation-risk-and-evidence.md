@@ -13,8 +13,7 @@ The user
 20261018-an-orchestrating-skill-runs-the-queue-and-replaces-the-sweep gave `orchestrate` one list
 of what waits on the person, ordered by what waiting costs. Each item said what was asked and
 linked the pull request or Ticket. With several runs at once, the person then opened each link to
-decide, and a count such as "3 held pull requests" stood in for items. pstack 0.15.27's review
-flow puts each choice in front of the person with the pick it recommends and why.
+decide, and a count such as "3 held pull requests" stood in for items.
 
 ## Decision
 - Each item on the list has its own bullet, never a count standing in for items, with what the
@@ -46,5 +45,5 @@ fails if `orchestrate` or the page reference drops an item's fields or lets a co
 items; whether a recommendation is sound stays judgment.
 
 ## Source
-- Session: figure-out and define comparing pstack 0.15.27 with manifest-dev (2026-10-19).
+- Session: figure-out and define reviewing manifest-dev's verification practice (2026-10-19).
 - Related: amends 20261018-an-orchestrating-skill-runs-the-queue-and-replaces-the-sweep

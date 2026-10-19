@@ -70,8 +70,8 @@ record, pushes that build on the head and merges only at the recorded head, and
 marker kinds exist stays judgment.
 
 ## Source
-- Session: figure-out and define comparing pstack 0.15.27 with manifest-dev, and a model of the
-  ticket protocol (2026-10-19).
+- Session: figure-out and define reviewing manifest-dev's verification practice, and a model of
+  the ticket protocol (2026-10-19).
 - Related: amends 20261018-the-tickets-attempt-record-carries-its-manifest-progress-and-run-facts;
   see also 20260812-trigger-adapters-enforce-per-ticket-single-flight,
   20261019-a-model-checks-the-ticket-protocol-against-the-prose-it-quotes

@@ -84,8 +84,8 @@ landed, escalated or taken by a person within its bound. Whether a cross-cut ove
 judgment.
 
 ## Source
-- Session: figure-out and define comparing pstack 0.15.27 with manifest-dev, and a model of the
-  ticket protocol (2026-10-19).
+- Session: figure-out and define reviewing manifest-dev's verification practice, and a model of
+  the ticket protocol (2026-10-19).
 - Related: amends 20261018-orchestrate-lands-and-run-ticket-stops-at-a-ready-pull-request; see
   also 20260825-escalation-clears-the-claim-and-carries-its-own-mark,
   20261019-a-model-checks-the-ticket-protocol-against-the-prose-it-quotes
