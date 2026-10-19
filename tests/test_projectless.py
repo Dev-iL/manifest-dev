@@ -3,7 +3,9 @@ skill stands alone. These checks keep the copies from drifting apart.
 
 Holds the decision in docs/adr/20261014-project-surfaces-follow-the-context.md, and in part
 docs/adr/20260709-gate-figure-out-project-docs-by-topic-relevance.md: the working directory alone
-does not make project docs relevant.
+does not make project docs relevant. In part it also holds
+docs/adr/20261015-do-states-the-goal-and-its-conventions-and-leaves-method-to-the-run.md: the
+conventions `/do` keeps.
 """
 
 from __future__ import annotations

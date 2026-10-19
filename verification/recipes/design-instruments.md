@@ -35,11 +35,16 @@ Run: `d=$(mktemp -d) && printf '%s' '<!doctype html><html lang="en"><head><meta 
 Proves: exit `0`; `NOTE`/`OK`/`FINDING` lines, `SKIPPED  render samples` when Playwright is absent, and a closing count line.
 Check: read
 
+### experiments
+Run: `d=$(mktemp -d) && node scripts/design-evals/run.mjs "$d/out"`
+Proves: exit `0` and a last line `Checks: PASS`: the instruments' constructed geometric, semantic and behavioral facts hold across the fixture pages, and a blind comparison gallery is written under the temporary directory. It measures no human preference or task speed.
+Check: read
+
 ## Gotchas
 
 - Needs Node 20+; Python 3 for HTML; Pillow for native images; Playwright with Chromium only for design-check's render samples. Commands run from the repository root, and the scratch page and outputs go to a temporary directory outside it.
 - Exit `0` means the run completed, findings or not; read the output.
 - Without Playwright the render samples are `SKIPPED`, which is not a pass.
 - Raster input is capped at 512 px on the long edge.
-- `tests/test_design_instruments.py` (runs `tests/fixtures/design-instruments/test-instruments.mjs`) and `tests/test_design_check.py` also check it; `scripts/design-evals/` is the harness for wider experiments and says what it does not measure.
+- `tests/test_design_instruments.py` (runs `tests/fixtures/design-instruments/test-instruments.mjs`) and `tests/test_design_check.py` also check it; `scripts/design-evals/`, which the `experiments` scenario runs, says what it does not measure and needs Playwright with Chromium, `pypdf` and Poppler's `pdftoppm`; a missing one fails the run rather than skipping it.
 - Not yet driven: the design skill's instruments reference, review-design's HTML check.

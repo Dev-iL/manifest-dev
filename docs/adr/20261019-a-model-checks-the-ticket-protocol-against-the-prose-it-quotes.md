@@ -61,7 +61,7 @@ that change had not found.
 ## Enforced by
 `tests/test_ticket_protocol_model.py` — fails when a quoted sentence leaves its file, or an action
 or checked property carries no quote, world or pre-fix mark; the `prefix` scenario of
-`verification/recipes/ticket-protocol-model.md` fails when the model stops catching the two old
+`verification/recipes/ticket-protocol-model.md` fails when the model stops catching the three old
 bugs.
 
 ## Source

@@ -19,6 +19,8 @@ surface reads the same words: no per-host rewrite exists.
 Reviewers are dimensions of the review-code skill, not standalone agents.
 """
 
+# Holds in part docs/adr/20261015-do-states-the-goal-and-its-conventions-and-leaves-method-to-the-run.md:
+# the conventions `/do` keeps.
 from __future__ import annotations
 
 import json

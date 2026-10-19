@@ -224,7 +224,8 @@ def test_walk_points_at_sections_that_exist(recipe: Path) -> None:
     assert not broken, "\n".join(broken)
 
 
-# Holds the decision in docs/adr/20261014-one-verification-harness-per-project.md.
+# Holds the decision in docs/adr/20261014-one-verification-harness-per-project.md, and in part
+# docs/adr/20261015-ask-first-marks-cost-not-slowness.md.
 def test_ask_first_recipe_is_refused_without_yes() -> None:
     marked = [
         p for p in sorted(RECIPES.glob("*.md")) if front_matter(p).get("ask-first")
@@ -1181,7 +1182,8 @@ def test_one_run_over_the_line_is_noise_until_a_confirming_run_crosses_too(
 
 
 # Holds the decision in docs/adr/20261018-the-harness-commits-no-evidence-and-time-lines-live-in-recipes.md, which amends
-# docs/adr/20261015-check-run-time-is-held-by-an-alarm-against-creep.md.
+# docs/adr/20261015-check-run-time-is-held-by-an-alarm-against-creep.md, and in part
+# docs/adr/20261015-runs-keep-the-harness-fit-for-speed-control-and-diagnosis.md.
 def test_a_crossing_a_confirming_run_repeats_exits_over_and_names_the_ways_on(
     tmp_path: Path,
 ) -> None:

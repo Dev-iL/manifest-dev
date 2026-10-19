@@ -34,6 +34,8 @@ The checks derive their own subject rather than listing today's sites, so a site
 later is covered without this file being edited.
 """
 
+# Holds in part docs/adr/20261015-do-states-the-goal-and-its-conventions-and-leaves-method-to-the-run.md:
+# the conventions `/do` keeps.
 from __future__ import annotations
 
 import re

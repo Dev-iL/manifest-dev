@@ -7,6 +7,8 @@ to the prose that drops or rewords a quoted sentence fails here, naming the file
 so the model is updated in the same change. An action that models the world rather than the
 protocol carries a `\\* World:` comment instead; a branch that restores an old behavior carries
 `\\* Pre-fix:` and quotes nothing, since the text it described is gone on purpose.
+
+Holds the decision in docs/adr/20261019-a-model-checks-the-ticket-protocol-against-the-prose-it-quotes.md.
 """
 
 import re
