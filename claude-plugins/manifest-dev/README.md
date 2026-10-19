@@ -75,7 +75,7 @@ Two skills run the queue:
 | `/orchestrate` | Proposes a plan over an effort's ready Tickets and runs it after you approve: each Ticket in its own session, landed one at a time. Auto Tickets land on their own; the rest stop at a ready pull request for you to land. The debt they leave becomes new Tickets, and one status page shows what is running and what waits on you. With `--autonomous`, started by a scheduler you already run, it starts a new run whenever one finishes, up to the number it may run at once, until no ready work remains, and grants Auto where no one's judgment is needed. |
 | `/run-ticket` | Works one Ticket up to a ready pull request, keeping its Manifest and progress on the Ticket so a fresh run can resume it. It lands only when told to. `/orchestrate` starts it for each Ticket; you can run it by hand too. |
 
-What waits for you: landing a Ticket without Auto, escalations, Tickets from people without write access, planning a new effort, and each plan in the default mode.
+What waits for you: landing a Ticket without Auto, a review the repository requires from a person, escalations, Tickets from people without write access, a cause that paused an effort (such as a check failing on the base branch), planning a new effort, and each plan in the default mode. Each item comes with the answer it recommends, the risk of taking it, and the evidence behind it.
 
 ## Review and verification
 

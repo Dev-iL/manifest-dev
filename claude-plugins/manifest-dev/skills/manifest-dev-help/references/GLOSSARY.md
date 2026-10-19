@@ -508,6 +508,10 @@ wait. It keeps no state of its own: it reads all of it from the Tickets and from
 Some work still waits for you. You merge a Ticket without Auto and answer escalations. You plan
 large work. You approve a Ticket whose author cannot write to the repository.
 
+You also give a review that the repository requires from a person. You fix a cause that stopped
+an effort, for example a check that fails on the base branch too. Each item tells you the answer
+that it recommends, the risk, and the evidence.
+
 ## Pull requests
 
 ### Babysit PR
