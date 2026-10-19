@@ -1,4 +1,5 @@
 ---
+# Holds the decision in docs/adr/20261019-verification-asks-whether-a-check-can-reach-the-case-that-breaks.md — that record's Enforced by line names this case; weakening or removing it means updating that line in the same change.
 tags: [figure-out]
 max_turns: 40
 timeout_seconds: 900
