@@ -50,10 +50,12 @@ local HTML file. Pick the first that applies:
 
 The page never writes to the store, the data file or anything else. A person who opens it reads it.
 
-Save the page's link on the effort's front item, on a line of its own: `Status page: <link or path>`.
-At the start of every plan, and when a new orchestrator session starts on the effort, read that line
-and update the page it names instead of making a new one. If the link no longer opens, or the host will
-not let you update that page, publish a new one and replace the line.
+Save the page's link on the effort's front item, on a line of its own: `Status page: <link or
+path>`. At the start of every plan, and when a new orchestrator session starts on the effort, read
+that line and update the page it names instead of making a new one. If the link no longer opens, or
+the host will not let you update that page, publish a new one and replace the line: re-read the
+front item just before that edit and change nothing else in it, so a `Paused:` line a person added
+meanwhile stays.
 
 The page holds Ticket titles and the person's open questions. On a host where pages can be shared,
 leave it private unless the person shares it.
@@ -151,9 +153,15 @@ comes first.
 | `ask` | string | What the person is asked, in one sentence. |
 | `ticket` | id, optional | The Ticket the ask is about. Its card gets the item's number as a badge, and the item opens its detail. |
 | `detail` | string, optional | What the person needs to answer, and where an answer counts: in the orchestrator's conversation, or on the venue. |
+| `pick` | string, optional | The answer the orchestrator recommends, such as "Merge it." |
+| `risk` | string, optional | What could go wrong if the person takes that answer. |
+| `evidence` | string, optional | What the recommendation rests on: the gates that passed and what they did not check, the failing check, or the blocker. |
 | `cost` | string, optional | What the wait holds back, such as "#153 depends on it". |
 | `startLine` | string, optional | A line the person copies to start a session, such as the start line for a deep-planning session. The page shows it with a Copy button. |
 
-Every item the orchestrator keeps on its list of what waits on the person is here: held pull requests,
-escalations, launches that went to a person, Tickets awaiting a grant, refactor proposals, planning
-sessions to start, and the next plan to approve.
+Every item the orchestrator keeps on its list of what waits on the person is here: held pull
+requests, escalations, launches that went to a person, Tickets awaiting a grant, refactor proposals,
+planning sessions to start, a common cause that paused the effort, and the next plan to approve.
+Each is its own item, never a count standing in for several. Give each the `pick`, `risk` and
+`evidence` that let the person decide it from the page; the page shows them under the ask, and in
+the Ticket's detail.

@@ -65,7 +65,7 @@ A shaped ticket carries, in plain language:
 - **Suggested approach** *(optional)* — a starting direction, marked as advice the picker may discard.
 - **Definition of done** — checks a stranger can judge for themselves, in prose.
 - **Depends on** — ticket IDs this one needs finished first. Structural needs only.
-- **Auto** *(when granted)* — the grant above, naming its grantor; a ticket that doesn't carry it is ungranted. A recorded withhold or withdrawal fences nothing: it only tells `orchestrate --autonomous` the ticket was already judged.
+- **Auto** *(when granted)* — the grant above, naming its grantor; a ticket that doesn't carry it is ungranted. A recorded withhold, withdrawal or decline grants nothing and tells `orchestrate --autonomous` the ticket was already judged, so it is not granted again; a person's decline or withdrawal also removes the grant itself, as the venue renders it.
 - **Type** *(when one fits)* — one of the types above, naming what kind of work this is; omitted when none of them describes it.
 - **Status / Claimed by** — see lifecycle.
 

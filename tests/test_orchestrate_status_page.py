@@ -174,6 +174,9 @@ def test_the_sample_snapshot_is_valid() -> None:
         (("tickets", 0, "phase"), "review"),
         (("tickets", 0, "kind"), "chore"),
         (("tickets", 0, "auto"), True),
+        (("needsYou", 0, "pick"), 1),
+        (("needsYou", 0, "risk"), ["low"]),
+        (("needsYou", 0, "evidence"), {"gates": 14}),
     ],
 )
 def test_a_snapshot_outside_the_schema_is_refused(
@@ -187,3 +190,14 @@ def test_a_snapshot_outside_the_schema_is_refused(
         target = target[step]
     target[path[-1]] = value
     assert not validate(snapshot), path
+
+
+@pytest.mark.parametrize("field", ["pick", "risk", "evidence"])
+def test_a_waiting_item_without_its_recommendation_risk_or_evidence_is_still_valid(
+    field: str,
+) -> None:
+    # The fields help the person decide; an orchestrator that has none to give still shows the item.
+    snapshot = sample()
+    assert field in snapshot["needsYou"][0], f"the sample's first waiting item lost `{field}`"
+    del snapshot["needsYou"][0][field]
+    assert validate(snapshot)

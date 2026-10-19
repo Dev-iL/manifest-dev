@@ -94,11 +94,13 @@ def test_the_one_landing_procedure_refreshes_checks_the_base_and_closes_after_me
     landing = flat(section(automation_text(SOURCE_SKILLS), "Landing"))
 
     assert "This is the one landing procedure." in landing
+    # The base is checked before the head: a branch behind its base cannot pass the head check,
+    # and checking the head first stopped the landing before the base was ever merged in.
     steps = [
         "**Re-reads the Ticket.**",
         "**Checks authority.**",
-        "**Refreshes the pull request.**",
         "**Checks the base.**",
+        "**Refreshes the pull request.**",
         "**Merges with the head pinned**",
         "**Records and closes.**",
     ]
@@ -107,7 +109,31 @@ def test_the_one_landing_procedure_refreshes_checks_the_base_and_closes_after_me
     assert "An unattended landing needs Auto still present" in landing
     assert "Its head must be the head commit the record names" in landing
     assert "When the base has moved since the base commit the record names" in landing
-    assert "re-runs every gate" in landing
+    # After a base move, only what the base change can reach re-runs.
+    assert "the same patch ID" in landing
+    assert "only the deterministic gates re-run" in landing
+    assert "the judgment gates' earlier verdicts stand" in landing
+    assert "otherwise it re-runs every gate" in landing
+    # Every way a landing cannot merge leads somewhere; none ends in "reports and stops".
+    assert "reports the current state and stops" not in landing
+    assert (
+        "When the head is not the one the record names, or a required check fails, "
+        "`orchestrate` relaunches the run to repair it" in landing
+    )
+    assert (
+        "When a protection needs what no run can give, or the pull request was closed "
+        "without merging, the lander writes the escalation record" in landing
+    )
+    assert (
+        "No Ticket keeps a landing turn while nothing works toward its landing."
+        in landing
+    )
+    # A reopened Ticket is new work, and an escalated one is never landed.
+    assert (
+        "only when the Ticket was not reopened after that merge" in landing
+        and "its next launch clears the ready mark" in landing
+    )
+    assert "It stops when the Ticket is closed, carries the escalation mark" in landing
     assert "observes the merged state" in landing
     assert "A Ticket closes only after its landing is observed" in landing
     assert "With Auto, its run closes it once the answer is recorded" in landing
@@ -453,7 +479,7 @@ def test_run_ticket_preserves_ticket_identity_and_routes_follow_ups() -> None:
     assert "close the same Ticket as done" in flat(text)
     assert "Leave the Ticket open" in text
     assert "Escalation ends this attempt, not the work" in flat(text)
-    assert "Never close the source or\ncreate a replacement Ticket" in text
+    assert "Never close the source or create a replacement Ticket" in flat(text)
     assert "invoke `ticket-up`" in text
     assert "Never write a follow-up directly to the venue" in text
 
@@ -482,12 +508,16 @@ def test_run_ticket_escalation_releases_the_claim_and_marks_the_ticket() -> None
     assert "<!-- manifest-dev-run-ticket-escalated -->" in text
     assert "apply the venue's escalation mark" in flat(text)
     assert (
-        "retain its Auto grant when it is still present, and release the claim"
+        "retain its Auto grant when it is still present, and release the automation claim"
         in flat(text)
     )
-    assert "clears the mark, which makes the Ticket eligible" in flat(text)
+    assert "never removing a person's" in flat(text)
+    assert (
+        "clearing the mark also clears any automation claim, which makes the Ticket eligible"
+        in flat(text)
+    )
     # Ordering is load-bearing: releasing the claim is itself a dispatch event.
-    assert "release the claim — in that order, mark first" in flat(text)
+    assert "release the automation claim — in that order, mark first" in flat(text)
     # An escalation mark is a dispatch rule, enforced by dispatchers rather than here.
     assert "never stops a person who invokes this skill on it deliberately" in flat(
         text
@@ -517,9 +547,10 @@ def test_github_venue_renders_the_escalation_mark_as_a_label() -> None:
 
     assert "| Escalation mark | An `escalated` label on the ticket" in text
     assert (
-        "apply the `escalated` label, leave `auto` unchanged, and clear the assignee"
-        in flat(text)
+        "apply the `escalated` label, leave `auto` unchanged, and remove the automation "
+        "assignee — never a person's" in flat(text)
     )
+    assert "removes the `escalated` label and any automation assignee" in flat(text)
     assert "removes the `escalated` label" in flat(text)
     assert "it also requires the absence of the `escalated` label" in flat(text)
     assert "assign the person needed next" not in flat(text)
@@ -630,6 +661,160 @@ def test_a_runs_outcomes_are_defined_once_and_a_drafted_answer_waits_on_the_pers
     )
     run_ticket = flat(skill_text(SOURCE_SKILLS, "run-ticket"))
     assert (
-        "A record holding a drafted answer waits for a person to accept it; stop."
-        in (run_ticket)
+        "A record holding a drafted answer waits for a person to accept it: tell whoever "
+        "started the run" in (run_ticket)
     )
+
+
+# Holds the decision in docs/adr/20261019-the-comment-the-venue-created-first-decides-each-ticket-fact.md.
+def test_where_two_comments_carry_one_marker_the_comment_created_first_decides() -> None:
+    """The class rule for races between writers sharing one identity lives in one place."""
+    rule = "the comment the venue created first decides"
+    homes = [
+        path.relative_to(SOURCE_SKILLS).as_posix()
+        for path in sorted(SOURCE_SKILLS.rglob("*.md"))
+        if rule in flat(path.read_text(encoding="utf-8"))
+    ]
+    assert homes == ["ticket-up/references/AUTOMATED_EXECUTION.md"]
+    record = flat(section(automation_text(SOURCE_SKILLS), "The attempt record"))
+    assert "A writer whose comment is not the first removes its own and stands down" in (
+        record
+    )
+    # Every other writer points to it.
+    assert "→ *The attempt record*" in flat(orchestrate_text(SOURCE_SKILLS))
+    assert "→ *The attempt record*" in flat(skill_text(SOURCE_SKILLS, "run-ticket"))
+    assert "`AUTOMATED_EXECUTION.md` → *The attempt record*" in flat(
+        ticket_ref(SOURCE_SKILLS, "GITHUB_STORE.md")
+    )
+    # A launcher re-reads after writing; the run facts are not called a lock.
+    assert "**Re-read the Ticket after writing.**" in flat(
+        orchestrate_text(SOURCE_SKILLS)
+    )
+    gotchas = flat(section(automation_text(SOURCE_SKILLS), "Gotchas"))
+    assert "and neither are the run facts" in gotchas
+    assert "The run facts and the re-read before each write are;" not in gotchas
+
+
+# Holds the decision in docs/adr/20261019-the-comment-the-venue-created-first-decides-each-ticket-fact.md.
+def test_each_ticket_fact_keeps_one_writer() -> None:
+    record = flat(section(automation_text(SOURCE_SKILLS), "The attempt record"))
+    identity = flat(section(automation_text(SOURCE_SKILLS), "The automation identity"))
+    orchestrate = flat(orchestrate_text(SOURCE_SKILLS))
+    run_ticket = flat(skill_text(SOURCE_SKILLS, "run-ticket"))
+
+    # A ready mark belongs to the run that wrote it.
+    assert (
+        "The ready mark and the drafted answer name the run that wrote them, and count "
+        "only while the run facts name that run." in record
+    )
+    # The session has one writer: the launcher before the run starts, else the run itself.
+    assert "the run records its own session on its first write instead" in record
+    assert "Record the session in the run facts once the host names it" not in (
+        orchestrate
+    )
+    # A record counts only when the automation identity created it and edited it last.
+    assert "it created the comment and made its last edit" in identity
+    # A live run notices a person's claim, a close and the escalation mark.
+    assert "Re-read the record and the Ticket before each write and each push" in (
+        run_ticket
+    )
+    assert (
+        "The run also stops when a person is assigned, when the Ticket is closed, or — "
+        "on an unattended run — when the escalation mark is on." in run_ticket
+    )
+    assert "the run the record names merges what is there and pushes again" in (
+        run_ticket
+    )
+    # A takeover restarts the timeout, so two orchestrators do not trade a Ticket.
+    assert "A takeover writes a fresh start time" in orchestrate
+
+
+# Holds the decision in docs/adr/20261019-every-way-a-landing-cannot-merge-relaunches-or-escalates.md.
+def test_orchestrate_sorts_each_ticket_into_one_category_and_keeps_checking_in() -> None:
+    orchestrate = flat(orchestrate_text(SOURCE_SKILLS))
+
+    assert "Each Ticket takes the first category below whose conditions hold" in (
+        orchestrate
+    )
+    order = ["*Left alone*", "*Running*", "*To land*", "*Answered*", "*To recover*", "*Ready*"]
+    positions = [orchestrate.index(f"- {name}") for name in order]
+    assert positions == sorted(positions), "the categories are out of order"
+    # An escalation that ended before its claim was released is recovered once the mark is gone.
+    assert "or wrote an escalation whose mark is now gone" in orchestrate
+    assert "clearing the mark also clears any automation claim and resets the launch count" in (
+        orchestrate
+    )
+    # Tickets waiting to land keep the check-ins going.
+    assert (
+        "Check in whenever a run or a landing turn ends, and otherwise every ten minutes "
+        "while a run is live or a Ticket in scope waits for a landing turn" in orchestrate
+    )
+    # Collisions are planned around running Tickets too, whoever runs them.
+    assert "each *Running* Ticket whoever runs it" in orchestrate
+
+
+# Holds the decision in docs/adr/20261019-the-first-grant-decision-stands-and-a-persons-decline-removes-the-grant.md.
+def test_debt_and_grants_are_decided_once_and_a_persons_no_stands() -> None:
+    orchestrate = flat(orchestrate_text(SOURCE_SKILLS))
+    default = flat(orchestrate_text(SOURCE_SKILLS, "PROPOSE_AND_WAIT.md"))
+    autonomous = flat(orchestrate_text(SOURCE_SKILLS, "AUTONOMOUS.md"))
+    github = flat(ticket_ref(SOURCE_SKILLS, "GITHUB_STORE.md"))
+    files = flat(ticket_ref(SOURCE_SKILLS, "FILE_STORE.md"))
+    convention = flat(convention_text(SOURCE_SKILLS))
+
+    assert "when this orchestrator recorded its landing" in orchestrate
+    assert "where a Ticket carries two, the one created first decides" in orchestrate
+    assert "record on the Ticket that the person was asked" in default
+    assert "any grant the Ticket already carries is removed" in default
+    assert "one saying a person was asked leaves the grant to that person" in autonomous
+    assert "a person's decline removes it too" in github
+    assert "declines one, by replacing any `Auto: yes` line" in files
+    assert "a person's decline or withdrawal also removes the grant itself" in convention
+    assert "fences nothing" not in convention
+
+
+# Holds the decision in docs/adr/20261019-one-cause-failing-several-runs-pauses-the-effort-once.md.
+def test_the_pause_line_is_never_erased_and_one_cause_pauses_once() -> None:
+    orchestrate = flat(orchestrate_text(SOURCE_SKILLS))
+    status_page = flat(orchestrate_text(SOURCE_SKILLS, "STATUS_PAGE.md"))
+
+    assert "When two or more live runs fail on one cause outside their Tickets" in (
+        orchestrate
+    )
+    assert "remove only the `Paused:` line it wrote, never one a person wrote" in (
+        orchestrate
+    )
+    assert "Write that line only when it is absent or its page no longer opens" in (
+        orchestrate
+    )
+    assert "so a `Paused:` line a person added since is kept" in orchestrate
+    assert "so a `Paused:` line a person added meanwhile stays" in status_page
+
+
+# Holds the decision in docs/adr/20261019-every-way-a-landing-cannot-merge-relaunches-or-escalates.md.
+def test_run_ticket_by_hand_says_where_it_stopped() -> None:
+    run_ticket = flat(skill_text(SOURCE_SKILLS, "run-ticket"))
+
+    assert (
+        "there is nothing to redo only when the pull request's head is the head the record "
+        "names and the base has not moved" in run_ticket
+    )
+    assert "unless the Ticket was reopened after that merge" in run_ticket
+    assert "an orchestrator's next check-in" in run_ticket
+    assert "the answer waits on them and where it is recorded" in run_ticket
+    assert "Where the record names the Manifest by path instead" in run_ticket
+
+
+# Holds the decision in docs/adr/20261019-each-item-waiting-on-the-person-carries-its-recommendation-risk-and-evidence.md.
+def test_each_item_waiting_on_the_person_can_be_decided_from_the_list() -> None:
+    orchestrate = flat(orchestrate_text(SOURCE_SKILLS))
+    status_page = flat(orchestrate_text(SOURCE_SKILLS, "STATUS_PAGE.md"))
+
+    assert "Give each item its own bullet, never a count standing in for items" in orchestrate
+    assert (
+        "with what the person is asked, the answer you recommend, the risk of taking it, and "
+        "the evidence it rests on" in orchestrate
+    )
+    assert "report only what changed since the last check-in" in orchestrate
+    for field in ("`pick`", "`risk`", "`evidence`"):
+        assert field in status_page, f"STATUS_PAGE.md lost the {field} field"
