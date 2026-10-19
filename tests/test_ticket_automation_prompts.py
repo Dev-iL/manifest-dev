@@ -130,9 +130,14 @@ def test_the_one_landing_procedure_refreshes_checks_the_base_and_closes_after_me
         "When the merge waits only on a review the repository requires, the Ticket waits on "
         "the person's list as a held pull request, with no escalation mark" in landing
     )
-    assert "one pending past the run timeout counts as failing" in landing
+    assert (
+        "one still pending a run timeout after the head was pushed counts as failing"
+        in landing
+    )
     # A relaunch keeps the cheap re-check: only commits after the recorded head are new work.
     assert "commits after the head the record names as new work" in landing
+    # A check red on the base too is the base's failure: repairing it per Ticket would loop.
+    assert "is the base's failure, not the Ticket's: nothing is repaired" in landing
     assert (
         "No Ticket keeps a landing turn while nothing works toward its landing."
         in landing
@@ -732,7 +737,10 @@ def test_each_ticket_fact_keeps_one_writer() -> None:
         "The ready mark and the drafted answer name the run that wrote them, and count "
         "only while the run facts name that run;" in record
     )
-    # A relaunched run still starts from an earlier run's mark.
+    # A relaunched run still starts from an earlier run's mark, which the launch facts leave alone.
+    assert "leaving the base commit and ready mark for the run to read" in flat(
+        orchestrate_text(SOURCE_SKILLS)
+    )
     assert (
         "a relaunched run reads an earlier run's mark as where the work stands"
         in record
@@ -825,7 +833,7 @@ def test_debt_and_grants_are_decided_once_and_a_persons_no_stands() -> None:
         in (autonomous)
     )
     assert "Re-read the Ticket after granting" in autonomous
-    assert "taking back anything it applied with it, such as a grant's label" in flat(
+    assert "a grant's label when the first decision withholds" in flat(
         automation_text(SOURCE_SKILLS)
     )
     assert "`Auto withheld: <person> — asked`" in files

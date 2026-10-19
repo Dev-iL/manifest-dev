@@ -30,8 +30,10 @@ each base move also meant a busy base could relaunch a ready Ticket again and ag
 - A head that is not the recorded one, or a required check that fails, relaunches the run to
   repair it, and only commits after the recorded head are new work; `run-ticket` treats an attempt
   as having nothing to redo only when the head is the recorded one and the base has not moved. A
-  relaunched run starts from an earlier run's ready mark. A required check still pending leaves
-  the merge for a later turn, and one pending past the run timeout counts as failing. A merge that
+  relaunched run starts from an earlier run's ready mark, which the launch facts leave in place. A
+  required check that fails the same way on the base is the base's failure and is not repaired per
+  Ticket. A required check still pending leaves the merge for a later turn, and one still pending a
+  run timeout after the head was pushed counts as failing. A merge that
   waits only on a required review holds the pull request on the person's list without an
   escalation mark, so their approval alone lets it land. Another protection that needs what no run
   can give, or a pull request closed without merging, gets an escalation record. No Ticket keeps a

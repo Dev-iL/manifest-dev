@@ -210,9 +210,9 @@ source or create a replacement Ticket for its unfinished obligation.
 
 A runner that disappears before writing an outcome (`../ticket-up/references/AUTOMATED_EXECUTION.md`
 → *The attempt record*) is a failed launch, not an outcome: its launcher counts it and starts the
-Ticket again. On a hand run nothing restarts it: the person runs this skill again, or an
-orchestrator recovers it once its timeout passes. `run-ticket` does not invent a Ticket outcome for
-a process that is no longer running.
+Ticket again. On a hand run nothing restarts it: the person runs this skill again, or, where the run
+wrote as the automation identity, an orchestrator recovers it once its timeout passes. `run-ticket`
+does not invent a Ticket outcome for a process that is no longer running.
 
 ## Gotchas
 

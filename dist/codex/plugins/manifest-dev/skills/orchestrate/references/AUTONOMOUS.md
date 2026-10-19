@@ -30,6 +30,7 @@ the ready work at once.
 
 ## Stop
 
-Stop when no ready work is left in scope, nothing waits for a landing turn, and no run is live.
+Stop when no ready work is left in scope, nothing waits for a landing turn but a pull request held
+for a person's review, and no run is live.
 Check in a last time, then report what landed, what waits on the person in its order, and the
 page's link.

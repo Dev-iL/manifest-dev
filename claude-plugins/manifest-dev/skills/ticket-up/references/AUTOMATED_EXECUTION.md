@@ -60,7 +60,8 @@ user asks for it.
 
 Where two comments on a Ticket carry the same marker, the comment the venue created first decides,
 and every reader takes it as the one record. A writer whose comment is not the first removes its own
-and stands down, taking back anything it applied with it, such as a grant's label: a launcher skips
+and stands down, taking back anything it applied with it that the first does not also stand behind
+— a grant's label when the first decision withholds: a launcher skips
 the Ticket, and a run stops. This holds for every marker the
 records here and the venue references use — the attempt, completion and escalation records and the
 grant-decision comment — except the Manifest's continuation comments, which are parts of one record,
@@ -121,15 +122,18 @@ follows it only when its prompt says to land. The lander:
    must pass, and the repository's protections must permit the merge; it never merges older state.
    When the head is not the one the record names, or a required check fails, `orchestrate`
    relaunches the run to repair it, and a landing `run-ticket` repairs it in place; the run treats
-   commits after the head the record names as new work and re-runs every gate. A required check
-   still pending leaves the merge for a later turn, and one pending past the run timeout counts as
-   failing. When the merge waits only on a review the repository requires, the Ticket waits on the
-   person's list as a held pull request, with no escalation mark; an approval from someone with
-   write access lets a later landing turn merge it. When another protection needs what no run can
-   give, or the pull request was closed without merging, the lander writes the escalation record,
-   naming what a person must give or decide, and applies the escalation mark before it releases the
-   claim; the Ticket then waits on the person's list. In each case the landing turn passes to the
-   next Ticket. No Ticket keeps a landing turn while nothing works toward its landing.
+   commits after the head the record names as new work and re-runs every gate. A required check that
+   fails the same way on the target base is the base's failure, not the Ticket's: nothing is
+   repaired, and the lander names that cause (`orchestrate` pauses on it, as its check-in says). A
+   required check still pending leaves the merge for a later turn, and one still pending a run
+   timeout after the head was pushed counts as failing. When the merge waits only on a review the
+   repository requires, the Ticket waits on the person's list as a held pull request, with no
+   escalation mark; an approval from someone with write access lets a later landing turn merge it.
+   When another protection needs what no run can give, or the pull request was closed without
+   merging, the lander writes the escalation record, naming what a person must give or decide, and
+   applies the escalation mark before it releases the claim; the Ticket then waits on the person's
+   list. In each case the landing turn passes to the next Ticket. No Ticket keeps a landing turn
+   while nothing works toward its landing.
 5. **Merges with the head pinned**, through the venue's normal protected mechanism, and observes
    the merged state. It never force-pushes a shared branch, bypasses protection, or merges work
    the Ticket does not authorize. A non-repository Ticket's landing is observed at its durable

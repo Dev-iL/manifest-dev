@@ -262,18 +262,24 @@ code { font-family: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, mo
 .list { margin: 6px -18px 0; }
 .row { display: grid; grid-template-columns: 24px minmax(0, 1fr) 14px; gap: 0 12px; align-items: start; padding: 12px 16px; position: relative; width: 100%; border: 0; background: transparent; text-align: left; }
 .row + .row::before { content: ""; position: absolute; top: 0; left: 52px; right: 0; border-top: .5px solid var(--sep); }
-button.row { cursor: pointer; }
-button.row:active { background: var(--fill); }
-@media (hover: hover) and (pointer: fine) { button.row:hover { background: color-mix(in srgb, var(--fill) 55%, transparent); } }
+/* A Ticket row opens through its ask alone, so the button's name is the ask; a layer stretched over
+   the row keeps the whole row clickable, and the fields above that layer stay selectable. */
+.row .open { display: block; width: 100%; padding: 0; border: 0; background: transparent; font: inherit; color: inherit; text-align: left; cursor: pointer; }
+.row .open::after { content: ""; position: absolute; inset: 0; }
+.row:has(.open):active { background: var(--fill); }
+@media (hover: hover) and (pointer: fine) { .row:has(.open):hover { background: color-mix(in srgb, var(--fill) 55%, transparent); } }
 .row .n { width: 24px; height: 24px; border-radius: 12px; background: var(--orange-fill); color: var(--on-orange); font-size: 12.5px; font-weight: 700; line-height: 24px; text-align: center; }
 .row .n.red { background: var(--solid-red); color: #fff; }
 .row .w { font-weight: 600; line-height: 1.35; }
 .row .y { font-size: 13px; color: var(--text-2); margin-top: 2px; }
-.why { margin: 6px 0 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 3px 10px; font-size: 13px; line-height: 1.4; }
-.why dt { color: var(--text-2); font-weight: 600; }
-.why dd { margin: 0; color: var(--text); overflow-wrap: anywhere; }
+/* Labels run in at the start of their value, since the values are long and the sheet is narrow. */
+.why { margin: 6px 0 0; font-size: 13px; line-height: 1.4; position: relative; z-index: 1; }
+.why dt { display: inline; margin-right: 6px; color: var(--text-2); font-weight: 600; }
+.why dd { display: inline; margin: 0; color: var(--text); overflow-wrap: anywhere; }
+.why dd::after { content: ""; display: block; margin-bottom: 4px; }
+.why dd.pick { font-weight: 600; }
 .row .chev { color: var(--text-3); font-size: 20px; line-height: 1; }
-.copyline { display: flex; gap: 8px; margin-top: 10px; }
+.copyline { display: flex; gap: 8px; margin-top: 10px; position: relative; z-index: 1; }
 .copyline code { flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap; background: var(--fill); border-radius: 9px; padding: 8px 10px; }
 
 @media (min-width: 760px) {
@@ -1410,14 +1416,15 @@ button.row:active { background: var(--fill); }
       var list = el("div", { "class": "list" });
       m.d.needsYou.forEach(function (a, i) {
         var t = a.ticket && m.byId[a.ticket], red = t && (t.status === "escalated" || t.status === "failed");
-        var text = el("div", null, [el("div", { "class": "w", text: (t ? t.id + "  " : "") + a.ask }), el("div", { "class": "y", text: t ? a.cost || "" : [a.detail, a.cost].filter(Boolean).join(" · ") })]);
+        var ask = t ? el("button", { type: "button", "class": "w open", text: t.id + "  " + a.ask }) : el("div", { "class": "w", text: a.ask });
+        var text = el("div", null, [ask, el("div", { "class": "y", text: t ? a.cost || "" : [a.detail, a.cost].filter(Boolean).join(" · ") })]);
         var why = reasons(a);
         if (why) text.appendChild(why);
         if (a.startLine) text.appendChild(copyLine(a.startLine));
         var row;
         if (t) {
-          row = el("button", { type: "button", "class": "row" }, [el("span", { "class": "n" + (red ? " red" : ""), text: String(i + 1) }), text, el("span", { "class": "chev", "aria-hidden": "true", text: "›" })]);
-          row.addEventListener("click", function (e) { choose(t.id, e.detail === 0); });
+          row = el("div", { "class": "row" }, [el("span", { "class": "n" + (red ? " red" : ""), text: String(i + 1) }), text, el("span", { "class": "chev", "aria-hidden": "true", text: "›" })]);
+          ask.addEventListener("click", function (e) { choose(t.id, e.detail === 0); });
         } else row = el("div", { "class": "row" }, [el("span", { "class": "n", text: String(i + 1) }), text, el("span")]);
         list.appendChild(row);
       });
@@ -1508,7 +1515,7 @@ button.row:active { background: var(--fill); }
   function reasons(a) {
     var rows = [["Recommended", a.pick], ["Risk", a.risk], ["Evidence", a.evidence]].filter(function (r) { return r[1]; });
     if (!rows.length) return null;
-    return el("dl", { "class": "why" }, rows.reduce(function (out, r) { return out.concat([el("dt", { text: r[0] }), el("dd", { text: r[1] })]); }, []));
+    return el("dl", { "class": "why" }, rows.reduce(function (out, r) { return out.concat([el("dt", { text: r[0] }), el("dd", { "class": r[0] === "Recommended" ? "pick" : null, text: r[1] })]); }, []));
   }
   function copyLine(text) {
     var b = el("button", { type: "button", "class": "btn", text: "Copy" });

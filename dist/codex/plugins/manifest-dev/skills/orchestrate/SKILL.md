@@ -105,12 +105,12 @@ For each free slot, take the next Ticket in the plan:
    escalation mark, a dependency is open, or its run facts name another orchestrator's run whose
    timeout has not passed. When its Auto grant was withdrawn, it is a Ticket without Auto from then
    on.
-2. **Claim it and write the launch facts** as the automation identity, in place of the run facts the
-   record held: a new run ID, the start time, the session where the host names it before the run
-   starts and none otherwise, and the launch count — one more than the record shows when the last
-   run ended without an outcome or this launch repairs a landing (*Landing* steps 3 and 4), and no
-   escalation mark was cleared since; otherwise one. Create the attempt record when the Ticket has
-   none.
+2. **Claim it and write the launch facts** as the automation identity, in place of the launch facts
+   the record held, leaving the base commit and ready mark for the run to read: a new run ID, the
+   start time, the session where the host names it before the run starts and none otherwise, and the
+   launch count — one more than the record shows when the last run ended without an outcome or this
+   launch repairs a landing (*Landing* steps 3 and 4), and no escalation mark was cleared since;
+   otherwise one. Create the attempt record when the Ticket has none.
 3. **Re-read the Ticket after writing.** Skip it when its run facts name another run, or when two
    comments carry the attempt record's marker and yours is not the first: remove yours and stand
    down (`../ticket-up/references/AUTOMATED_EXECUTION.md` → *The attempt record*).
