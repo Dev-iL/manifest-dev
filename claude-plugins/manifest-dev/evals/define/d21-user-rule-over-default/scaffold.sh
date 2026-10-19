@@ -6,10 +6,10 @@ cat > README.md <<'EOF'
 
 Command-line tool that tracks books a reading club has borrowed.
 
-    python -m shelfnote checkout --member ana --book "Middlemarch"
-    python -m shelfnote return --book "Middlemarch"
-    python -m shelfnote overdue
-    python -m shelfnote export --format csv
+    python3 src/shelfnote.py checkout --member ana --book "Middlemarch"
+    python3 src/shelfnote.py return --book "Middlemarch"
+    python3 src/shelfnote.py overdue
+    python3 src/shelfnote.py export --format csv
 EOF
 cat > src/shelfnote.py <<'EOF'
 import argparse, json, pathlib, sys
@@ -36,4 +36,4 @@ cat > CLAUDE.md <<'EOF'
 This repository holds no test files. Behavior is checked only through the scripted acceptance
 checks in `checks/`; the test suite lives in a separate repository the club does not control.
 EOF
-printf '#!/usr/bin/env bash\npython -m shelfnote overdue\n' > checks/overdue.sh
+printf '#!/usr/bin/env bash\npython3 src/shelfnote.py overdue\n' > checks/overdue.sh

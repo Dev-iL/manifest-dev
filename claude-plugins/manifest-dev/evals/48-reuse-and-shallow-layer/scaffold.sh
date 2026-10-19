@@ -6,9 +6,9 @@ cat > README.md <<'EOF'
 
 Command-line tool that tracks books a reading club has borrowed.
 
-    python -m shelfnote checkout --member ana --book "Middlemarch"
-    python -m shelfnote return --book "Middlemarch"
-    python -m shelfnote overdue
+    python3 src/shelfnote.py checkout --member ana --book "Middlemarch"
+    python3 src/shelfnote.py return --book "Middlemarch"
+    python3 src/shelfnote.py overdue
 EOF
 cat > src/shelfnote.py <<'EOF'
 import argparse

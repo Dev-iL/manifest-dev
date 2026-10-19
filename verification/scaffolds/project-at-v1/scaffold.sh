@@ -118,10 +118,10 @@ cat > README.md <<'EOF'
 
 Command-line tool that tracks books a reading club has borrowed.
 
-    python -m shelfnote checkout --member ana --book "Middlemarch"
-    python -m shelfnote return --book "Middlemarch"
-    python -m shelfnote overdue
-    python -m shelfnote export --format csv
+    python3 src/shelfnote.py checkout --member ana --book "Middlemarch"
+    python3 src/shelfnote.py return --book "Middlemarch"
+    python3 src/shelfnote.py overdue
+    python3 src/shelfnote.py export --format csv
 EOF
 cat > src/shelfnote.py <<'EOF'
 import argparse, json, pathlib, sys
@@ -163,5 +163,5 @@ python3 shelfnote.py "$@"
 EOF
 chmod +x verify/drive.sh
 for f in checkout return overdue export; do
-  printf '# %s\n\nunverified\n\n- Reach it: `python -m shelfnote %s`\n- Drive it: `./verify/drive.sh %s`\n- Proof: the command prints its name.\n' "$f" "$f" "$f" > "verify/features/$f.md"
+  printf '# %s\n\nunverified\n\n- Reach it: `python3 src/shelfnote.py %s`\n- Drive it: `./verify/drive.sh %s`\n- Proof: the command prints its name.\n' "$f" "$f" "$f" > "verify/features/$f.md"
 done
